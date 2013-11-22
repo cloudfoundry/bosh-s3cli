@@ -1,0 +1,1 @@
+{"AccessKey":"some-access-key","SecretKey":"some-secret-key","Bucket":"some-bucket"}
