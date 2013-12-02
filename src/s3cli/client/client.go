@@ -6,8 +6,6 @@ import (
 	amzaws "launchpad.net/goamz/aws"
 	amzs3 "launchpad.net/goamz/s3"
 	"os"
-	"os/user"
-	"path/filepath"
 )
 
 type configType struct {
@@ -16,8 +14,8 @@ type configType struct {
 	Bucket    string
 }
 
-func GetS3Client() (client S3Client, err error) {
-	config, err := getConfig()
+func GetS3Client(configPath string) (client S3Client, err error) {
+	config, err := getConfig(configPath)
 	if err != nil {
 		return
 	}
@@ -32,12 +30,7 @@ func GetS3Client() (client S3Client, err error) {
 	return
 }
 
-func getConfig() (config configType, err error) {
-	configPath, err := getConfigPath()
-	if err != nil {
-		return
-	}
-
+func getConfig(configPath string) (config configType, err error) {
 	file, err := os.Open(configPath)
 	if err != nil {
 		return
@@ -49,20 +42,5 @@ func getConfig() (config configType, err error) {
 	}
 
 	err = json.Unmarshal(configBytes, &config)
-	return
-}
-
-func getConfigPath() (path string, err error) {
-	path = os.Getenv("S3_CLI_CONFIG")
-	if path != "" {
-		return
-	}
-
-	usr, err := user.Current()
-	if err != nil {
-		return
-	}
-
-	path = filepath.Join(usr.HomeDir, ".s3cli")
 	return
 }
