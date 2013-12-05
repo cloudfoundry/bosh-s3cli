@@ -17,6 +17,7 @@ type concreteFactory struct {
 func NewFactory(s3Client s3cliclient.S3Client) (factory Factory) {
 	return concreteFactory{
 		cmds: map[string]Cmd{
+			"get": newGet(s3Client),
 			"put": newPut(s3Client),
 		},
 	}
