@@ -3,15 +3,16 @@ package client
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
+
 	amzaws "launchpad.net/goamz/aws"
 	amzs3 "launchpad.net/goamz/s3"
-	"os"
 )
 
 type configType struct {
-	AccessKey string
-	SecretKey string
-	Bucket    string
+	AccessKeyID     string `json:"access_key_id"`
+	SecretAccessKey string `json:"secret_access_key"`
+	BucketName      string `json:"bucket_name"`
 }
 
 func GetS3Client(configPath string) (client S3Client, err error) {
@@ -21,12 +22,12 @@ func GetS3Client(configPath string) (client S3Client, err error) {
 	}
 
 	awsAuth := amzaws.Auth{
-		AccessKey: config.AccessKey,
-		SecretKey: config.SecretKey,
+		AccessKey: config.AccessKeyID,
+		SecretKey: config.SecretAccessKey,
 	}
 
 	s3 := amzs3.New(awsAuth, amzaws.USEast)
-	client = s3.Bucket(config.Bucket)
+	client = s3.Bucket(config.BucketName)
 	return
 }
 
