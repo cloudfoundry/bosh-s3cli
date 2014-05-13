@@ -1,5 +1,0 @@
-{
-  "access_key_id":"some-access-key",
-  "secret_access_key":"some-secret-key",
-  "bucket_name":"some-bucket"
-}

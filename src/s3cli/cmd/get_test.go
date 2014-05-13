@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
-	fakeclient "s3cli/client/fakes"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	fakeclient "s3cli/client/fakes"
 )
 
 func TestGetRun(t *testing.T) {
