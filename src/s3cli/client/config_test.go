@@ -1,4 +1,4 @@
-package client
+package client_test
 
 import (
 	"io/ioutil"
@@ -6,9 +6,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "s3cli/client"
 )
 
-func TestGetAuth(t *testing.T) {
+func TestNewConfigFromPath(t *testing.T) {
 	configPath := writeConfigFile(t, `{
 	  "access_key_id":"some-access-key",
 	  "secret_access_key":"some-secret-key",
@@ -17,7 +19,7 @@ func TestGetAuth(t *testing.T) {
 
 	defer os.Remove(configPath)
 
-	config, err := getConfig(configPath)
+	config, err := NewConfigFromPath(configPath)
 	assert.NoError(t, err)
 	assert.Equal(t, "some-access-key", config.AccessKeyID)
 	assert.Equal(t, "some-secret-key", config.SecretAccessKey)

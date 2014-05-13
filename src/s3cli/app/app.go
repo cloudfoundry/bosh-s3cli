@@ -6,12 +6,12 @@ import (
 	"io/ioutil"
 	"os/user"
 	"path/filepath"
+
 	s3cliclient "s3cli/client"
 	s3clicmd "s3cli/cmd"
 )
 
-type app struct {
-}
+type app struct{}
 
 func New() (app app) {
 	return
@@ -25,7 +25,12 @@ func (app app) Run(args []string) (err error) {
 		return
 	}
 
-	s3Client, err := s3cliclient.GetS3Client(configPath)
+	config, err := s3cliclient.NewConfigFromPath(configPath)
+	if err != nil {
+		return
+	}
+
+	s3Client, err := s3cliclient.New(config)
 	if err != nil {
 		return
 	}
