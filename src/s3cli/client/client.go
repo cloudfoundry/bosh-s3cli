@@ -6,12 +6,13 @@ import (
 )
 
 func New(config Config) (S3Client, error) {
-	awsAuth := amzaws.Auth{
-		AccessKey: config.AccessKeyID,
-		SecretKey: config.SecretAccessKey,
-	}
-
-	s3 := amzs3.New(awsAuth, amzaws.USEast)
+	s3 := amzs3.New(
+		amzaws.Auth{
+			AccessKey: config.AccessKeyID,
+			SecretKey: config.SecretAccessKey,
+		},
+		config.AWSRegion(),
+	)
 
 	return s3.Bucket(config.BucketName), nil
 }
