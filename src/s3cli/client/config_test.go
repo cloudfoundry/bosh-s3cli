@@ -194,6 +194,31 @@ var _ = Describe("NewConfigFromPath", func() {
 			Expect(config.AWSRegion()).To(Equal(expectedRegion))
 		})
 	})
+
+	Context("with SSL set to false without custom port but with custom host", func() {
+		It("returns a config with a region with http scheme and host", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "use_ssl": false,
+			  "host": "host.example.com"
+	    	}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
+
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "http://host.example.com" // no 443
+
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 })
 
 func writeConfigFile(contents string) string {
