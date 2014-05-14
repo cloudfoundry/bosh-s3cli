@@ -14,8 +14,9 @@ type Config struct {
 	SecretAccessKey string `json:"secret_access_key"`
 	BucketName      string `json:"bucket_name"`
 
-	Host string `json:"host"`
-	Port int    `json:"port"` // 0 means no custom port
+	Host   string `json:"host"`
+	Port   int    `json:"port"` // 0 means no custom port
+	UseSSL bool   `json:"use_ssl"`
 }
 
 func NewConfigFromPath(path string) (Config, error) {
@@ -31,7 +32,7 @@ func NewConfigFromPath(path string) (Config, error) {
 		return Config{}, err
 	}
 
-	var config Config
+	config := Config{UseSSL: true, Port: 443}
 
 	err = json.Unmarshal(bytes, &config)
 	if err != nil {
@@ -42,22 +43,11 @@ func NewConfigFromPath(path string) (Config, error) {
 }
 
 func (c Config) AWSRegion() amzaws.Region {
-	host := "s3.amazonaws.com"
-	if c.Host != "" {
-		host = c.Host
-	}
-
-	s3Endpoint := "https://" + host
-
-	if c.Port != 0 {
-		s3Endpoint += ":" + strconv.Itoa(c.Port)
-	}
-
 	return amzaws.Region{
 		Name:        "us-east-1",
 		EC2Endpoint: "https://ec2.us-east-1.amazonaws.com",
 
-		S3Endpoint:           s3Endpoint,
+		S3Endpoint:           c.s3Endpoint(),
 		S3BucketEndpoint:     "",
 		S3LocationConstraint: false,
 		S3LowercaseBucket:    false,
@@ -67,4 +57,23 @@ func (c Config) AWSRegion() amzaws.Region {
 		SQSEndpoint: "https://sqs.us-east-1.amazonaws.com",
 		IAMEndpoint: "https://iam.amazonaws.com",
 	}
+}
+
+func (c Config) s3Endpoint() string {
+	host := "s3.amazonaws.com"
+	if c.Host != "" {
+		host = c.Host
+	}
+
+	scheme := "https"
+	if !c.UseSSL {
+		scheme = "http"
+	}
+
+	portSuffix := ""
+	if c.Port != 443 {
+		portSuffix = ":" + strconv.Itoa(c.Port)
+	}
+
+	return scheme + "://" + host + portSuffix
 }
