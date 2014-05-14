@@ -67,6 +67,51 @@ func TestNewConfigFromPathWithPort(t *testing.T) {
 	assert.Equal(t, expectedRegion, config.AWSRegion())
 }
 
+func TestNewConfigFromPathWithHost(t *testing.T) {
+	configPath := writeConfigFile(t, `{
+	  "access_key_id":"some-access-key",
+	  "secret_access_key":"some-secret-key",
+	  "bucket_name":"some-bucket",
+	  "host": "host.example.com"
+	}`)
+
+	defer os.Remove(configPath)
+
+	config, err := NewConfigFromPath(configPath)
+	assert.NoError(t, err)
+	assert.Equal(t, "some-access-key", config.AccessKeyID)
+	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
+	assert.Equal(t, "some-bucket", config.BucketName)
+
+	expectedRegion := expectedDefaultRegion
+	expectedRegion.S3Endpoint = "https://host.example.com"
+
+	assert.Equal(t, expectedRegion, config.AWSRegion())
+}
+
+func TestNewConfigFromPathWithHostAndPort(t *testing.T) {
+	configPath := writeConfigFile(t, `{
+	  "access_key_id":"some-access-key",
+	  "secret_access_key":"some-secret-key",
+	  "bucket_name":"some-bucket",
+	  "host": "host.example.com",
+	  "port": 123
+	}`)
+
+	defer os.Remove(configPath)
+
+	config, err := NewConfigFromPath(configPath)
+	assert.NoError(t, err)
+	assert.Equal(t, "some-access-key", config.AccessKeyID)
+	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
+	assert.Equal(t, "some-bucket", config.BucketName)
+
+	expectedRegion := expectedDefaultRegion
+	expectedRegion.S3Endpoint = "https://host.example.com:123"
+
+	assert.Equal(t, expectedRegion, config.AWSRegion())
+}
+
 func writeConfigFile(t *testing.T, contents string) string {
 	file, err := ioutil.TempFile("", "client_test")
 	assert.NoError(t, err)

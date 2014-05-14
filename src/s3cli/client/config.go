@@ -13,7 +13,9 @@ type Config struct {
 	AccessKeyID     string `json:"access_key_id"`
 	SecretAccessKey string `json:"secret_access_key"`
 	BucketName      string `json:"bucket_name"`
-	Port            int    `json:"port"` // 0 means no custom port
+
+	Host string `json:"host"`
+	Port int    `json:"port"` // 0 means no custom port
 }
 
 func NewConfigFromPath(path string) (Config, error) {
@@ -40,7 +42,13 @@ func NewConfigFromPath(path string) (Config, error) {
 }
 
 func (c Config) AWSRegion() amzaws.Region {
-	s3Endpoint := "https://s3.amazonaws.com"
+	host := "s3.amazonaws.com"
+	if c.Host != "" {
+		host = c.Host
+	}
+
+	s3Endpoint := "https://" + host
+
 	if c.Port != 0 {
 		s3Endpoint += ":" + strconv.Itoa(c.Port)
 	}
