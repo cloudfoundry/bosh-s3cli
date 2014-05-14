@@ -1,0 +1,11 @@
+language: go
+
+go:
+- 1.2
+
+install:
+- go install -a -race std
+- go get code.google.com/p/go.tools/cmd/vet
+
+script:
+- GOPATH=$PWD bin/test

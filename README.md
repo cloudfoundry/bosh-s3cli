@@ -1,4 +1,4 @@
-# S3 CLI written in pure Go
+# S3 CLI written in pure Go [![Build Status](https://travis-ci.org/pivotal-golang/s3cli?branch=master)](https://travis-ci.org/pivotal-golang/s3cli)
 
 ## Using Go AMZ
 
