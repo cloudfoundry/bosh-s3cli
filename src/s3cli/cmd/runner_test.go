@@ -1,39 +1,23 @@
-package cmd
+package cmd_test
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	s3clicmd "s3cli/cmd"
+	fakecmd "s3cli/cmd/fakes"
 )
 
-type FakeFactory struct {
-	CreatedCmdName string
-	CreatedCmd     *FakeCmd
-}
+var _ = Describe("runner", func() {
+	Describe("Run", func() {
+		It("run specified command with given arguments", func() {
+			fakeFactory := &fakecmd.FakeFactory{CreatedCmd: &fakecmd.FakeCmd{}}
+			runner := s3clicmd.NewRunner(fakeFactory)
 
-func (factory *FakeFactory) Create(cmdName string) (cmd Cmd, err error) {
-	factory.CreatedCmdName = cmdName
-	cmd = factory.CreatedCmd
-	return
-}
-
-type FakeCmd struct {
-	RunArgs []string
-}
-
-func (cmd *FakeCmd) Run(args []string) (err error) {
-	cmd.RunArgs = args
-	return
-}
-
-func TestRunnerRun(t *testing.T) {
-	fakeFactory := &FakeFactory{
-		CreatedCmd: &FakeCmd{},
-	}
-
-	runner := NewRunner(fakeFactory)
-	err := runner.Run("some-cmd", []string{"param1", "param2"})
-
-	assert.NoError(t, err)
-	assert.Equal(t, "some-cmd", fakeFactory.CreatedCmdName)
-	assert.Equal(t, []string{"param1", "param2"}, fakeFactory.CreatedCmd.RunArgs)
-}
+			err := runner.Run("some-cmd", []string{"param1", "param2"})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fakeFactory.CreatedCmdName).To(Equal("some-cmd"))
+			Expect(fakeFactory.CreatedCmd.RunArgs).To(Equal([]string{"param1", "param2"}))
+		})
+	})
+})

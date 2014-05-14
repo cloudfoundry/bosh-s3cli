@@ -1,22 +1,26 @@
 package app
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestGetConfigPathWithConfigFlag(t *testing.T) {
-	path, args, err := getConfigPath([]string{"-c", "/some/path", "foo", "bar"})
+var _ = Describe("getConfigPath", func() {
+	Context("when -c flag is given", func() {
+		It("returns custom path", func() {
+			path, args, err := getConfigPath([]string{"-c", "/some/path", "foo", "bar"})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(path).To(Equal("/some/path"))
+			Expect(args).To(Equal([]string{"foo", "bar"}))
+		})
+	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, "/some/path", path)
-	assert.Equal(t, []string{"foo", "bar"}, args)
-}
-
-func TestGetConfigPathWithoutConfigFlag(t *testing.T) {
-	path, args, err := getConfigPath([]string{"foo", "bar"})
-
-	assert.NoError(t, err)
-	assert.Contains(t, path, ".s3cli")
-	assert.Equal(t, []string{"foo", "bar"}, args)
-}
+	Context("when -c flag is not given", func() {
+		It("returns default path in home directory", func() {
+			path, args, err := getConfigPath([]string{"foo", "bar"})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(path).To(ContainSubstring(".s3cli"))
+			Expect(args).To(Equal([]string{"foo", "bar"}))
+		})
+	})
+})

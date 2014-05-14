@@ -2,24 +2,26 @@
 
 result=0
 
+bin=$(dirname $0)
+
 echo -e "\n Formatting packages..."
-$(dirname $0)/go fmt s3cli/...
+$bin/go fmt s3cli/...
 let "result+=$?"
 
-echo -e "\n Installing package dependencies..."
-$(dirname $0)/go test -i s3cli/...
+echo -e "\n Installing ginkgo..."
+$bin/go install github.com/onsi/ginkgo/ginkgo
 let "result+=$?"
 
-echo -e "\n Testing packages:"
-$(dirname $0)/go test s3cli/... -race -parallel 4$@
+echo -e "\n Testing packages..."
+$bin/env ginkgo -r -race $bin/../src/s3cli
 let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
-$(dirname $0)/go vet s3cli/...
+$bin/go vet s3cli/...
 let "result+=$?"
 
 echo -e "\n Running build script to confirm everything compiles..."
-$(dirname $0)/build
+$bin/build
 let "result+=$?"
 
 if [ $result -eq 0 ]; then

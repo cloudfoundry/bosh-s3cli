@@ -1,40 +1,64 @@
-package cmd
+package cmd_test
 
 import (
 	"os"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
 	fakeclient "s3cli/client/fakes"
+	s3clicmd "s3cli/cmd"
 )
 
-func TestGetRun(t *testing.T) {
-	fixtureCatPath := "../../fixtures/cat.jpg"
-	tmpCatPath := "../../../tmp/cat.jpg"
-	fixtureCatFile, err := os.Open(fixtureCatPath)
-	assert.NoError(t, err)
+var _ = Describe("getCmd", func() {
+	var (
+		client *fakeclient.FakeClient
+		cmd    s3clicmd.Cmd
+	)
 
-	client := &fakeclient.FakeClient{GetReaderReadCloser: fixtureCatFile}
-	factory := NewFactory(client)
-	cmd, _ := factory.Create("get")
+	BeforeEach(func() {
+		var err error
 
-	err = cmd.Run([]string{"my-cat.jpg", tmpCatPath})
-	assert.NoError(t, err)
-	defer os.RemoveAll(tmpCatPath)
+		client = &fakeclient.FakeClient{}
+		factory := s3clicmd.NewFactory(client)
 
-	assert.Equal(t, client.GetReaderPath, "my-cat.jpg")
+		cmd, err = factory.Create("get")
+		Expect(err).ToNot(HaveOccurred())
+	})
 
-	tmpCatFile, _ := os.Open(tmpCatPath)
-	tmpCatStats, _ := tmpCatFile.Stat()
-	assert.Equal(t, tmpCatStats.Size(), 1718186)
-}
+	Describe("Run", func() {
+		Context("with enough arguments", func() {
+			It("downloads blob", func() {
+				fixtureCatPath := "../../fixtures/cat.jpg"
+				tmpCatPath := "../../../tmp/cat.jpg"
+				fixtureCatFile, err := os.Open(fixtureCatPath)
+				Expect(err).ToNot(HaveOccurred())
 
-func TestGetRunWhenNotEnoughArgument(t *testing.T) {
-	client := &fakeclient.FakeClient{}
-	factory := NewFactory(client)
-	cmd, _ := factory.Create("get")
+				client.GetReaderReadCloser = fixtureCatFile
 
-	err := cmd.Run([]string{"my-cat.jpg"})
-	assert.Error(t, err)
-}
+				err = cmd.Run([]string{"my-cat.jpg", tmpCatPath})
+				Expect(err).ToNot(HaveOccurred())
+
+				defer os.RemoveAll(tmpCatPath)
+
+				Expect(client.GetReaderPath).To(Equal("my-cat.jpg"))
+
+				tmpCatFile, err := os.Open(tmpCatPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				tmpCatStats, err := tmpCatFile.Stat()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(tmpCatStats.Size()).To(Equal(int64(1718186)))
+			})
+		})
+
+		Context("with not enough arguments", func() {
+			It("returns error", func() {
+				err := cmd.Run([]string{"my-cat.jpg"})
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal(
+					"Not enough arguments, expected remote path and destination path"))
+			})
+		})
+	})
+})

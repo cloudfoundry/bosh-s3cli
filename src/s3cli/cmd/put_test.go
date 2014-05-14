@@ -1,35 +1,54 @@
-package cmd
+package cmd_test
 
 import (
-	"github.com/stretchr/testify/assert"
-	amzs3 "launchpad.net/goamz/s3"
 	"os"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	amzs3 "launchpad.net/goamz/s3"
+
 	fakeclient "s3cli/client/fakes"
-	"testing"
+	s3clicmd "s3cli/cmd"
 )
 
-func TestPutRun(t *testing.T) {
-	client := &fakeclient.FakeClient{}
-	factory := NewFactory(client)
-	cmd, _ := factory.Create("put")
+var _ = Describe("getCmd", func() {
+	var (
+		client *fakeclient.FakeClient
+		cmd    s3clicmd.Cmd
+	)
 
-	err := cmd.Run([]string{"../../fixtures/cat.jpg", "my-cat.jpg"})
-	assert.NoError(t, err)
+	BeforeEach(func() {
+		var err error
 
-	file := client.PutReaderReader.(*os.File)
+		client = &fakeclient.FakeClient{}
+		factory := s3clicmd.NewFactory(client)
 
-	assert.Equal(t, "my-cat.jpg", client.PutReaderPath)
-	assert.Equal(t, file.Name(), "../../fixtures/cat.jpg")
-	assert.Equal(t, 1718186, client.PutReaderLength)
-	assert.Equal(t, "application/octet-stream", client.PutReaderContentType)
-	assert.Equal(t, amzs3.BucketOwnerFull, client.PutReaderPerm)
-}
+		cmd, err = factory.Create("put")
+		Expect(err).ToNot(HaveOccurred())
+	})
 
-func TestPutRunWhenNotEnoughArgument(t *testing.T) {
-	client := &fakeclient.FakeClient{}
-	factory := NewFactory(client)
-	cmd, _ := factory.Create("put")
+	Describe("Run", func() {
+		Context("with enough arguments", func() {
+			It("uploads blob", func() {
+				err := cmd.Run([]string{"../../fixtures/cat.jpg", "my-cat.jpg"})
+				Expect(err).ToNot(HaveOccurred())
 
-	err := cmd.Run([]string{"my-cat.jpg"})
-	assert.Error(t, err)
-}
+				file := client.PutReaderReader.(*os.File)
+				Expect(client.PutReaderPath).To(Equal("my-cat.jpg"))
+				Expect(file.Name()).To(Equal("../../fixtures/cat.jpg"))
+				Expect(client.PutReaderLength).To(Equal(int64(1718186)))
+				Expect(client.PutReaderContentType).To(Equal("application/octet-stream"))
+				Expect(client.PutReaderPerm).To(Equal(amzs3.BucketOwnerFull))
+			})
+		})
+
+		Context("with not enough arguments", func() {
+			It("returns error", func() {
+				err := cmd.Run([]string{"my-cat.jpg"})
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal(
+					"Not enough arguments, expected source file and destination path"))
+			})
+		})
+	})
+})

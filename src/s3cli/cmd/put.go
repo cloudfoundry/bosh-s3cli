@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"errors"
-	amzs3 "launchpad.net/goamz/s3"
 	"os"
+
+	amzs3 "launchpad.net/goamz/s3"
 	s3cliclient "s3cli/client"
 )
 
@@ -11,16 +12,13 @@ type putCmd struct {
 	client s3cliclient.S3Client
 }
 
-func newPut(s3Client s3cliclient.S3Client) (cmd Cmd) {
-	return putCmd{
-		client: s3Client,
-	}
+func newPut(s3Client s3cliclient.S3Client) Cmd {
+	return putCmd{client: s3Client}
 }
 
 func (cmd putCmd) Run(args []string) (err error) {
 	if len(args) < 2 {
-		err = errors.New("Not enough arguments, expected source file and destination path")
-		return
+		return errors.New("Not enough arguments, expected source file and destination path")
 	}
 
 	source := args[0]
@@ -28,20 +26,19 @@ func (cmd putCmd) Run(args []string) (err error) {
 
 	file, err := os.Open(source)
 	if err != nil {
-		return
+		return err
 	}
 
 	stat, err := file.Stat()
 	if err != nil {
-		return
+		return err
 	}
 
-	err = cmd.client.PutReader(
+	return cmd.client.PutReader(
 		destination,
 		file,
 		stat.Size(),
 		"application/octet-stream",
 		amzs3.BucketOwnerFull,
 	)
-	return
 }

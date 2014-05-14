@@ -3,9 +3,9 @@ package client_test
 import (
 	"io/ioutil"
 	"os"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	amzaws "launchpad.net/goamz/aws"
 
 	. "s3cli/client"
@@ -28,167 +28,183 @@ var (
 	}
 )
 
-func TestNewConfigFromPathWithDefaultPort(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket"
-	}`)
+var _ = Describe("NewConfigFromPath", func() {
+	Context("With minimum configuration", func() {
+		It("return config with a default region", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket"
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
-	assert.Equal(t, expectedDefaultRegion, config.AWSRegion())
-}
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
+			Expect(config.AWSRegion()).To(Equal(expectedDefaultRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithPort(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "port": 123
-	}`)
+	Context("with custom port", func() {
+		It("return config with a region with specified port", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "port": 123
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "https://s3.amazonaws.com:123"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "https://s3.amazonaws.com:123"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithHostWithoutPort(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "host": "host.example.com"
-	}`)
+	Context("with custom host but without port", func() {
+		It("returns a config with a region with specified host", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "host": "host.example.com"
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "https://host.example.com"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "https://host.example.com"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithHostAndPort(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "host": "host.example.com",
-	  "port": 123
-	}`)
+	Context("with custom host and port", func() {
+		It("returns a config with a region with specified host and port", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "host": "host.example.com",
+			  "port": 123
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "https://host.example.com:123"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "https://host.example.com:123"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithUseSslTrue(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "use_ssl": true
-	}`)
+	Context("with SSL set to true", func() {
+		It("returns a config with a region with https scheme", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "use_ssl": true
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "https://s3.amazonaws.com"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "https://s3.amazonaws.com"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithUseSslFalse(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "use_ssl": false
-	}`)
+	Context("with SSL set to false", func() {
+		It("returns a config with a region with http scheme", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "use_ssl": false
+			}`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "http://s3.amazonaws.com"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "http://s3.amazonaws.com"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
 
-func TestNewConfigFromPathWithUseSslFalseAndHostAndPort(t *testing.T) {
-	configPath := writeConfigFile(t, `{
-	  "access_key_id":"some-access-key",
-	  "secret_access_key":"some-secret-key",
-	  "bucket_name":"some-bucket",
-	  "use_ssl": false,
-	  "host": "host.example.com",
-	  "port": 123
-	}`)
+	Context("with SSL set to false and custom host and port", func() {
+		It("returns a config with a region with https scheme and host and port", func() {
+			configPath := writeConfigFile(`{
+			  "access_key_id":"some-access-key",
+			  "secret_access_key":"some-secret-key",
+			  "bucket_name":"some-bucket",
+			  "use_ssl": false,
+			  "host": "host.example.com",
+			  "port": 123
+	    }`)
 
-	defer os.Remove(configPath)
+			defer os.Remove(configPath)
 
-	config, err := NewConfigFromPath(configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, "some-access-key", config.AccessKeyID)
-	assert.Equal(t, "some-secret-key", config.SecretAccessKey)
-	assert.Equal(t, "some-bucket", config.BucketName)
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.AccessKeyID).To(Equal("some-access-key"))
+			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
+			Expect(config.BucketName).To(Equal("some-bucket"))
 
-	expectedRegion := expectedDefaultRegion
-	expectedRegion.S3Endpoint = "http://host.example.com:123"
+			expectedRegion := expectedDefaultRegion
+			expectedRegion.S3Endpoint = "http://host.example.com:123"
 
-	assert.Equal(t, expectedRegion, config.AWSRegion())
-}
+			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
+})
 
-func writeConfigFile(t *testing.T, contents string) string {
+func writeConfigFile(contents string) string {
 	file, err := ioutil.TempFile("", "client_test")
-	assert.NoError(t, err)
+	Expect(err).ToNot(HaveOccurred())
 
 	err = file.Close()
-	assert.NoError(t, err)
+	Expect(err).ToNot(HaveOccurred())
 
 	err = ioutil.WriteFile(file.Name(), []byte(contents), os.ModeTemporary)
-	assert.NoError(t, err)
+	Expect(err).ToNot(HaveOccurred())
 
 	return file.Name()
 }
