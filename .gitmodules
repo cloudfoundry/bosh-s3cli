@@ -4,3 +4,9 @@
 [submodule "src/github.com/stretchr/objx"]
 	path = src/github.com/stretchr/objx
 	url = https://github.com/stretchr/objx.git
+[submodule "src/github.com/onsi/ginkgo"]
+	path = src/github.com/onsi/ginkgo
+	url = https://github.com/onsi/ginkgo
+[submodule "src/github.com/onsi/gomega"]
+	path = src/github.com/onsi/gomega
+	url = https://github.com/onsi/gomega
