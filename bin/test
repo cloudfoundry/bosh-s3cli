@@ -20,6 +20,10 @@ echo -e "\n Vetting packages for potential issues..."
 $bin/go vet s3cli/...
 let "result+=$?"
 
+echo -e "\n Checking with golint..."
+$bin/golint
+let "result+=$?"
+
 echo -e "\n Running build script to confirm everything compiles..."
 $bin/build
 let "result+=$?"

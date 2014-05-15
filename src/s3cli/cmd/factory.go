@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
+
 	s3cliclient "s3cli/client"
 )
 
@@ -25,9 +25,8 @@ func NewFactory(s3Client s3cliclient.S3Client) (factory Factory) {
 
 func (factory concreteFactory) Create(cmdName string) (cmd Cmd, err error) {
 	cmd, found := factory.cmds[cmdName]
-
 	if !found {
-		err = errors.New(fmt.Sprintf("Command not found: %s", cmdName))
+		err = fmt.Errorf("Command not found: %s", cmdName)
 	}
 	return
 }
