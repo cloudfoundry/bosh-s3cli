@@ -44,6 +44,7 @@ var _ = Describe("NewConfigFromPath", func() {
 			Expect(config.AccessKeyID).To(Equal("some-access-key"))
 			Expect(config.SecretAccessKey).To(Equal("some-secret-key"))
 			Expect(config.BucketName).To(Equal("some-bucket"))
+			Expect(config.SSLVerifyPeer).To(BeTrue())
 			Expect(config.AWSRegion()).To(Equal(expectedDefaultRegion))
 		})
 	})
@@ -217,6 +218,21 @@ var _ = Describe("NewConfigFromPath", func() {
 			expectedRegion.S3Endpoint = "http://host.example.com" // no 443
 
 			Expect(config.AWSRegion()).To(Equal(expectedRegion))
+		})
+	})
+
+	Context("with SSL verify peer set to false", func() {
+		It("returns a config with ssl verification set to false", func() {
+			configPath := writeConfigFile(`{
+			  "ssl_verify_peer": false
+	    	}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(config.SSLVerifyPeer).To(BeFalse())
 		})
 	})
 })

@@ -2,6 +2,7 @@ package client
 
 import (
 	"io"
+
 	amzs3 "launchpad.net/goamz/s3"
 )
 

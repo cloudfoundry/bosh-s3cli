@@ -14,9 +14,11 @@ type Config struct {
 	SecretAccessKey string `json:"secret_access_key"`
 	BucketName      string `json:"bucket_name"`
 
-	Host   string `json:"host"`
-	Port   int    `json:"port"` // 0 means no custom port
-	UseSSL bool   `json:"use_ssl"`
+	Host string `json:"host"`
+	Port int    `json:"port"` // 0 means no custom port
+
+	UseSSL        bool `json:"use_ssl"`
+	SSLVerifyPeer bool `json:"ssl_verify_peer"`
 }
 
 func NewConfigFromPath(path string) (Config, error) {
@@ -32,7 +34,7 @@ func NewConfigFromPath(path string) (Config, error) {
 		return Config{}, err
 	}
 
-	config := Config{UseSSL: true, Port: 443}
+	config := Config{UseSSL: true, Port: 443, SSLVerifyPeer: true}
 
 	err = json.Unmarshal(bytes, &config)
 	if err != nil {
