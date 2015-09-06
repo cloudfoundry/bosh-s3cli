@@ -224,6 +224,7 @@ var _ = Describe("NewConfigFromPath", func() {
 	Context("with SSL verify peer set to false", func() {
 		It("returns a config with ssl verification set to false", func() {
 			configPath := writeConfigFile(`{
+				  "access_key_id":"",
 			  "ssl_verify_peer": false
 	    	}`)
 
@@ -233,6 +234,46 @@ var _ = Describe("NewConfigFromPath", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(config.SSLVerifyPeer).To(BeFalse())
+		})
+	})
+
+	Context("with credentials_source set", func() {
+		It("returns a correct config", func() {
+			configPath := writeConfigFile(`{
+			  "credentials_source": "any-source"
+			}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.CredentialsSource).To(Equal("any-source"))
+		})
+	})
+
+	Context("with credentials_source not set", func() {
+		It("returns a correct config", func() {
+			configPath := writeConfigFile(`{}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.CredentialsSource).To(Equal("static"))
+		})
+	})
+
+	Context("with credentials_source set to empty string", func() {
+		It("returns a correct config", func() {
+			configPath := writeConfigFile(`{
+			  "credentials_source": ""
+			}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.CredentialsSource).To(Equal("static"))
 		})
 	})
 })
