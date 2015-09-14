@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	AccessKeyID     string `json:"access_key_id"`
-	SecretAccessKey string `json:"secret_access_key"`
-	BucketName      string `json:"bucket_name"`
+	AccessKeyID       string `json:"access_key_id"`
+	SecretAccessKey   string `json:"secret_access_key"`
+	BucketName        string `json:"bucket_name"`
+	CredentialsSource string `json:"credentials_source"`
 
 	Host string `json:"host"`
 	Port int    `json:"port"` // 0 means no custom port
@@ -34,11 +35,15 @@ func NewConfigFromPath(path string) (Config, error) {
 		return Config{}, err
 	}
 
-	config := Config{UseSSL: true, Port: 443, SSLVerifyPeer: true}
+	config := Config{UseSSL: true, Port: 443, SSLVerifyPeer: true, CredentialsSource: "static"}
 
 	err = json.Unmarshal(bytes, &config)
 	if err != nil {
 		return Config{}, err
+	}
+
+	if config.CredentialsSource == "" {
+		config.CredentialsSource = "static"
 	}
 
 	return config, nil

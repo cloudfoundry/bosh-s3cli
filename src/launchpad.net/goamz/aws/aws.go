@@ -10,8 +10,12 @@
 package aws
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"os"
+	"time"
 )
 
 // Region defines the URLs where AWS services may be accessed.
@@ -147,6 +151,16 @@ var Regions = map[string]Region{
 
 type Auth struct {
 	AccessKey, SecretKey string
+	token                string
+	expiration           time.Time
+}
+
+func (a Auth) Token() string {
+	return a.token
+}
+
+func (a Auth) Expiration() time.Time {
+	return a.expiration
 }
 
 var unreserved = make([]bool, 128)
@@ -210,4 +224,97 @@ func Encode(s string) string {
 		}
 	}
 	return string(e[:ei])
+}
+
+type credentials struct {
+	Code            string
+	LastUpdated     string
+	Type            string
+	AccessKeyId     string
+	SecretAccessKey string
+	Token           string
+	Expiration      string
+}
+
+var DEFAULT_METADATA_URL = "http://169.254.169.254/latest/meta-data/"
+
+// GetMetaData retrieves instance metadata about the current machine.
+//
+// See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html for more details.
+func GetMetaData(path string) (contents []byte, err error) {
+	url := DEFAULT_METADATA_URL + path
+
+	resp, err := RetryingClient.Get(url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("Code %d returned for url %s", resp.StatusCode, url)
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	return []byte(body), err
+}
+
+func getInstanceCredentials() (cred credentials, err error) {
+	credentialPath := "iam/security-credentials/"
+
+	// Get the instance role
+	role, err := GetMetaData(credentialPath)
+	if err != nil {
+		return
+	}
+
+	// Get the instance role credentials
+	credentialJSON, err := GetMetaData(credentialPath + string(role))
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal([]byte(credentialJSON), &cred)
+	return
+}
+
+// To be used with other APIs that return auth credentials such as STS
+func NewAuth(accessKey, secretKey, token string, expiration time.Time) Auth {
+	return Auth{
+		AccessKey:  accessKey,
+		SecretKey:  secretKey,
+		token:      token,
+		expiration: expiration,
+	}
+}
+
+// GetAuth creates an Auth based on either passed in credentials,
+// environment information or instance based role credentials.
+func GetAuth() (auth Auth, err error) {
+	// Next try to get auth from the environment
+	auth, err = EnvAuth()
+	if err == nil {
+		// Found auth, return
+		return
+	}
+
+	// Next try getting auth from the instance role
+	cred, err := getInstanceCredentials()
+	if err == nil {
+		// Found auth, return
+		auth.AccessKey = cred.AccessKeyId
+		auth.SecretKey = cred.SecretAccessKey
+		auth.token = cred.Token
+		exptdate, err := time.Parse("2006-01-02T15:04:05Z", cred.Expiration)
+		if err != nil {
+			err = fmt.Errorf("Error Parseing expiration date: cred.Expiration :%s , error: %s \n", cred.Expiration, err)
+		}
+		auth.expiration = exptdate
+		return auth, err
+	}
+	err = errors.New("No valid AWS authentication found")
+	return auth, err
 }
