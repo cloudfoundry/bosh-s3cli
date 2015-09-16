@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	amzaws "launchpad.net/goamz/aws"
+	amzaws "gopkg.in/amz.v3/aws"
 
 	. "s3cli/client"
 )
@@ -274,6 +274,45 @@ var _ = Describe("NewConfigFromPath", func() {
 			config, err := NewConfigFromPath(configPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(config.CredentialsSource).To(Equal("static"))
+		})
+	})
+
+	Context("with default region name", func() {
+		It("returns a config with default region name", func() {
+			configPath := writeConfigFile(`{
+	    	}`)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.Region).To(Equal("us-east-1"))
+		})
+	})
+
+	Context("with specified region name", func() {
+		It("returns a config with specified region name", func() {
+			configPath := writeConfigFile(`{
+				"region": "fake-region-name"
+	    	}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.Region).To(Equal("fake-region-name"))
+		})
+	})
+
+	Context("with specified signature version", func() {
+		It("returns a config with specified signature version", func() {
+			configPath := writeConfigFile(`{
+				"signature_version": "fake-signature-version"
+	    	}`)
+
+			defer os.Remove(configPath)
+
+			config, err := NewConfigFromPath(configPath)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(config.SignatureVersion).To(Equal("fake-signature-version"))
 		})
 	})
 })

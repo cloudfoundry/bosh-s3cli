@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	amzs3 "launchpad.net/goamz/s3"
+	amzs3 "gopkg.in/amz.v3/s3"
 
 	fakeclient "s3cli/client/fakes"
 	s3clicmd "s3cli/cmd"

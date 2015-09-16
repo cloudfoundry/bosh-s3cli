@@ -3,7 +3,7 @@ package client
 import (
 	"io"
 
-	amzs3 "launchpad.net/goamz/s3"
+	amzs3 "gopkg.in/amz.v3/s3"
 )
 
 type S3Client interface {

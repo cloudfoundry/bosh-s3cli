@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	amzs3 "launchpad.net/goamz/s3"
+	amzs3 "gopkg.in/amz.v3/s3"
 	s3cliclient "s3cli/client"
 )
 

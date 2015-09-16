@@ -1,8 +1,8 @@
 package fakes
 
 import (
+	amzs3 "gopkg.in/amz.v3/s3"
 	"io"
-	amzs3 "launchpad.net/goamz/s3"
 )
 
 type FakeClient struct {

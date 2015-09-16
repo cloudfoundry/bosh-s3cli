@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	amzaws "launchpad.net/goamz/aws"
+	amzaws "gopkg.in/amz.v3/aws"
 )
 
 type Config struct {
@@ -14,6 +14,8 @@ type Config struct {
 	SecretAccessKey   string `json:"secret_access_key"`
 	BucketName        string `json:"bucket_name"`
 	CredentialsSource string `json:"credentials_source"`
+	Region            string `json:"region"`
+	SignatureVersion  string `json:"signature_version"`
 
 	Host string `json:"host"`
 	Port int    `json:"port"` // 0 means no custom port
@@ -35,7 +37,7 @@ func NewConfigFromPath(path string) (Config, error) {
 		return Config{}, err
 	}
 
-	config := Config{UseSSL: true, Port: 443, SSLVerifyPeer: true, CredentialsSource: "static"}
+	config := Config{UseSSL: true, Port: 443, SSLVerifyPeer: true, CredentialsSource: "static", Region: "us-east-1"}
 
 	err = json.Unmarshal(bytes, &config)
 	if err != nil {
@@ -51,7 +53,7 @@ func NewConfigFromPath(path string) (Config, error) {
 
 func (c Config) AWSRegion() amzaws.Region {
 	return amzaws.Region{
-		Name:        "us-east-1",
+		Name:        c.Region,
 		EC2Endpoint: "https://ec2.us-east-1.amazonaws.com",
 
 		S3Endpoint:           c.s3Endpoint(),
