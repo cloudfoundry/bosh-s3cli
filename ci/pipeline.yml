@@ -10,7 +10,7 @@ groups:
 jobs:
   - name: trigger-build
     plan:
-      - {trigger: false, get: s3cli, resource: s3cli-in}
+      - {trigger: true, get: s3cli, resource: s3cli-in}
 
   - name: aws-s3-integration
     serial: true
@@ -46,14 +46,14 @@ jobs:
             host:                     {{host__s3_compat}}
             port:                     {{port__s3_compat}}
 
-  - name: promote-candidate
+  - name: promote-to-master
     plan:
       - aggregate:
         - {trigger: false, get: s3cli, passed: [aws-s3-integration, s3-compatible-integration], resource: s3cli-in}
 
       - put: s3cli-out
         resource: s3cli-out
-        params: {repository: s3cli, rebase: true}
+        params: {repository: s3cli}
 
 resources:
   - name: s3cli-in
