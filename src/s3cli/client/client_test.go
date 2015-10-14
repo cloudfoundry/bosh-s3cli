@@ -6,14 +6,13 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	amzaws "gopkg.in/amz.v3/aws"
-	amzs3 "gopkg.in/amz.v3/s3"
+	amzaws "launchpad.net/goamz/aws"
+	amzs3 "launchpad.net/goamz/s3"
 
 	. "s3cli/client"
 )
@@ -30,7 +29,6 @@ var _ = Describe("New", func() {
 				SecretAccessKey:   "fake-secret-key",
 				BucketName:        "fake-bucket-name",
 				CredentialsSource: "static",
-				Region:            "fake-region-name",
 			}
 			client, err := New(config)
 			Expect(err).ToNot(HaveOccurred())
@@ -41,13 +39,10 @@ var _ = Describe("New", func() {
 					SecretKey: "fake-secret-key",
 				},
 				config.AWSRegion(),
-				nil,
 			)
 
 			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(reflect.TypeOf(bucket.S3.Sign)).To(Equal(reflect.TypeOf(expectedS3.Sign)))
+			Expect(bucket.S3).To(Equal(expectedS3))
 			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 	})
@@ -59,7 +54,6 @@ var _ = Describe("New", func() {
 				SecretAccessKey:   "fake-secret-key",
 				BucketName:        "fake-bucket-name",
 				CredentialsSource: "static",
-				Region:            "fake-region-name",
 				Port:              123,
 			}
 			client, err := New(config)
@@ -71,13 +65,10 @@ var _ = Describe("New", func() {
 					SecretKey: "fake-secret-key",
 				},
 				config.AWSRegion(),
-				nil,
 			)
 
 			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(reflect.TypeOf(bucket.S3.Sign)).To(Equal(reflect.TypeOf(expectedS3.Sign)))
+			Expect(bucket.S3).To(Equal(expectedS3))
 			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 	})
@@ -166,13 +157,10 @@ var _ = Describe("New", func() {
 					SecretKey: "fake-secret-key",
 				},
 				config.AWSRegion(),
-				nil,
 			)
 
 			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(amzaws.SignS3))
+			Expect(bucket.S3).To(Equal(expectedS3))
 			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 	})
@@ -195,13 +183,10 @@ var _ = Describe("New", func() {
 					SecretKey: "fake-secret-key",
 				},
 				config.AWSRegion(),
-				nil,
 			)
 
 			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(amzaws.SignS3))
+			Expect(bucket.S3).To(Equal(expectedS3))
 			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 
@@ -233,13 +218,10 @@ var _ = Describe("New", func() {
 					SecretKey: "fake-secret-key",
 				},
 				config.AWSRegion(),
-				nil,
 			)
 
 			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(amzaws.SignS3))
+			Expect(bucket.S3).To(Equal(expectedS3))
 			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 
@@ -264,94 +246,6 @@ var _ = Describe("New", func() {
 
 			_, err := New(config)
 			Expect(err).To(HaveOccurred())
-		})
-	})
-
-	Context("with different signature version", func() {
-		It("returns default s3 legacy signature", func() {
-			config := Config{
-				AccessKeyID:       "fake-access-key",
-				SecretAccessKey:   "fake-secret-key",
-				BucketName:        "fake-bucket-name",
-				CredentialsSource: "static",
-				Region:            "fake-region-name",
-			}
-
-			expectedS3 := amzs3.New(
-				amzaws.Auth{
-					AccessKey: "fake-access-key",
-					SecretKey: "fake-secret-key",
-				},
-				config.AWSRegion(),
-				amzaws.SignS3,
-			)
-
-			client, err := New(config)
-			Expect(err).ToNot(HaveOccurred())
-
-			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(amzaws.SignS3))
-			Expect(bucket.Name).To(Equal("fake-bucket-name"))
-		})
-
-		It("returns V2 signature", func() {
-			config := Config{
-				AccessKeyID:       "fake-access-key",
-				SecretAccessKey:   "fake-secret-key",
-				BucketName:        "fake-bucket-name",
-				CredentialsSource: "static",
-				Region:            "fake-region-name",
-				SignatureVersion:  "2",
-			}
-
-			expectedS3 := amzs3.New(
-				amzaws.Auth{
-					AccessKey: "fake-access-key",
-					SecretKey: "fake-secret-key",
-				},
-				config.AWSRegion(),
-				amzaws.SignV2,
-			)
-
-			client, err := New(config)
-			Expect(err).ToNot(HaveOccurred())
-
-			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(amzaws.SignV2))
-			Expect(bucket.Name).To(Equal("fake-bucket-name"))
-		})
-
-		It("returns V4 signature", func() {
-			config := Config{
-				AccessKeyID:       "fake-access-key",
-				SecretAccessKey:   "fake-secret-key",
-				BucketName:        "fake-bucket-name",
-				CredentialsSource: "static",
-				Region:            "fake-region-name",
-				SignatureVersion:  "4",
-			}
-
-			expectedS3 := amzs3.New(
-				amzaws.Auth{
-					AccessKey: "fake-access-key",
-					SecretKey: "fake-secret-key",
-				},
-				config.AWSRegion(),
-				amzaws.SignV4Factory(config.Region, "s3"),
-			)
-
-			client, err := New(config)
-			Expect(err).ToNot(HaveOccurred())
-
-			bucket := client.(*amzs3.Bucket)
-			Expect(bucket.S3.Auth).To(Equal(expectedS3.Auth))
-			Expect(bucket.S3.Region).To(Equal(expectedS3.Region))
-			Expect(bucket.S3.Sign).To(BeAssignableToTypeOf(func(*http.Request, amzaws.Auth) error { return nil }))
-			Expect(bucket.Name).To(Equal("fake-bucket-name"))
 		})
 	})
 })
