@@ -5,7 +5,7 @@ groups:
       - trigger-build
       - aws-s3-integration
       - s3-compatible-integration
-      - promote-candidate
+      - promote-to-master
 
 jobs:
   - name: trigger-build
