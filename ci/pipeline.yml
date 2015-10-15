@@ -3,7 +3,8 @@ groups:
   - name: s3cli
     jobs:
       - trigger-build
-      - aws-s3-integration
+      - aws-s3-us-integration
+      - aws-s3-china-integration
       - s3-compatible-integration
       - promote-to-master
 
@@ -12,27 +13,41 @@ jobs:
     plan:
       - {trigger: true, get: s3cli, resource: s3cli-in}
 
-  - name: aws-s3-integration
+  - name: aws-s3-us-integration
     serial: true
     plan:
       - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
-
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
           params:
-            access_key_id:            {{access_key_id__aws}}
-            secret_access_key:        {{secret_access_key__aws}}
-            bucket_name:              {{bucket_name__aws}}
-            region_name:              {{region_name__aws}}
-            host:                     {{host__aws}}
-            port:                     {{port__aws}}
+            access_key_id:            {{access_key_id__aws_us}}
+            secret_access_key:        {{secret_access_key__aws_us}}
+            bucket_name:              {{bucket_name__aws_us}}
+            region_name:              {{region_name__aws_us}}
+            signature_version:        {{signature_version__aws_us}}
+            host:                     {{host__aws_us}}
+            port:                     {{port__aws_us}}
+
+  - name: aws-s3-china-integration
+    serial: true
+    plan:
+      - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
+      - task: test
+        file: s3cli/ci/tasks/run-integration.yml
+        config:
+          params:
+            access_key_id:            {{access_key_id__aws_china}}
+            secret_access_key:        {{secret_access_key__aws_china}}
+            bucket_name:              {{bucket_name__aws_china}}
+            region_name:              {{region_name__aws_china}}
+            host:                     {{host__aws_china}}
+            port:                     {{port__aws_china}}
 
   - name: s3-compatible-integration
     serial: true
     plan:
       - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
-
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -46,9 +61,7 @@ jobs:
 
   - name: promote-to-master
     plan:
-      - aggregate:
-        - {trigger: false, get: s3cli, passed: [aws-s3-integration, s3-compatible-integration], resource: s3cli-in}
-
+      - {trigger: false, get: s3cli, passed: [aws-s3-us-integration, aws-s3-china-integration, s3-compatible-integration], resource: s3cli-in}
       - put: s3cli-out
         resource: s3cli-out
         params: {repository: s3cli}
@@ -57,13 +70,17 @@ resources:
   - name: s3cli-in
     type: git
     source:
-      uri: git@github.com:pivotal-golang/s3cli.git
-      branch: develop
+      #uri: git@github.com:pivotal-golang/s3cli.git
+      uri: pivotal@midway.sf.pivotallabs.com:workspace/s3cli
+      #branch: develop
+      branch: v4-support
       private_key: {{github_deployment_key__s3cli}}
 
   - name: s3cli-out
     type: git
     source:
-      uri: git@github.com:pivotal-golang/s3cli.git
-      branch: master
+      #uri: git@github.com:pivotal-golang/s3cli.git
+      uri: pivotal@midway.sf.pivotallabs.com:workspace/s3cli
+      #branch: master
+      branch: develop
       private_key: {{github_deployment_key__s3cli}}
