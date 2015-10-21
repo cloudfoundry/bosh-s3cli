@@ -10,6 +10,5 @@ params:
   secret_access_key:        replace-me
   bucket_name:              replace-me
   region_name:              replace-me
-  signature_version:        replace-me
   host:                     replace-me
   port:                     replace-me

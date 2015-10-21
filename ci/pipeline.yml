@@ -25,7 +25,6 @@ jobs:
             secret_access_key:        {{secret_access_key__aws}}
             bucket_name:              {{bucket_name__aws}}
             region_name:              {{region_name__aws}}
-            signature_version:        {{signature_version__aws}}
             host:                     {{host__aws}}
             port:                     {{port__aws}}
 
@@ -42,7 +41,6 @@ jobs:
             secret_access_key:        {{secret_access_key__s3_compat}}
             bucket_name:              {{bucket_name__s3_compat}}
             region_name:              {{region_name__s3_compat}}
-            signature_version:        {{signature_version__s3_compat}}
             host:                     {{host__s3_compat}}
             port:                     {{port__s3_compat}}
 
@@ -69,4 +67,3 @@ resources:
       uri: git@github.com:pivotal-golang/s3cli.git
       branch: master
       private_key: {{github_deployment_key__s3cli}}
-

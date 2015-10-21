@@ -8,7 +8,6 @@ check_param access_key_id
 check_param secret_access_key
 check_param bucket_name
 check_param region_name
-check_param signature_version
 check_param host
 check_param port
 
@@ -22,11 +21,8 @@ cat > "${CONFIG_FILE}"<< EOF
   "bucket_name": "${bucket_name}",
   "credentials_source": "static",
   "region": "${region_name}",
-  "signature_version": "${signature_version}",
-
   "host": "${host}",
   "port": ${port},
-
   "use_ssl": true,
   "ssl_verify_peer": true
 }
