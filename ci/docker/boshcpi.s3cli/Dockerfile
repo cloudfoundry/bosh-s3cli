@@ -6,7 +6,7 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 RUN apt-get update; apt-get -y upgrade; apt-get clean
-RUN apt-get install -y git curl python; apt-get clean
+RUN apt-get install -y git curl python uuid-runtime; apt-get clean
 
 RUN cd /tmp && \
     curl -O -L https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz && \
