@@ -13,3 +13,5 @@ gobin/*
 
 .bzr
 .lbox
+
+ci/docker/.vagrant
