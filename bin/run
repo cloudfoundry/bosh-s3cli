@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -e
-
-$(dirname $0)/go run src/s3cli/main/s3.go $*
