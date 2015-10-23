@@ -12,13 +12,20 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
+// BlobstoreClient encapsulates interacting with an S3 compatible blobstore
 type BlobstoreClient struct {
 	s3Client *s3.S3
 	config   blobstoreClientConfig
 }
 
+// New returns a BlobstoreClient if the configuration file backing configFile is valid
 func New(configFile io.Reader) (BlobstoreClient, error) {
 	config, err := newConfig(configFile)
+	if err != nil {
+		return BlobstoreClient{}, err
+	}
+
+	err = config.validate()
 	if err != nil {
 		return BlobstoreClient{}, err
 	}
@@ -51,6 +58,8 @@ func New(configFile io.Reader) (BlobstoreClient, error) {
 	return BlobstoreClient{s3Client: s3Client, config: config}, nil
 }
 
+// Get fetches a blob from an S3 compatible blobstore
+// Destination will be overwritten if exists
 func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
 	downloader := s3manager.NewDownloader(&s3manager.DownloadOptions{S3: c.s3Client})
 
@@ -66,6 +75,7 @@ func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
 	return nil
 }
 
+// Put uploads a blob to an S3 compatible blobstore
 func (c *BlobstoreClient) Put(src io.Reader, dest string) error {
 	reader, writer := io.Pipe()
 
