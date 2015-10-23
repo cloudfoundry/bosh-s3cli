@@ -2,10 +2,10 @@
 groups:
   - name: s3cli
     jobs:
-      - trigger-build
       - unit
       - aws-s3-us-integration
       - aws-s3-china-integration
+      - aws-s3-frankfurt-integration
       - s3-compatible-integration
       - promote-to-master
 
@@ -20,7 +20,7 @@ jobs:
   - name: aws-s3-us-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -29,14 +29,13 @@ jobs:
             secret_access_key:        {{secret_access_key__aws_us}}
             bucket_name:              {{bucket_name__aws_us}}
             region_name:              {{region_name__aws_us}}
-            signature_version:        {{signature_version__aws_us}}
             host:                     {{host__aws_us}}
             port:                     {{port__aws_us}}
 
   - name: aws-s3-china-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -48,10 +47,26 @@ jobs:
             host:                     {{host__aws_china}}
             port:                     {{port__aws_china}}
 
+  - name: aws-s3-frankfurt-integration
+    serial: true
+    plan:
+      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
+      - task: test
+        file: s3cli/ci/tasks/run-integration.yml
+        config:
+          params:
+            access_key_id:            {{access_key_id__aws_frankfurt}}
+            secret_access_key:        {{secret_access_key__aws_frankfurt}}
+            bucket_name:              {{bucket_name__aws_frankfurt}}
+            region_name:              {{region_name__aws_frankfurt}}
+            host:                     {{host__aws_frankfurt}}
+            port:
+
+
   - name: s3-compatible-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -65,7 +80,7 @@ jobs:
 
   - name: promote-to-master
     plan:
-      - {trigger: false, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, s3-compatible-integration], resource: s3cli-in}
+      - {trigger: false, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
       - put: s3cli-out
         resource: s3cli-out
         params: {repository: s3cli}
@@ -74,17 +89,14 @@ resources:
   - name: s3cli-in
     type: git
     source:
-      #uri: git@github.com:pivotal-golang/s3cli.git
-      uri: pivotal@midway.sf.pivotallabs.com:workspace/s3cli
-      #branch: develop
-      branch: v4-support
+      uri: git@github.com:pivotal-golang/s3cli.git
+      branch: develop
       private_key: {{github_deployment_key__s3cli}}
 
   - name: s3cli-out
     type: git
     source:
-      #uri: git@github.com:pivotal-golang/s3cli.git
-      uri: pivotal@midway.sf.pivotallabs.com:workspace/s3cli
-      #branch: master
+      uri: git@github.com:pivotal-golang/s3cli.git
+      branch: master
       branch: develop
       private_key: {{github_deployment_key__s3cli}}
