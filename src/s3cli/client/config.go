@@ -32,10 +32,9 @@ func newConfig(file io.Reader) (blobstoreClientConfig, error) {
 
 	config := blobstoreClientConfig{
 		CredentialsSource: credentialsSourceStatic,
-		// Port:              443,
-		Region:        "us-east-1",
-		SSLVerifyPeer: true,
-		UseSSL:        true,
+		Region:            "us-east-1",
+		SSLVerifyPeer:     true,
+		UseSSL:            true,
 	}
 
 	err = json.Unmarshal(bytes, &config)
