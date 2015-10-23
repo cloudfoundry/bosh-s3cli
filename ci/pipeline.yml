@@ -3,20 +3,24 @@ groups:
   - name: s3cli
     jobs:
       - trigger-build
+      - unit
       - aws-s3-us-integration
       - aws-s3-china-integration
       - s3-compatible-integration
       - promote-to-master
 
 jobs:
-  - name: trigger-build
+  - name: unit
+    serial: true
     plan:
       - {trigger: true, get: s3cli, resource: s3cli-in}
+      - task: test
+        file: s3cli/ci/tasks/run-unit.yml
 
   - name: aws-s3-us-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -32,7 +36,7 @@ jobs:
   - name: aws-s3-china-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -47,7 +51,7 @@ jobs:
   - name: s3-compatible-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [trigger-build], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [trigger-build, unit], resource: s3cli-in}
       - task: test
         file: s3cli/ci/tasks/run-integration.yml
         config:
@@ -61,7 +65,7 @@ jobs:
 
   - name: promote-to-master
     plan:
-      - {trigger: false, get: s3cli, passed: [aws-s3-us-integration, aws-s3-china-integration, s3-compatible-integration], resource: s3cli-in}
+      - {trigger: false, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, s3-compatible-integration], resource: s3cli-in}
       - put: s3cli-out
         resource: s3cli-out
         params: {repository: s3cli}

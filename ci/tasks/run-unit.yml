@@ -1,0 +1,8 @@
+---
+platform: linux
+image: docker:///boshcpi/s3cli
+inputs:
+- name: s3cli
+run:
+  path: s3cli/ci/tasks/run-unit.sh
+params: {}
