@@ -16,3 +16,4 @@ gobin/*
 
 ci/docker/.vagrant
 src/golang.org
+src/github.com/stretchr
