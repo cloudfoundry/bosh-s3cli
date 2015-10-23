@@ -2,49 +2,89 @@ package client
 
 import (
 	"crypto/tls"
-	"errors"
-	"fmt"
+	"io"
+	"log"
 	"net/http"
 
-	amzaws "launchpad.net/goamz/aws"
-	amzs3 "launchpad.net/goamz/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-func New(config Config) (S3Client, error) {
-	awsAuth := amzaws.Auth{
-		AccessKey: config.AccessKeyID,
-		SecretKey: config.SecretAccessKey,
+type BlobstoreClient struct {
+	s3Client *s3.S3
+	config   blobstoreClientConfig
+}
+
+func New(configFile io.Reader) (BlobstoreClient, error) {
+	config, err := newConfig(configFile)
+	if err != nil {
+		return BlobstoreClient{}, err
 	}
 
-	switch config.CredentialsSource {
-	case "static":
-		if config.AccessKeyID == "" || config.SecretAccessKey == "" {
-			return nil, errors.New("access_key_id or secret_access_key is missing")
-		}
-	case "env_or_profile":
-		if config.AccessKeyID == "" && config.SecretAccessKey == "" {
-			auth, err := amzaws.GetAuth()
-			if err != nil {
-				return nil, err
-			}
-			awsAuth = amzaws.NewAuth(auth.AccessKey, auth.SecretKey, auth.Token(), auth.Expiration())
-		} else {
-			return nil, errors.New("Can't use access_key_id and secret_access_key with env_or_profile credentials_source")
-		}
-	default:
-		return nil, fmt.Errorf("Incorrect credentials_source: %s", config.CredentialsSource)
+	transport := *http.DefaultTransport.(*http.Transport)
+	transport.TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: !config.SSLVerifyPeer,
 	}
 
-	s3 := amzs3.New(awsAuth, config.AWSRegion())
+	httpClient := &http.Client{Transport: &transport}
 
-	transport := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: !config.SSLVerifyPeer,
-		},
+	s3Config := aws.NewConfig().
+		WithRegion(config.Region).
+		WithS3ForcePathStyle(true).
+		WithEndpoint(config.s3Endpoint()).
+		WithLogLevel(aws.LogOff).
+		WithDisableSSL(!config.UseSSL).
+		WithHTTPClient(httpClient)
+
+	if config.CredentialsSource == credentialsSourceStatic {
+		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(config.AccessKeyID, config.SecretAccessKey, ""))
 	}
 
-	http.DefaultClient.Transport = transport
+	s3Client := s3.New(s3Config)
 
-	return s3.Bucket(config.BucketName), nil
+	if config.UseV2SigningMethod {
+		setv2Handlers(s3Client)
+	}
+
+	return BlobstoreClient{s3Client: s3Client, config: config}, nil
+}
+
+func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
+	downloader := s3manager.NewDownloader(&s3manager.DownloadOptions{S3: c.s3Client})
+
+	_, err := downloader.Download(dest, &s3.GetObjectInput{
+		Bucket: aws.String(c.config.BucketName),
+		Key:    aws.String(src),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *BlobstoreClient) Put(src io.Reader, dest string) error {
+	reader, writer := io.Pipe()
+
+	go func() {
+		io.Copy(writer, src)
+		writer.Close()
+	}()
+
+	uploader := s3manager.NewUploader(&s3manager.UploadOptions{S3: c.s3Client})
+	putResult, err := uploader.Upload(&s3manager.UploadInput{
+		Body:   reader,
+		Bucket: aws.String(c.config.BucketName),
+		Key:    aws.String(dest),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Println("Successfully uploaded file to", putResult.Location)
+	return nil
 }
