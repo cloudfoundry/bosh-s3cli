@@ -7,6 +7,8 @@ source s3cli/ci/tasks/utils.sh
 result=0
 
 pushd s3cli > /dev/null
+  . .envrc
+
   echo -e "\n Vetting packages for potential issues..."
   go vet s3cli/...
   let "result+=$?"
