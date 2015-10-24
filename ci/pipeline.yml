@@ -60,7 +60,7 @@ jobs:
             bucket_name:              {{bucket_name__aws_frankfurt}}
             region_name:              {{region_name__aws_frankfurt}}
             host:                     {{host__aws_frankfurt}}
-            port:
+            port:                     {{port__aws_frankfurt}}
 
 
   - name: s3-compatible-integration
