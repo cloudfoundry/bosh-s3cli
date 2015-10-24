@@ -1,5 +1,12 @@
 #!/usr/bin/env bats
 
+print_debug() {
+  description=$1
+  output=$2
+
+  echo "BATS_DEBUG-[$(date)] '${description}': ${output}" >> ${BATS_LOG}
+}
+
 setup() {
   export BATS_TMPDIR=$(mktemp -d /tmp/bats.XXXXXX)
 
@@ -31,6 +38,10 @@ multipart_chunk_size_mb = 15
 use_https = True
 EOF
 
+  print_debug "s3 config" "$(cat ${CONFIG_FILE})"
+  print_debug "s3cmd config" "$(cat ${S3CMD_CONFIG_FILE})"
+  print_debug "random id" "${BATS_RANDOM_ID}"
+
   export BATS_RANDOM_ID=$(uuidgen)
 }
 
@@ -38,12 +49,6 @@ teardown() {
   rm -rf ${BATS_TMPDIR}
 }
 
-print_debug() {
-  description=$1
-  output=$2
-
-  echo "BATS_DEBUG-[$(date)] '${description}': ${output}" >> ${BATS_LOG}
-}
 
 @test "Invoking s3cli get with nonexistent key should output error" {
   local non_existant_file=${BATS_RANDOM_ID}
