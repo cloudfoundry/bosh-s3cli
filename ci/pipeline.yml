@@ -80,7 +80,7 @@ jobs:
 
   - name: promote-to-master
     plan:
-      - {trigger: false, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
+      - {trigger: true, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
       - put: s3cli-out
         resource: s3cli-out
         params: {repository: s3cli}
