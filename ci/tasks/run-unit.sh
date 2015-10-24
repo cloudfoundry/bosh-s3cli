@@ -8,6 +8,9 @@ source s3cli/ci/tasks/utils.sh
 pushd s3cli > /dev/null
   . .envrc
 
+  go install github.com/onsi/ginkgo/ginkgo
+  go install -u github.com/golang/lint/golint
+
   echo -e "\n Vetting packages for potential issues..."
   go vet s3cli/...
 
