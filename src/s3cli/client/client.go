@@ -76,17 +76,10 @@ func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
 }
 
 // Put uploads a blob to an S3 compatible blobstore
-func (c *BlobstoreClient) Put(src io.Reader, dest string) error {
-	reader, writer := io.Pipe()
-
-	go func() {
-		io.Copy(writer, src)
-		writer.Close()
-	}()
-
+func (c *BlobstoreClient) Put(src io.ReadSeeker, dest string) error {
 	uploader := s3manager.NewUploader(&s3manager.UploadOptions{S3: c.s3Client})
 	putResult, err := uploader.Upload(&s3manager.UploadInput{
-		Body:   reader,
+		Body:   src,
 		Bucket: aws.String(c.config.BucketName),
 		Key:    aws.String(dest),
 	})
