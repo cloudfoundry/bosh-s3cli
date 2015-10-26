@@ -98,5 +98,4 @@ resources:
     source:
       uri: git@github.com:pivotal-golang/s3cli.git
       branch: master
-      branch: develop
       private_key: {{github_deployment_key__s3cli}}
