@@ -38,7 +38,7 @@ multipart_chunk_size_mb = 15
 use_https = True
 EOF
 
-  print_debug "s3 config" "$(cat ${CONFIG_FILE})"
+  print_debug "s3cli config" "$(cat ${CONFIG_FILE})"
   print_debug "s3cmd config" "$(cat ${S3CMD_CONFIG_FILE})"
   print_debug "random id" "${BATS_RANDOM_ID}"
 
@@ -53,7 +53,7 @@ teardown() {
 @test "Invoking s3cli get with nonexistent key should output error" {
   local non_existant_file=${BATS_RANDOM_ID}
 
-  run s3 -c ${CONFIG_FILE} get ${non_existant_file} ${BATS_TMPDIR}/empty_file
+  run s3cli -c ${CONFIG_FILE} get ${non_existant_file} ${BATS_TMPDIR}/empty_file
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
 
   [ "${status}" -ne 0 ]
@@ -67,7 +67,7 @@ teardown() {
   echo -n ${expected_string} > ${BATS_TMPDIR}/${s3_filename}
   s3cmd --config ${S3CMD_CONFIG_FILE} put ${BATS_TMPDIR}/${s3_filename} s3://${bucket_name}/
 
-  run s3 -c ${CONFIG_FILE} get ${s3_filename} ${BATS_TMPDIR}/gotten_file
+  run s3cli -c ${CONFIG_FILE} get ${s3_filename} ${BATS_TMPDIR}/gotten_file
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
   local actual_string=$(cat ${BATS_TMPDIR}/gotten_file)
   print_debug "actual_string" "${actual_string}"
@@ -83,7 +83,7 @@ teardown() {
   local expected_string=${BATS_RANDOM_ID}
 
   echo -n ${expected_string} > ${BATS_TMPDIR}/file_to_upload
-  run s3 -c ${CONFIG_FILE} put ${BATS_TMPDIR}/file_to_upload uploaded_by_s3
+  run s3cli -c ${CONFIG_FILE} put ${BATS_TMPDIR}/file_to_upload uploaded_by_s3
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
 
   s3cmd --config ${S3CMD_CONFIG_FILE} get s3://${bucket_name}/uploaded_by_s3 ${BATS_TMPDIR}/uploaded_by_s3

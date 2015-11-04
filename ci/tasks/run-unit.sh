@@ -27,10 +27,10 @@ pushd s3cli > /dev/null
   ginkgo -r -race src/s3cli
 
   echo -e "\n Running build script to confirm everything compiles..."
-  go build -ldflags "-X main.version ${version}" -o out/s3 s3cli/s3
+  go build -ldflags "-X main.version ${version}" -o out/s3cli s3cli/s3cli
 
   echo -e "\n Testing version information"
-  app_version=$(out/s3 -v)
+  app_version=$(out/s3cli -v)
   test "${app_version}" = "version ${version}"
 
   echo -e "\n suite success"

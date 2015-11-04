@@ -20,6 +20,6 @@ export TERM=xterm
 
 pushd ${PWD}/s3cli > /dev/null
   . .envrc
-  go install s3cli/s3
+  go install s3cli/s3cli
   bats integration/test.bats
 popd > /dev/null

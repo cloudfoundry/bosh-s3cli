@@ -15,6 +15,6 @@ pushd s3cli > /dev/null
   . .envrc
 
   echo -e "\n building artifact..."
-  go build -ldflags "-X main.version ${version}" -o "out/s3cli-${semver}-linux-amd64" s3cli/s3
+  go build -ldflags "-X main.version ${version}" -o "out/s3cli-${semver}-linux-amd64" s3cli/s3cli
 popd > /dev/null
 
