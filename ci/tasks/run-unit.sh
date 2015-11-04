@@ -5,7 +5,7 @@ set -e
 source s3cli/ci/tasks/utils.sh
 
 
-semver=`1.2.3.4`
+semver='1.2.3.4'
 timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
 pushd s3cli > /dev/null
