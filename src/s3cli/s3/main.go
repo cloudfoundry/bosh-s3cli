@@ -2,14 +2,23 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"s3cli/client"
 )
 
+var version string
+
 func main() {
 	configPath := flag.String("c", "", "configuration path")
+	showVer := flag.Bool("v", false, "version")
 	flag.Parse()
+
+	if *showVer {
+		fmt.Printf("version %s", version)
+		os.Exit(0)
+	}
 
 	configFile, err := os.Open(*configPath)
 	if err != nil {
