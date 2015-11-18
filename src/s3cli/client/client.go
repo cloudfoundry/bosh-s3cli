@@ -48,7 +48,7 @@ func New(configFile io.Reader) (BlobstoreClient, error) {
 	if config.Region != "" && config.Host == "" {
 		s3Config = s3Config.WithRegion(config.Region)
 	} else if config.Host != "" && config.Region == "" {
-		s3Config = s3Config.WithRegion("").WithEndpoint(config.s3Endpoint())
+		s3Config = s3Config.WithRegion(" ").WithEndpoint(config.s3Endpoint())
 	} else {
 		return BlobstoreClient{}, errors.New("Unable to handle both region and host being set")
 	}
