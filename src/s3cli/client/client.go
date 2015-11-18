@@ -2,10 +2,11 @@ package client
 
 import (
 	"crypto/tls"
-	"errors"
 	"io"
 	"log"
 	"net/http"
+
+	"s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -13,66 +14,58 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-// BlobstoreClient encapsulates interacting with an S3 compatible blobstore
-type BlobstoreClient struct {
-	s3Client *s3.S3
-	config   BlobstoreClientConfig
+// S3Blobstore encapsulates interactions with an S3 compatible blobstore
+type S3Blobstore struct {
+	s3Client    *s3.S3
+	s3cliConfig config.S3Cli
 }
 
 // New returns a BlobstoreClient if the configuration file backing configFile is valid
-func New(configFile io.Reader) (BlobstoreClient, error) {
-	config, err := newConfig(configFile)
+func New(configFile io.Reader) (S3Blobstore, error) {
+	c, err := config.NewFromReader(configFile)
 	if err != nil {
-		return BlobstoreClient{}, err
-	}
-
-	err = config.validate()
-	if err != nil {
-		return BlobstoreClient{}, err
+		return S3Blobstore{}, err
 	}
 
 	transport := *http.DefaultTransport.(*http.Transport)
 	transport.TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: !config.SSLVerifyPeer,
+		InsecureSkipVerify: !c.SSLVerifyPeer,
 	}
 
 	httpClient := &http.Client{Transport: &transport}
 
 	s3Config := aws.NewConfig().
-		WithRegion(config.Region).
 		WithS3ForcePathStyle(true).
 		WithLogLevel(aws.LogOff).
-		WithDisableSSL(!config.UseSSL).
+		WithDisableSSL(!c.UseSSL).
 		WithHTTPClient(httpClient)
 
-	if config.Region != "" && config.Host == "" {
-		s3Config = s3Config.WithRegion(config.Region)
-	} else if config.Host != "" && config.Region == "" {
-		s3Config = s3Config.WithRegion(" ").WithEndpoint(config.s3Endpoint())
+	if c.UseRegion() {
+		s3Config = s3Config.WithRegion(c.Region)
 	} else {
-		return BlobstoreClient{}, errors.New("Unable to handle both region and host being set")
+		s3Config = s3Config.WithEndpoint(c.S3Endpoint())
 	}
 
-	if config.CredentialsSource == credentialsSourceStatic {
-		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(config.AccessKeyID, config.SecretAccessKey, ""))
+	if c.CredentialsSource == config.StaticCredentialsSource {
+		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(c.AccessKeyID, c.SecretAccessKey, ""))
 	}
 
 	s3Client := s3.New(s3Config)
 
-	if config.UseV2SigningMethod {
+	if c.UseV2SigningMethod {
 		setv2Handlers(s3Client)
 	}
 
-	return BlobstoreClient{s3Client: s3Client, config: config}, nil
+	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
 }
 
 // Get fetches a blob from an S3 compatible blobstore
 // Destination will be overwritten if exists
-func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
-	downloader := s3manager.NewDownloader(&s3manager.DownloadOptions{S3: c.s3Client})
+func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
+	downloader := s3manager.NewDownloader(&s3manager.DownloadOptions{S3: client.s3Client})
 
 	_, err := downloader.Download(dest, &s3.GetObjectInput{
-		Bucket: aws.String(c.config.BucketName),
+		Bucket: aws.String(client.s3cliConfig.BucketName),
 		Key:    aws.String(src),
 	})
 
@@ -84,11 +77,11 @@ func (c *BlobstoreClient) Get(src string, dest io.WriterAt) error {
 }
 
 // Put uploads a blob to an S3 compatible blobstore
-func (c *BlobstoreClient) Put(src io.ReadSeeker, dest string) error {
-	uploader := s3manager.NewUploader(&s3manager.UploadOptions{S3: c.s3Client})
+func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
+	uploader := s3manager.NewUploader(&s3manager.UploadOptions{S3: client.s3Client})
 	putResult, err := uploader.Upload(&s3manager.UploadInput{
 		Body:   src,
-		Bucket: aws.String(c.config.BucketName),
+		Bucket: aws.String(client.s3cliConfig.BucketName),
 		Key:    aws.String(dest),
 	})
 
