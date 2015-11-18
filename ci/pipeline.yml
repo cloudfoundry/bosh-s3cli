@@ -83,7 +83,6 @@ jobs:
             secret_access_key:        {{secret_access_key__aws_frankfurt}}
             bucket_name:              {{bucket_name__aws_frankfurt}}
             region_name:              {{region_name__aws_frankfurt}}
-            host:                     {{host__aws_frankfurt}}
             s3cmd_region:             {{region_name__aws_frankfurt}}
             s3cmd_host:               {{host__aws_frankfurt}}
             port:                     {{port__aws_frankfurt}}
@@ -100,7 +99,6 @@ jobs:
             access_key_id:            {{access_key_id__s3_compat}}
             secret_access_key:        {{secret_access_key__s3_compat}}
             bucket_name:              {{bucket_name__s3_compat}}
-            region_name:              {{region_name__s3_compat}}
             host:                     {{host__s3_compat}}
             s3cmd_region:             {{region_name__s3_compat}}
             s3cmd_host:               {{host__s3_compat}}

@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/tls"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -49,7 +50,7 @@ func New(configFile io.Reader) (BlobstoreClient, error) {
 	} else if config.Host != "" && config.Region == "" {
 		s3Config = s3Config.WithEndpoint(config.s3Endpoint())
 	} else {
-		panic("unable to handle specifying both host and region")
+		return BlobstoreClient{}, errors.New("Unable to handle both region and host being set")
 	}
 
 	if config.CredentialsSource == credentialsSourceStatic {
