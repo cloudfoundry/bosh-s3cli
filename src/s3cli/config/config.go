@@ -22,6 +22,10 @@ type S3Cli struct {
 	UseV2SigningMethod bool
 }
 
+// EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
+// the concept of a region
+const EmptyRegion = " "
+
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
 

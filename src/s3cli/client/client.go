@@ -43,7 +43,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 	if c.UseRegion() {
 		s3Config = s3Config.WithRegion(c.Region)
 	} else {
-		s3Config = s3Config.WithEndpoint(c.S3Endpoint())
+		s3Config = s3Config.WithRegion(config.EmptyRegion).WithEndpoint(c.S3Endpoint())
 	}
 
 	if c.CredentialsSource == config.StaticCredentialsSource {
