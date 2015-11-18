@@ -10,6 +10,12 @@ import (
 )
 
 var _ = Describe("BlobstoreClient configuration", func() {
+	Describe("ignoring region configuration", func() {
+		It("allows for the S3 SDK to be configured with empty region information", func() {
+			Expect(config.EmptyRegion).To(Equal(" "))
+		})
+	})
+
 	Describe("building a configuration", func() {
 		Describe("checking that either host or region has been set", func() {
 			Context("when host has been set but not region", func() {
