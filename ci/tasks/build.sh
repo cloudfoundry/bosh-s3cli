@@ -15,6 +15,10 @@ pushd s3cli > /dev/null
   . .envrc
 
   echo -e "\n building artifact..."
-  go build -ldflags "-X main.version ${version}" -o "out/s3cli-${semver}-linux-amd64" s3cli/s3cli
+  go build -ldflags "-X main.version=${version}" -o "out/s3cli-${semver}-linux-amd64" s3cli/s3cli
+
+  echo -e "\n sha1 of artifact..."
+  sha1sum out/s3cli-${semver}-linux-amd64
+
 popd > /dev/null
 
