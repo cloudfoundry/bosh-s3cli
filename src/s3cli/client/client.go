@@ -44,10 +44,12 @@ func New(configFile io.Reader) (BlobstoreClient, error) {
 		WithDisableSSL(!config.UseSSL).
 		WithHTTPClient(httpClient)
 
-	if config.Region != "" {
+	if config.Region != "" && config.Host == "" {
 		s3Config = s3Config.WithRegion(config.Region)
-	} else if config.Host != "" {
+	} else if config.Host != "" && config.Region == "" {
 		s3Config = s3Config.WithEndpoint(config.s3Endpoint())
+	} else {
+		panic("unable to handle specifying both host and region")
 	}
 
 	if config.CredentialsSource == credentialsSourceStatic {
