@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 )
 
-type blobstoreClientConfig struct {
+type BlobstoreClientConfig struct {
 	AccessKeyID        string `json:"access_key_id"`
 	SecretAccessKey    string `json:"secret_access_key"`
 	BucketName         string `json:"bucket_name"`
@@ -21,29 +21,34 @@ type blobstoreClientConfig struct {
 	UseV2SigningMethod bool
 }
 
-const credentialsSourceStatic = "static"
-const credentialsSourceEnvOrProfile = "env_or_profile"
+const (
+	credentialsSourceStatic = "static"
+	credentialsSourceEnvOrProfile = "env_or_profile"
+	defaultRegion = "us-east-1"
+)
 
-func newConfig(file io.Reader) (blobstoreClientConfig, error) {
+func newConfig(file io.Reader) (BlobstoreClientConfig, error) {
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		return blobstoreClientConfig{}, err
+		return BlobstoreClientConfig{}, err
 	}
 
-	config := blobstoreClientConfig{
-		CredentialsSource: credentialsSourceStatic,
-		Region:            "us-east-1",
+	config := BlobstoreClientConfig{
 		SSLVerifyPeer:     true,
 		UseSSL:            true,
 	}
 
 	err = json.Unmarshal(bytes, &config)
 	if err != nil {
-		return blobstoreClientConfig{}, err
+		return BlobstoreClientConfig{}, err
 	}
 
 	if config.CredentialsSource == "" {
 		config.CredentialsSource = credentialsSourceStatic
+	}
+
+	if config.Region == "" && config.Host == "" {
+		config.Region = defaultRegion
 	}
 
 	switch config.Region {
@@ -58,7 +63,7 @@ func newConfig(file io.Reader) (blobstoreClientConfig, error) {
 	return config, nil
 }
 
-func (c blobstoreClientConfig) s3Endpoint() string {
+func (c BlobstoreClientConfig) s3Endpoint() string {
 	if c.Port != 0 {
 		return fmt.Sprintf("%s:%d", c.Host, c.Port)
 	}
@@ -66,7 +71,7 @@ func (c blobstoreClientConfig) s3Endpoint() string {
 	return c.Host
 }
 
-func (c blobstoreClientConfig) validate() error {
+func (c BlobstoreClientConfig) validate() error {
 	switch c.CredentialsSource {
 	case credentialsSourceStatic:
 		if c.AccessKeyID == "" || c.SecretAccessKey == "" {

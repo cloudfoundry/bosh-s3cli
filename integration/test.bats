@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+set -e
+
 print_debug() {
   description=$1
   output=$2
@@ -10,35 +12,22 @@ print_debug() {
 setup() {
   export BATS_TMPDIR=$(mktemp -d /tmp/bats.XXXXXX)
 
-  export CONFIG_FILE="${BATS_TMPDIR}/blobstore-s3.json"
-  cat > "${CONFIG_FILE}"<< EOF
-{
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "credentials_source": "static",
-  "region": "${region_name}",
-  "host": "${host}",
-  "port": ${port},
-  "use_ssl": true,
-  "ssl_verify_peer": true
-}
-EOF
+  : "${S3_CLI_CONFIG:?Need to set S3_CLI_CONFIG non-empty}"
 
   export S3CMD_CONFIG_FILE="${BATS_TMPDIR}/s3cmd.s3cfg"
   cat > "${S3CMD_CONFIG_FILE}" << EOF
 [default]
 access_key = ${access_key_id}
 secret_key = ${secret_access_key}
-bucket_location = ${region_name}
-host_base = ${host}
-host_bucket = %(bucket)s.${host}
+bucket_location = ${s3cmd_region}
+host_base = ${s3cmd_host}
+host_bucket = %(bucket)s.${s3cmd_host}
 enable_multipart = True
 multipart_chunk_size_mb = 15
 use_https = True
 EOF
 
-  print_debug "s3cli config" "$(cat ${CONFIG_FILE})"
+  print_debug "s3cli config" "$(cat ${S3_CLI_CONFIG})"
   print_debug "s3cmd config" "$(cat ${S3CMD_CONFIG_FILE})"
   print_debug "random id" "${BATS_RANDOM_ID}"
 
@@ -53,7 +42,7 @@ teardown() {
 @test "Invoking s3cli get with nonexistent key should output error" {
   local non_existant_file=${BATS_RANDOM_ID}
 
-  run s3cli -c ${CONFIG_FILE} get ${non_existant_file} ${BATS_TMPDIR}/empty_file
+  run s3cli -c ${S3_CLI_CONFIG} get ${non_existant_file} ${BATS_TMPDIR}/empty_file
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
 
   [ "${status}" -ne 0 ]
@@ -67,7 +56,7 @@ teardown() {
   echo -n ${expected_string} > ${BATS_TMPDIR}/${s3_filename}
   s3cmd --config ${S3CMD_CONFIG_FILE} put ${BATS_TMPDIR}/${s3_filename} s3://${bucket_name}/
 
-  run s3cli -c ${CONFIG_FILE} get ${s3_filename} ${BATS_TMPDIR}/gotten_file
+  run s3cli -c ${S3_CLI_CONFIG} get ${s3_filename} ${BATS_TMPDIR}/gotten_file
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
   local actual_string=$(cat ${BATS_TMPDIR}/gotten_file)
   print_debug "actual_string" "${actual_string}"
@@ -83,7 +72,7 @@ teardown() {
   local expected_string=${BATS_RANDOM_ID}
 
   echo -n ${expected_string} > ${BATS_TMPDIR}/file_to_upload
-  run s3cli -c ${CONFIG_FILE} put ${BATS_TMPDIR}/file_to_upload uploaded_by_s3
+  run s3cli -c ${S3_CLI_CONFIG} put ${BATS_TMPDIR}/file_to_upload uploaded_by_s3
   print_debug "${BATS_TEST_DESCRIPTION}" "status:${status}, output:${output}"
 
   s3cmd --config ${S3CMD_CONFIG_FILE} get s3://${bucket_name}/uploaded_by_s3 ${BATS_TMPDIR}/uploaded_by_s3

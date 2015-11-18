@@ -4,6 +4,7 @@ groups:
     jobs:
       - unit
       - aws-s3-us-integration
+      - aws-s3-tokyo-integration
       - aws-s3-china-integration
       - aws-s3-frankfurt-integration
       - s3-compatible-integration
@@ -50,9 +51,9 @@ jobs:
             access_key_id:            {{access_key_id__aws_us}}
             secret_access_key:        {{secret_access_key__aws_us}}
             bucket_name:              {{bucket_name__aws_us}}
-            region_name:              {{region_name__aws_us}}
-            host:                     {{host__aws_us}}
-            port:                     {{port__aws_us}}
+            s3cmd_host:               {{host__aws_us}}
+            s3cmd_region:             {{region_name__aws_us}}
+            port:                     0
 
   - name: aws-s3-china-integration
     serial: true
@@ -66,7 +67,9 @@ jobs:
             secret_access_key:        {{secret_access_key__aws_china}}
             bucket_name:              {{bucket_name__aws_china}}
             region_name:              {{region_name__aws_china}}
+            s3cmd_region:             {{region_name__aws_china}}
             host:                     {{host__aws_china}}
+            s3cmd_host:               {{host__aws_china}}
             port:                     {{port__aws_china}}
 
   - name: aws-s3-frankfurt-integration
@@ -82,7 +85,26 @@ jobs:
             bucket_name:              {{bucket_name__aws_frankfurt}}
             region_name:              {{region_name__aws_frankfurt}}
             host:                     {{host__aws_frankfurt}}
+            s3cmd_region:             {{region_name__aws_frankfurt}}
+            s3cmd_host:               {{host__aws_frankfurt}}
             port:                     {{port__aws_frankfurt}}
+
+  - name: aws-s3-tokyo-integration
+    serial: true
+    plan:
+      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
+      - task: test
+        file: s3cli/ci/tasks/run-integration.yml
+        config:
+          params:
+            access_key_id:            {{access_key_id__aws_tokyo}}
+            secret_access_key:        {{secret_access_key__aws_tokyo}}
+            bucket_name:              {{bucket_name__aws_tokyo}}
+            region_name:              {{region_name__aws_tokyo}}
+            host:                     {{host__aws_tokyo}}
+            s3cmd_region:             {{region_name__aws_tokyo}}
+            s3cmd_host:               {{host__aws_tokyo}}
+            port:                     {{port__aws_tokyo}}
 
 
   - name: s3-compatible-integration
@@ -98,12 +120,14 @@ jobs:
             bucket_name:              {{bucket_name__s3_compat}}
             region_name:              {{region_name__s3_compat}}
             host:                     {{host__s3_compat}}
+            s3cmd_region:             {{region_name__s3_compat}}
+            s3cmd_host:               {{host__s3_compat}}
             port:                     {{port__s3_compat}}
 
   - name: promote
     plan:
       - aggregate:
-          - {trigger: true, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
+          - {trigger: true, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-tokyo-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
           - get: version-semver
             params: {bump: patch}
 

@@ -15,7 +15,7 @@ import (
 // BlobstoreClient encapsulates interacting with an S3 compatible blobstore
 type BlobstoreClient struct {
 	s3Client *s3.S3
-	config   blobstoreClientConfig
+	config   BlobstoreClientConfig
 }
 
 // New returns a BlobstoreClient if the configuration file backing configFile is valid
@@ -40,10 +40,15 @@ func New(configFile io.Reader) (BlobstoreClient, error) {
 	s3Config := aws.NewConfig().
 		WithRegion(config.Region).
 		WithS3ForcePathStyle(true).
-		WithEndpoint(config.s3Endpoint()).
 		WithLogLevel(aws.LogOff).
 		WithDisableSSL(!config.UseSSL).
 		WithHTTPClient(httpClient)
+
+	if config.Region != "" {
+		s3Config = s3Config.WithRegion(config.Region)
+	} else if config.Host != "" {
+		s3Config = s3Config.WithEndpoint(config.s3Endpoint())
+	}
 
 	if config.CredentialsSource == credentialsSourceStatic {
 		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(config.AccessKeyID, config.SecretAccessKey, ""))

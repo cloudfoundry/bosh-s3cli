@@ -9,6 +9,6 @@ params:
   access_key_id:            replace-me
   secret_access_key:        replace-me
   bucket_name:              replace-me
-  region_name:              replace-me
-  host:                     replace-me
+  s3cmd_host:               replace-me
+  s3cmd_region:             replace-me
   port:                     replace-me
