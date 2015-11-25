@@ -16,10 +16,7 @@ export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
 
-cloudformation_parameters="[\
-{\"ParameterKey\": \"AmazonMachineImageID\", \"ParameterValue\": \"${ec2_ami}\", \"UsePreviousValue\": false},\
-{\"ParameterKey\": \"KeyPairName\",          \"ParameterValue\": \"${public_key_name}\", \"UsePreviousValue\": false}\
-]"
+cloudformation_parameters="ParameterKey=AmazonMachineImageID,ParameterValue=${ec2_ami} ParameterKey=KeyPairName,ParameterValue=${public_key_name}"
 
 cmd="aws cloudformation create-stack \
     --stack-name    ${stack_name} \
@@ -67,7 +64,8 @@ cat > "static_wout_host_w_region-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "static_w_host_wout_region-s3cli_config.json"<< EOF
+if [ "${region_optional}" = true ]; then
+  cat > "static_w_host_wout_region-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
@@ -79,7 +77,6 @@ cat > "static_w_host_wout_region-s3cli_config.json"<< EOF
 }
 EOF
 
-if [ "${region_optional}" = true ]; then
   cat > "static_wout_host_wout_region-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
@@ -102,6 +99,7 @@ cat > "profile_wout_host_w_region-s3cli_config.json"<< EOF
 }
 EOF
 
+if [ "${region_optional}" = true ]; then
   cat > "profile_w_host_wout_region-s3cli_config.json"<< EOF
 {
   "credentials_source": "env_or_profile",
@@ -112,7 +110,6 @@ EOF
 }
 EOF
 
-if [ "${region_optional}" = true ]; then
   cat > "profile_wout_host_wout_region-s3cli_config.json"<< EOF
 {
   "credentials_source": "env_or_profile",

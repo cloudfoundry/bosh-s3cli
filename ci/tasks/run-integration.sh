@@ -25,7 +25,7 @@ if [ -e ${PWD}/configs/test_host_ip ]; then
   cat > ~/.ssh/config << EOF
   Host *
     StrictHostKeyChecking no
-  EOF
+EOF
 fi
 
 export bucket_name=$(cat ${PWD}/configs/bucket_name)

@@ -64,10 +64,10 @@ jobs:
             secret_access_key: {{secret_access_key__aws_us}}
             region_name:       {{region_name__aws_us}}
             private_key_data:  {{private_key_data__aws_us}}
-
-      - task: teardown
-        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
-        config: *aws-us-infrastructure-config
+        ensure:
+          task: teardown
+          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
+          config: *aws-us-infrastructure-config
 
   - name: aws-s3-china-integration
     serial: true
@@ -94,10 +94,10 @@ jobs:
             secret_access_key: {{secret_access_key__aws_china}}
             region_name:       {{region_name__aws_china}}
             private_key_data:  {{private_key_data__aws_china}}
-
-      - task: teardown
-        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
-        config: *aws-china-infrastructure-config
+        ensure:
+          task: teardown
+          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
+          config: *aws-china-infrastructure-config
 
   - name: aws-s3-frankfurt-integration
     serial: true
@@ -124,10 +124,10 @@ jobs:
             secret_access_key: {{secret_access_key__aws_frankfurt}}
             region_name:       {{region_name__aws_frankfurt}}
             private_key_data:  {{private_key_data__aws_frankfurt}}
-
-      - task: teardown
-        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
-        config: *aws-frankfurt-infrastructure-config
+        ensure:
+          task: teardown
+          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
+          config: *aws-frankfurt-infrastructure-config
 
   - name: s3-compatible-integration
     serial: true

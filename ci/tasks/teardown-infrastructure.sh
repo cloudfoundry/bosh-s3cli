@@ -2,7 +2,7 @@
 
 set -e
 
-source bosh-cpi-src/ci/tasks/utils.sh
+source s3cli-src/ci/tasks/utils.sh
 
 check_param access_key_id
 check_param secret_access_key

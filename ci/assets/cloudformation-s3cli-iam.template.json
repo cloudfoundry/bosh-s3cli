@@ -25,46 +25,56 @@
         "CIDR": "10.0.0.0/24"
       }
     },
-    "RegionToEndpoint": {
+    "RegionSettings": {
       "us-east-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3.amazonaws.com"
       },
       "us-west-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-us-west-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-us-west-1.amazonaws.com"
       },
       "us-west-2": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-us-west-2.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-us-west-2.amazonaws.com"
       },
       "eu-west-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-eu-west-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-eu-west-1.amazonaws.com"
       },
       "ap-southeast-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-ap-southeast-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-ap-southeast-1.amazonaws.com"
       },
       "ap-northeast-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-ap-northeast-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-ap-northeast-1.amazonaws.com"
       },
       "ap-southeast-2": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-ap-southeast-2.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-ap-southeast-2.amazonaws.com"
       },
       "sa-east-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-sa-east-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-sa-east-1.amazonaws.com"
       },
       "cn-north-1": {
-        "EC2": "ec2.amazonaws.com.cn",
-        "S3": "s3.cn-north-1.amazonaws.com.cn"
+        "EC2Endpoint": "ec2.amazonaws.com.cn",
+        "AWSNamespace": "aws-cn",
+        "S3Endpoint": "s3.cn-north-1.amazonaws.com.cn"
       },
       "eu-central-1": {
-        "EC2": "ec2.amazonaws.com",
-        "S3": "s3-eu-central-1.amazonaws.com"
+        "EC2Endpoint": "ec2.amazonaws.com",
+        "AWSNamespace": "aws",
+        "S3Endpoint": "s3-eu-central-1.amazonaws.com"
       }
     }
   },
@@ -190,13 +200,7 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": {
-                  "Fn::FindInMap": [
-                    "RegionToEndpoint",
-                    { "Ref": "AWS::Region"},
-                    "EC2"
-                  ]
-                }
+                "Service": { "Fn::FindInMap": [ "RegionSettings", { "Ref": "AWS::Region" }, "EC2Endpoint" ] }
               },
               "Action": [
                 "sts:AssumeRole"
@@ -219,7 +223,18 @@
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref": "S3Bucket" }, "/*" ] ] }
+                    { 
+                      "Fn::Join": [ 
+                        "", 
+                        [ 
+                          "arn:",
+                          { "Fn::FindInMap": [ "RegionSettings", { "Ref": "AWS::Region" }, "AWSNamespace" ] },
+                          ":s3:::", 
+                          { "Ref": "S3Bucket" }, 
+                          "/*" 
+                        ] 
+                      ] 
+                    }
                   ]
                 }
               ]
@@ -313,13 +328,7 @@
     "TestHostIP": { "Value": { "Ref": "IPAddress" }},
     "BucketName": { "Value": { "Ref": "S3Bucket" }},
     "S3EndpointHost": {
-      "Value": {
-        "Fn::FindInMap": [
-          "RegionToEndpoint",
-          { "Ref": "AWS::Region"},
-          "S3"
-        ]
-      }
+      "Value": { "Fn::FindInMap": [ "RegionSettings", { "Ref": "AWS::Region"}, "S3Endpoint" ] }
     }
   }
 }

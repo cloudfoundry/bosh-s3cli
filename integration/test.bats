@@ -56,6 +56,8 @@ setup() {
 
   run_local_or_remote "${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} get ${s3_filename} gotten_file"
 
+  s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/${s3_filename}
+
   if [ ! -z ${test_host} ]; then
     scp ec2-user@${test_host}:./gotten_file ./
   fi
@@ -77,6 +79,7 @@ setup() {
   run_local_or_remote "${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} put file_to_upload uploaded_by_s3"
 
   s3cmd --config ${S3CMD_CONFIG_FILE} get s3://${bucket_name}/uploaded_by_s3 uploaded_by_s3 --force
+  s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/uploaded_by_s3
   local actual_string=$(cat uploaded_by_s3)
 
   [ "${status}" -eq 0 ]
