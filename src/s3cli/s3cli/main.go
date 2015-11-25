@@ -57,7 +57,7 @@ func main() {
 		defer dstFile.Close()
 		err = blobstoreClient.Get(src, dstFile)
 	default:
-		log.Fatalf("unkown command: '%s'\n", cmd)
+		log.Fatalf("unknown command: '%s'\n", cmd)
 	}
 
 	if err != nil {
