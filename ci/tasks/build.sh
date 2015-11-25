@@ -2,7 +2,7 @@
 
 set -e
 
-source s3cli/ci/tasks/utils.sh
+source s3cli-src/ci/tasks/utils.sh
 
 
 semver=`cat version-semver/number`
