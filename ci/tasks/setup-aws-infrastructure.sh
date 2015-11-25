@@ -18,7 +18,7 @@ export AWS_DEFAULT_REGION=${region_name}
 
 cloudformation_parameters="[\
 {\"ParameterKey\": \"AmazonMachineImageID\", \"ParameterValue\": \"${ec2_ami}\", \"UsePreviousValue\": false},\
-{\"ParameterKey\": \"KeyPairName\",          \"ParameterValue\": \"${public_key_name}\", \"UsePreviousValue\": false},\
+{\"ParameterKey\": \"KeyPairName\",          \"ParameterValue\": \"${public_key_name}\", \"UsePreviousValue\": false}\
 ]"
 
 cmd="aws cloudformation create-stack \
