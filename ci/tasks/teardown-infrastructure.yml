@@ -1,0 +1,12 @@
+---
+platform: linux
+image: docker:///boshcpi/aws-cpi-release
+inputs:
+  - name: bosh-cpi-src
+run:
+  path: bosh-cpi-src/ci/tasks/teardown-infrastructure.sh
+params:
+  access_key_id:         replace-me
+  secret_access_key:     replace-me
+  region_name:               replace-me
+  stack_name:                replace-me

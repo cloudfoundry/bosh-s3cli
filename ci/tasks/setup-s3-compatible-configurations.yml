@@ -3,11 +3,13 @@ platform: linux
 image: docker:///boshcpi/s3cli
 inputs:
   - name: s3cli-src
+outputs:
   - name: configs
 run:
-  path: s3cli-src/ci/tasks/run-integration.sh
+  path: s3cli-src/ci/tasks/setup-s3-compatible-configurations.sh
 params:
   access_key_id:     replace-me
   secret_access_key: replace-me
-  region_name:
-  private_key_data:
+  bucket_name:       replace-me
+  s3_endpoint_host:  replace-me
+  s3_endpoint_port:  replace-me

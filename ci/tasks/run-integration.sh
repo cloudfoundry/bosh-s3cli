@@ -2,41 +2,59 @@
 
 set -e
 
-source s3cli/ci/tasks/utils.sh
+source s3cli-src/ci/tasks/utils.sh
 
 check_param access_key_id
 check_param secret_access_key
-check_param bucket_name
-check_param s3cmd_host
-check_param s3cmd_region
-check_param port
 
 export BATS_LOG="${PWD}/bats_log"
-echo "" > $BATS_LOG
+echo "" > ${BATS_LOG}
 trap "echo 'Output log:'; cat ${BATS_LOG}" ERR
 
-# Hack to get bats to work with concourse
-export TERM=xterm
+configs_dir=${PWD}/configs
+if [ -e ${PWD}/configs/test_host_ip ]; then
+  export test_host=$(cat ${PWD}/configs/test_host_ip)
+  #setup private key for ssh
+  private_key=${PWD}/private_key.pem
+  echo "${private_key_data}" > ${private_key}
+  chmod 600 ${private_key}
+  eval $(ssh-agent)
+  ssh-add ${private_key}
 
-pushd ${PWD}/s3cli > /dev/null
+  mkdir -p ~/.ssh
+  cat > ~/.ssh/config << EOF
+  Host *
+    StrictHostKeyChecking no
+  EOF
+fi
+
+export bucket_name=$(cat ${PWD}/configs/bucket_name)
+export s3cmd_host=$(cat ${PWD}/configs/s3_endpoint_host)
+
+pushd s3cli-src > /dev/null
+  # Hack to get bats to work with concourse
+  export TERM=xterm
   . .envrc
   go install s3cli/s3cli
 
-  export S3_CLI_CONFIG="$(mktemp -d /tmp/bats.XXXXXX)/s3cli.config"
-  cat > "${S3_CLI_CONFIG}"<< EOF
-{
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "credentials_source": "static",
-  "port": ${port},
-  "region": "${region_name}",
-  "host": "${host}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
-}
+  export S3CLI_EXE=$(which s3cli)
+popd > /dev/null
+
+export S3CMD_CONFIG_FILE="s3cmd.s3cfg"
+cat > "${S3CMD_CONFIG_FILE}" << EOF
+[default]
+access_key = ${access_key_id}
+secret_key = ${secret_access_key}
+bucket_location = ${region_name}
+host_base = ${s3cmd_host}
+host_bucket = %(bucket)s.${s3cmd_host}
+enable_multipart = True
+multipart_chunk_size_mb = 15
+use_https = True
 EOF
 
-
-  bats integration/test.bats
-popd > /dev/null
+for file in configs/*-s3cli_config.json; do
+  echo "Running with ${file}:" >> ${BATS_LOG}
+  echo "$(cat ${file})" >> ${BATS_LOG}
+  S3CLI_CONFIG_FILE=${file} bats s3cli-src/integration/test.bats
+done

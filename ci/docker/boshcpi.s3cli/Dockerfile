@@ -31,3 +31,5 @@ RUN cd /tmp && \
     cp -R s3cmd S3 /usr/local/bin && \
     cd /tmp && \
     rm -rf s3cmd-1.6.0/ v1.6.0.tar.gz
+
+RUN apt-get install -y python python-pip groff jq; apt-get clean; pip install awscli;

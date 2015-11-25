@@ -34,92 +34,140 @@ jobs:
     serial: true
     plan:
       - aggregate:
-          - {trigger: true, get: s3cli, resource: s3cli-in}
+          - {trigger: true, get: s3cli-src, resource: s3cli-in}
 
       - task: test
-        file: s3cli/ci/tasks/run-unit.yml
+        file: s3cli-src/ci/tasks/run-unit.yml
 
   - name: aws-s3-us-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: setup
+        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
+        config: &aws-us-infrastructure-config
+          params:
+            access_key_id:     {{access_key_id__aws_us}}
+            secret_access_key: {{secret_access_key__aws_us}}
+            region_name:       {{region_name__aws_us}}
+            stack_name:        s3cli-iam
+            region_optional:   true
+            ec2_ami:           {{ec2_ami__aws_us}}
+            public_key_name:   {{public_key_name__aws_us}}
+
       - task: test
-        file: s3cli/ci/tasks/run-integration.yml
+        file: s3cli-src/ci/tasks/run-integration.yml
         config:
           params:
-            access_key_id:            {{access_key_id__aws_us}}
-            secret_access_key:        {{secret_access_key__aws_us}}
-            bucket_name:              {{bucket_name__aws_us}}
-            s3cmd_host:               {{host__aws_us}}
-            s3cmd_region:             {{region_name__aws_us}}
-            port:                     0
+            access_key_id:     {{access_key_id__aws_us}}
+            secret_access_key: {{secret_access_key__aws_us}}
+            region_name:       {{region_name__aws_us}}
+            private_key_data:  {{private_key_data__aws_us}}
+
+      - task: teardown
+        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+        config: *aws-us-infrastructure-config
 
   - name: aws-s3-china-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: setup
+        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
+        config: &aws-china-infrastructure-config
+          params:
+            access_key_id:     {{access_key_id__aws_china}}
+            secret_access_key: {{secret_access_key__aws_china}}
+            region_name:       {{region_name__aws_china}}
+            stack_name:        s3cli-iam
+            region_optional:   false
+            ec2_ami:           {{ec2_ami__aws_china}}
+            public_key_name:   {{public_key_name__aws_china}}
+
       - task: test
-        file: s3cli/ci/tasks/run-integration.yml
+        file: s3cli-src/ci/tasks/run-integration.yml
         config:
           params:
-            access_key_id:            {{access_key_id__aws_china}}
-            secret_access_key:        {{secret_access_key__aws_china}}
-            bucket_name:              {{bucket_name__aws_china}}
-            region_name:              {{region_name__aws_china}}
-            s3cmd_region:             {{region_name__aws_china}}
-            s3cmd_host:               {{host__aws_china}}
-            port:                     {{port__aws_china}}
+            access_key_id:     {{access_key_id__aws_china}}
+            secret_access_key: {{secret_access_key__aws_china}}
+            region_name:       {{region_name__aws_china}}
+            private_key_data:  {{private_key_data__aws_china}}
+
+      - task: teardown
+        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+        config: *aws-china-infrastructure-config
 
   - name: aws-s3-frankfurt-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: setup
+        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
+        config: &aws-frankfurt-infrastructure-config
+          params:
+            access_key_id:     {{access_key_id__aws_frankfurt}}
+            secret_access_key: {{secret_access_key__aws_frankfurt}}
+            region_name:       {{region_name__aws_frankfurt}}
+            stack_name:        s3cli-iam
+            region_optional:   false
+            ec2_ami:           {{ec2_ami__aws_frankfurt}}
+            public_key_name:   {{public_key_name__aws_frankfurt}}
+
       - task: test
-        file: s3cli/ci/tasks/run-integration.yml
+        file: s3cli-src/ci/tasks/run-integration.yml
         config:
           params:
-            access_key_id:            {{access_key_id__aws_frankfurt}}
-            secret_access_key:        {{secret_access_key__aws_frankfurt}}
-            bucket_name:              {{bucket_name__aws_frankfurt}}
-            region_name:              {{region_name__aws_frankfurt}}
-            s3cmd_region:             {{region_name__aws_frankfurt}}
-            s3cmd_host:               {{host__aws_frankfurt}}
-            port:                     {{port__aws_frankfurt}}
+            access_key_id:     {{access_key_id__aws_frankfurt}}
+            secret_access_key: {{secret_access_key__aws_frankfurt}}
+            region_name:       {{region_name__aws_frankfurt}}
+            private_key_data:  {{private_key_data__aws_frankfurt}}
 
+      - task: teardown
+        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+        config: *aws-frankfurt-infrastructure-config
 
   - name: s3-compatible-integration
     serial: true
     plan:
-      - {trigger: true, get: s3cli, passed: [unit], resource: s3cli-in}
-      - task: test
-        file: s3cli/ci/tasks/run-integration.yml
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: setup
+        file: s3cli-src/ci/tasks/setup-s3-compatible-configurations.yml
         config:
           params:
-            access_key_id:            {{access_key_id__s3_compat}}
-            secret_access_key:        {{secret_access_key__s3_compat}}
-            bucket_name:              {{bucket_name__s3_compat}}
-            host:                     {{host__s3_compat}}
-            s3cmd_region:             {{region_name__s3_compat}}
-            s3cmd_host:               {{host__s3_compat}}
-            port:                     {{port__s3_compat}}
+            access_key_id:     {{access_key_id__s3_compat}}
+            secret_access_key: {{secret_access_key__s3_compat}}
+            bucket_name:       {{bucket_name__s3_compat}}
+            s3_endpoint_host:  {{host__s3_compat}}
+            s3_endpoint_port:  {{port__s3_compat}}
+
+      - task: test
+        file: s3cli-src/ci/tasks/run-integration.yml
+        config:
+          params:
+            access_key_id:     {{access_key_id__s3_compat}}
+            secret_access_key: {{secret_access_key__s3_compat}}
 
   - name: promote
     plan:
       - aggregate:
-          - {trigger: true, get: s3cli, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
-          - get: version-semver
-            params: {bump: patch}
+          - {trigger: true,  get: s3cli-src,     passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
+          - {trigger: false, get: version-semver, params: {bump: patch} }
 
       - {put: version-semver, params: {file: version-semver/number}}
 
       - task: build-linux
-        file: s3cli/ci/tasks/build.yml
+        file: s3cli-src/ci/tasks/build.yml
 
-      - {put: release-bucket-linux, params: {from: build-linux/s3cli/out/s3}}
+      - put: release-bucket-linux
+        params: {file: out/s3cli-*-linux-amd64}
 
-      - put: s3cli-out
+      - put: s3cli-src
         resource: s3cli-out
-        params: {repository: s3cli}
+        params: {repository: s3cli-src}
 
 resources:
   - name: s3cli-in

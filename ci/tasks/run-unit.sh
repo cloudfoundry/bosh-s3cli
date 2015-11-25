@@ -8,7 +8,7 @@ source s3cli/ci/tasks/utils.sh
 semver='1.2.3.4'
 timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
-pushd s3cli > /dev/null
+pushd s3cli-src > /dev/null
   git_rev=`git rev-parse --short HEAD`
   version="${semver}-${git_rev}-${timestamp}"
 

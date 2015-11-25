@@ -8,7 +8,9 @@ source s3cli/ci/tasks/utils.sh
 semver=`cat version-semver/number`
 timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
-pushd s3cli > /dev/null
+output_dir=${PWD}/out
+
+pushd s3cli-src > /dev/null
   git_rev=`git rev-parse --short HEAD`
   version="${semver}-${git_rev}-${timestamp}"
 
@@ -20,5 +22,5 @@ pushd s3cli > /dev/null
   echo -e "\n sha1 of artifact..."
   sha1sum out/s3cli-${semver}-linux-amd64
 
+  mv out/s3cli-${semver}-linux-amd64 ${output_dir}/
 popd > /dev/null
-
