@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"regexp"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -86,13 +87,11 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, errors.New("Cannot set both region and host at the same time")
 	}
 
-	switch c.Region {
-	case euCentralRegion:
-		// use v4 signing
-	case cnNorthRegion:
-		// use v4 signing
-	default:
-		c.UseV2SigningMethod = true
+	if c.Region == "" && c.Host != "" {
+		isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
+		if !isHostAWS || c.CredentialsSource == StaticCredentialsSource {
+			c.UseV2SigningMethod = true
+		}
 	}
 
 	return c, nil

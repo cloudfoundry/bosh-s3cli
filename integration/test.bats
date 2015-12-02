@@ -3,10 +3,8 @@
 set -e
 
 print_debug() {
-  description=$1
-  output=$2
-
-  echo "BATS_DEBUG-[$(date)] '${description}': ${output}" >> ${BATS_LOG}
+  local output=$1
+  echo "BATS_DEBUG-[$(date)] ${output}" >> ${BATS_LOG}
 }
 
 run_local_or_remote() {
@@ -15,7 +13,12 @@ run_local_or_remote() {
     cmd="ssh ec2-user@${test_host} ${cmd}"
   fi
   run ${cmd}
-  print_debug "${BATS_TEST_DESCRIPTION}" "cmd:${cmd} status:${status}, output:${output}"
+  print_debug "-------------"
+  print_debug "Test:        ${BATS_TEST_DESCRIPTION}"
+  print_debug "Config file: ${S3CLI_CONFIG_FILE}"
+  print_debug "Command:     ${cmd}"
+  print_debug "Status:      ${status}"
+  print_debug "Output:      ${output}"
 }
 
 setup() {
@@ -23,12 +26,6 @@ setup() {
   : "${S3CMD_CONFIG_FILE:?Need to set S3CMD_CONFIG non-empty}"
   : "${S3CLI_EXE:?Need to set S3CLI_EXE non-empty}"
   export BATS_RANDOM_ID=$(uuidgen)
-
-#  print_debug "s3cli config" "${S3CLI_CONFIG_FILE}: $(cat ${S3CLI_CONFIG_FILE})"
-#  print_debug "s3cmd config" "${S3CMD_CONFIG_FILE}: $(cat ${S3CMD_CONFIG_FILE})"
-#  print_debug "random id" "${BATS_RANDOM_ID}"
-#  print_debug "S3CLI_EXE" "${S3CLI_EXE}"
-#  print_debug "test_host" "${test_host}"
 
   if [ ! -z ${test_host} ]; then
     ssh ec2-user@${test_host} "mkdir -p ~/configs"

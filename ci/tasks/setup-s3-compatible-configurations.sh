@@ -15,7 +15,7 @@ cd ${PWD}/configs
 echo ${s3_endpoint_host} > s3_endpoint_host
 echo ${bucket_name} > bucket_name
 
-cat > "s3_compatible_w_port-s3cli_config.json"<< EOF
+cat > "s3_compatible_w_ssl-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
@@ -27,15 +27,27 @@ cat > "s3_compatible_w_port-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "static_w_host_wout_region-s3cli_config.json"<< EOF
+cat > "s3_compatible_wout_ssl-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
   "host": "${s3_endpoint_host}",
-  "port": "${s3_endpoint_port}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "ssl_verify_peer": false,
+  "use_ssl": false
+}
+EOF
+
+cat > "s3_compatible_w_port_wout_ssl-s3cli_config.json"<< EOF
+{
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}",
+  "port": ${s3_endpoint_port},
+  "ssl_verify_peer": false,
+  "use_ssl": false
 }
 EOF

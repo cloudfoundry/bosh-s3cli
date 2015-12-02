@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
@@ -35,8 +36,9 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 	httpClient := &http.Client{Transport: &transport}
 
 	s3Config := aws.NewConfig().
+		WithLogLevel(aws.LogDebugWithHTTPBody).
+//		WithLogLevel(aws.LogOff).
 		WithS3ForcePathStyle(true).
-		WithLogLevel(aws.LogOff).
 		WithDisableSSL(!c.UseSSL).
 		WithHTTPClient(httpClient)
 
@@ -50,7 +52,8 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(c.AccessKeyID, c.SecretAccessKey, ""))
 	}
 
-	s3Client := s3.New(s3Config)
+	s3Session := session.New(s3Config)
+	s3Client := s3.New(s3Session)
 
 	if c.UseV2SigningMethod {
 		setv2Handlers(s3Client)
@@ -62,7 +65,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 // Get fetches a blob from an S3 compatible blobstore
 // Destination will be overwritten if exists
 func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
-	downloader := s3manager.NewDownloader(&s3manager.DownloadOptions{S3: client.s3Client})
+	downloader := s3manager.NewDownloaderWithClient(client.s3Client)
 
 	_, err := downloader.Download(dest, &s3.GetObjectInput{
 		Bucket: aws.String(client.s3cliConfig.BucketName),
@@ -78,7 +81,7 @@ func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
 
 // Put uploads a blob to an S3 compatible blobstore
 func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
-	uploader := s3manager.NewUploader(&s3manager.UploadOptions{S3: client.s3Client})
+	uploader := s3manager.NewUploaderWithClient(client.s3Client)
 	putResult, err := uploader.Upload(&s3manager.UploadInput{
 		Body:   src,
 		Bucket: aws.String(client.s3cliConfig.BucketName),

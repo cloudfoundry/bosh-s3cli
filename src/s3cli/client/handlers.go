@@ -84,16 +84,16 @@ func setv2Handlers(svc *s3.S3) {
 func Sign(req *request.Request) {
 	// If the request does not need to be signed ignore the signing of the
 	// request if the AnonymousCredentials object is used.
-	if req.Service.Config.Credentials == credentials.AnonymousCredentials {
+	if req.Config.Credentials == credentials.AnonymousCredentials {
 		return
 	}
 
 	v2 := signer{
 		Request:     req.HTTPRequest,
 		Time:        req.Time,
-		Credentials: req.Service.Config.Credentials,
-		Debug:       req.Service.Config.LogLevel.Value(),
-		Logger:      req.Service.Config.Logger,
+		Credentials: req.Config.Credentials,
+		Debug:       req.Config.LogLevel.Value(),
+		Logger:      req.Config.Logger,
 	}
 
 	req.Error = v2.Sign()

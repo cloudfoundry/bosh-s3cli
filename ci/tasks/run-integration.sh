@@ -7,14 +7,17 @@ source s3cli-src/ci/tasks/utils.sh
 check_param access_key_id
 check_param secret_access_key
 
-export BATS_LOG="${PWD}/bats_log"
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_RESET='\033[0m'
+export BATS_LOG="${PWD}/bats_output.log"
+export BATS_ERRORS="${PWD}/bats_errors.log"
 echo "" > ${BATS_LOG}
-trap "echo 'Output log:'; cat ${BATS_LOG}" ERR
+echo "" > ${BATS_ERRORS}
 
 configs_dir=${PWD}/configs
 if [ -e ${PWD}/configs/test_host_ip ]; then
   export test_host=$(cat ${PWD}/configs/test_host_ip)
-  #setup private key for ssh
   private_key=${PWD}/private_key.pem
   echo "${private_key_data}" > ${private_key}
   chmod 600 ${private_key}
@@ -53,8 +56,34 @@ multipart_chunk_size_mb = 15
 use_https = True
 EOF
 
+set +e
+combined_status=0
+configurations_run=0
+failed_runs=0
 for file in configs/*-s3cli_config.json; do
-  echo "Running with ${file}:" >> ${BATS_LOG}
+  echo "### Running with ${file} #######################################################"
+  echo "### Running with ${file} #######################################################" >> ${BATS_LOG}
   echo "$(cat ${file})" >> ${BATS_LOG}
   S3CLI_CONFIG_FILE=${file} bats s3cli-src/integration/test.bats
+  status=$?
+  let "configurations_run++"
+#  printf "\n\n${COLOR_GREEN}\n"
+#  cat ${BATS_LOG}
+#  printf "${COLOR_RESET}\n\n"
+  combined_status=$(($combined_status + ${status}))
+  if [ ${status} -ne 0 ]; then
+    let "failed_runs++"
+    cat ${BATS_LOG} >> ${BATS_ERRORS}
+  fi
+  echo "" > ${BATS_LOG}
 done
+case "${combined_status}" in
+ 0) OUTPUT_COLOR=${COLOR_GREEN} ;;
+ *) OUTPUT_COLOR=${COLOR_RED} ;;
+esac
+if [ ${combined_status} -ne 0 ]; then
+  printf "\n\n${COLOR_RED}ERRORS${COLOR_RESET}:"
+  cat ${BATS_ERRORS}
+fi
+printf "\n\n${OUTPUT_COLOR}${configurations_run} configurations run, ${failed_runs} failed${COLOR_RESET}\n"
+exit $combined_status
