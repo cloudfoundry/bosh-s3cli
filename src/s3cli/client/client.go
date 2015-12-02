@@ -36,8 +36,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 	httpClient := &http.Client{Transport: &transport}
 
 	s3Config := aws.NewConfig().
-		WithLogLevel(aws.LogDebugWithHTTPBody).
-//		WithLogLevel(aws.LogOff).
+		WithLogLevel(aws.LogOff).
 		WithS3ForcePathStyle(true).
 		WithDisableSSL(!c.UseSSL).
 		WithHTTPClient(httpClient)
