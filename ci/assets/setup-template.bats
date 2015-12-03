@@ -2,23 +2,18 @@
 
 set -e
 
-print_debug() {
-  local output=$1
-  echo "BATS_DEBUG-[$(date)] ${output}"
-}
-
 run_local_or_remote() {
   local cmd=$1
   if [ ! -z ${test_host} ]; then
     cmd="ssh ec2-user@${test_host} ${cmd}"
   fi
   run ${cmd}
-  print_debug "-------------"
-  print_debug "Test:        ${BATS_TEST_DESCRIPTION}"
-  print_debug "Config file: ${S3CLI_CONFIG_FILE}"
-  print_debug "Command:     ${cmd}"
-  print_debug "Status:      ${status}"
-  print_debug "Output:      ${output}"
+  echo "-------------"
+  echo "Test:        ${BATS_TEST_DESCRIPTION}"
+  echo "Config file: ${S3CLI_CONFIG_FILE}"
+  echo "Command:     ${cmd}"
+  echo "Status:      ${status}"
+  echo "Output:      ${output}"
 }
 
 setup() {

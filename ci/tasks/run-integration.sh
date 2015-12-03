@@ -24,7 +24,7 @@ EOF
 fi
 
 export bucket_name=$(cat ${PWD}/configs/bucket_name)
-export s3cmd_host=$(cat ${PWD}/configs/s3_endpoint_host)
+s3cmd_host=$(cat ${PWD}/configs/s3_endpoint_host)
 
 pushd s3cli-src > /dev/null
   # Hack to get bats to work with concourse
@@ -48,64 +48,18 @@ multipart_chunk_size_mb = 15
 use_https = True
 EOF
 
-# Note there is a subtle use of bash environment variables where some are
-# evaluated by the here-doc and some are injected into the script by the
-# here-doc to be evaluated by the bats runtime.
-
-bats_file=dynamic.bats
-cat s3cli-src/integration/test.bats > ${bats_file}
+bats_file=test.bats
+cat s3cli-src/ci/assets/setup-template.bats > ${bats_file}
 export S3CLI_CONFIGS_DIR=${configs_dir}
-for S3CLI_CONFIG_FILE in ${configs_dir}/*-s3cli_config.json; do
-  cat >> "${bats_file}" << EOF
+for file in ${configs_dir}/*-s3cli_config.json; do
+  export S3CLI_CONFIG_FILE=${file}
 
-@test "Invoking s3cli get with nonexistent key should output error using config: ${S3CLI_CONFIG_FILE}" {
-  local non_existant_file=\${BATS_RANDOM_ID}
+  # We pass the `shell-format` parameter to envsubst to limit which environment
+  # variables should be interpolated, leaving the rest to be interpolated at bats runtime.
+  # See: https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html
 
-  run_local_or_remote "\${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} get \${non_existant_file} empty_file"
-
-  [ "\${status}" -ne 0 ]
-  [[ "\${output}" =~ "NoSuchKey" ]]
-}
-
-@test "Invoking s3cli get with existing key should return the correct file using config: ${S3CLI_CONFIG_FILE}" {
-  local expected_string=\${BATS_RANDOM_ID}
-  local s3_filename="existing_file_in_s3"
-
-  echo -n \${expected_string} > \${s3_filename}
-  s3cmd --config ${S3CMD_CONFIG_FILE} put \${s3_filename} s3://${bucket_name}/
-
-  run_local_or_remote "\${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} get \${s3_filename} gotten_file"
-
-  s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/\${s3_filename}
-
-  if [ ! -z \${test_host} ]; then
-    scp ec2-user@\${test_host}:./gotten_file ./
-  fi
-  local actual_string=\$(cat gotten_file)
-  print_debug "actual_string" "\${actual_string}"
-
-  [ "\${status}" -eq 0 ]
-  [ "\${expected_string}" = "\${actual_string}" ]
-}
-
-@test "Invoking s3cli put should correctly write the file to the bucket using config: ${S3CLI_CONFIG_FILE}" {
-  local expected_string=\${BATS_RANDOM_ID}
-
-  echo -n \${expected_string} > file_to_upload
-  if [ ! -z \${test_host} ]; then
-    scp file_to_upload ec2-user@\${test_host}:~/file_to_upload
-  fi
-
-  run_local_or_remote "\${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} put file_to_upload uploaded_by_s3"
-
-  s3cmd --config ${S3CMD_CONFIG_FILE} get s3://${bucket_name}/uploaded_by_s3 uploaded_by_s3 --force
-  s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/uploaded_by_s3
-  local actual_string=\$(cat uploaded_by_s3)
-
-  [ "\${status}" -eq 0 ]
-  [ "\${expected_string}" = "\${actual_string}" ]
-}
-EOF
+  cat s3cli-src/ci/assets/examples-template.bats | \
+  envsubst "\$S3CLI_CONFIG_FILE \$bucket_name \$S3CMD_CONFIG_FILE" >> "${bats_file}"
 done
 
 bats ${bats_file}
