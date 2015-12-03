@@ -9,11 +9,11 @@ run_local_or_remote() {
   fi
   run ${cmd}
   echo "-------------"
-  echo "Test:        ${BATS_TEST_DESCRIPTION}"
-  echo "Config file: ${S3CLI_CONFIG_FILE}"
-  echo "Command:     ${cmd}"
-  echo "Status:      ${status}"
-  echo "Output:      ${output}"
+  echo   "Test:        ${BATS_TEST_DESCRIPTION}"
+  printf "Config file: ${current_config_file}\n$(cat ${current_config_file})\n"
+  echo   "Command:     ${cmd}"
+  echo   "Status:      ${status}"
+  echo   "Output:      ${output}"
 }
 
 setup() {
