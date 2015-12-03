@@ -223,17 +223,28 @@
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    { 
-                      "Fn::Join": [ 
-                        "", 
-                        [ 
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
                           "arn:",
                           { "Fn::FindInMap": [ "RegionSettings", { "Ref": "AWS::Region" }, "AWSNamespace" ] },
-                          ":s3:::", 
-                          { "Ref": "S3Bucket" }, 
-                          "/*" 
-                        ] 
-                      ] 
+                          ":s3:::",
+                          { "Ref": "S3Bucket" }
+                        ]
+                      ]
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          { "Fn::FindInMap": [ "RegionSettings", { "Ref": "AWS::Region" }, "AWSNamespace" ] },
+                          ":s3:::",
+                          { "Ref": "S3Bucket" },
+                          "/*"
+                        ]
+                      ]
                     }
                   ]
                 }

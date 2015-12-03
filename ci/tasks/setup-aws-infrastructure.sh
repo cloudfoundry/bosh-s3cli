@@ -20,10 +20,9 @@ cloudformation_parameters="ParameterKey=AmazonMachineImageID,ParameterValue=${ec
 
 cmd="aws cloudformation create-stack \
     --stack-name    ${stack_name} \
-    --template-body file:///${PWD}/s3cli-src/ci/assets/cloudformation-s3cli-iam.template.json \
+    --template-body file://${PWD}/s3cli-src/ci/assets/cloudformation-s3cli-iam.template.json \
     --capabilities  CAPABILITY_IAM
     --parameters    ${cloudformation_parameters}"
-
 
 echo "Running: ${cmd}"; ${cmd}
 while true; do
