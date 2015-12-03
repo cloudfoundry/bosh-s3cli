@@ -122,44 +122,94 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 
 		Describe("configuring signing method", func() {
-			It("uses v4 signing in the `eu-central-1` AWS region", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "region": "eu-central-1"}`)
-				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
-				c, err := config.NewFromReader(dummyJSONReader)
+			var s3CliConfig config.S3Cli
+			var configJson []byte
+			JustBeforeEach(func() {
+				dummyJSONReader := bytes.NewReader(configJson)
+				var err error
+				s3CliConfig, err = config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(c.UseV2SigningMethod).To(BeFalse())
 			})
 
-			It("uses v4 signing in the `cn-north-1` AWS region", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "region": "cn-north-1"}`)
-				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+			Context("when there is a host and no region defined", func() {
+				Context("when the hostname contains 'amazonaws'", func() {
+					Context("when the credential source is static", func() {
+						BeforeEach(func() {
+							configJson = []byte(`{
+								"credentials_source": "static",
+								"access_key_id": "id",
+								"secret_access_key": "key",
+								"bucket_name": "some-bucket",
+								"host": "something.amazonaws.com.something"
+							}`)
+						})
 
-				c, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(c.UseV2SigningMethod).To(BeFalse())
+						It("uses v2 signing", func() {
+							Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
+						})
+					})
+
+					Context("when the credential source is env_or_profile", func() {
+						BeforeEach(func() {
+							configJson = []byte(`{
+								"credentials_source": "env_or_profile",
+								"bucket_name": "some-bucket",
+								"host": "something.amazonaws.com.something"
+							}`)
+						})
+
+						It("uses v4 signing", func() {
+							Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+						})
+					})
+				})
+
+				Context("when the hostname does not contain 'amazonaws'", func() {
+					BeforeEach(func() {
+						configJson = []byte(`{
+						 "credentials_source": "static",
+							"access_key_id": "id",
+							"secret_access_key": "key",
+							"bucket_name": "some-bucket",
+							"host": "s3-compatible.com"
+						}`)
+					})
+
+					It("uses v2 signing", func() {
+						Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
+					})
+				})
 			})
 
-			It("uses v2 signing for any other regions", func() {
-				regions := []string{"us-east-1", "us-west-1", "unknown-region"}
+			Context("when there is no host and no region defined", func() {
+				BeforeEach(func() {
+					configJson = []byte(`{
+						"credentials_source": "static",
+						"access_key_id": "id",
+						"secret_access_key": "key",
+						"bucket_name": "some-bucket"
+					}`)
+				})
 
-				for _, region := range regions {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "region": "` + region + `"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
-					c, err := config.NewFromReader(dummyJSONReader)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseV2SigningMethod).To(BeTrue())
-				}
+				It("uses v4 signing", func() {
+					Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+				})
 			})
 
-			It("defaults to v2 signing if region is not specified", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
-				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+			Context("when there is no host and region defined", func() {
+				BeforeEach(func() {
+					configJson = []byte(`{
+						"credentials_source": "static",
+						"access_key_id": "id",
+						"secret_access_key": "key",
+						"bucket_name": "some-bucket",
+						"region": "some-region-3"
+					}`)
+				})
 
-				c, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(c.UseV2SigningMethod).To(BeTrue())
+				It("uses v4 signing", func() {
+					Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+				})
 			})
 		})
 
