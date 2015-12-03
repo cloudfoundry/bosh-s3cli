@@ -100,16 +100,6 @@ cat > "profile_wout_host_w_region-s3cli_config.json"<< EOF
 EOF
 
 if [ "${region_optional}" = true ]; then
-  cat > "profile_w_host_wout_region-s3cli_config.json"<< EOF
-{
-  "credentials_source": "env_or_profile",
-  "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
-}
-EOF
-
   cat > "profile_wout_host_wout_region-s3cli_config.json"<< EOF
 {
   "credentials_source": "env_or_profile",
