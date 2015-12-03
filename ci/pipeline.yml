@@ -51,7 +51,7 @@ jobs:
             access_key_id:     {{access_key_id__aws_us}}
             secret_access_key: {{secret_access_key__aws_us}}
             region_name:       {{region_name__aws_us}}
-            stack_name:        s3cli-iam
+            stack_name:        {{stack_name__aws_us}}
             region_optional:   true
             ec2_ami:           {{ec2_ami__aws_us}}
             public_key_name:   {{public_key_name__aws_us}}
@@ -81,7 +81,7 @@ jobs:
             access_key_id:     {{access_key_id__aws_china}}
             secret_access_key: {{secret_access_key__aws_china}}
             region_name:       {{region_name__aws_china}}
-            stack_name:        s3cli-iam
+            stack_name:        {{stack_name__aws_china}}
             region_optional:   false
             ec2_ami:           {{ec2_ami__aws_china}}
             public_key_name:   {{public_key_name__aws_china}}
@@ -111,7 +111,7 @@ jobs:
             access_key_id:     {{access_key_id__aws_frankfurt}}
             secret_access_key: {{secret_access_key__aws_frankfurt}}
             region_name:       {{region_name__aws_frankfurt}}
-            stack_name:        s3cli-iam
+            stack_name:        {{stack_name__aws_frankfurt}}
             region_optional:   false
             ec2_ami:           {{ec2_ami__aws_frankfurt}}
             public_key_name:   {{public_key_name__aws_frankfurt}}
