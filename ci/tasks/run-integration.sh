@@ -7,9 +7,19 @@ source s3cli-src/ci/tasks/utils.sh
 check_param access_key_id
 check_param secret_access_key
 
-configs_dir=./configs
-if [ -e ${PWD}/configs/test_host_ip ]; then
-  export test_host=$(cat ${PWD}/configs/test_host_ip)
+# Hack to get bats to work with concourse
+export TERM=xterm
+
+pushd s3cli-src > /dev/null
+  . .envrc
+  go install s3cli/s3cli
+
+  export S3CLI_EXE=$(which s3cli)
+popd > /dev/null
+
+export S3CLI_CONFIGS_DIR=./configs
+if [ -e ${S3CLI_CONFIGS_DIR}/test_host_ip ]; then
+  export test_host=$(cat ${S3CLI_CONFIGS_DIR}/test_host_ip)
   private_key=${PWD}/private_key.pem
   echo "${private_key_data}" > ${private_key}
   chmod 600 ${private_key}
@@ -21,19 +31,15 @@ if [ -e ${PWD}/configs/test_host_ip ]; then
   Host *
     StrictHostKeyChecking no
 EOF
+
+  ssh ec2-user@${test_host} "mkdir -p /home/ec2-user/configs"
+  scp -r ${S3CLI_CONFIGS_DIR}/*.json  ec2-user@${test_host}:/home/ec2-user/configs/
+  scp ${S3CLI_EXE} ec2-user@${test_host}:/home/ec2-user/s3cli
+  S3CLI_EXE="/home/ec2-user/s3cli"
 fi
 
-export bucket_name=$(cat ${PWD}/configs/bucket_name)
-s3cmd_host=$(cat ${PWD}/configs/s3_endpoint_host)
-
-pushd s3cli-src > /dev/null
-  # Hack to get bats to work with concourse
-  export TERM=xterm
-  . .envrc
-  go install s3cli/s3cli
-
-  export S3CLI_EXE=$(which s3cli)
-popd > /dev/null
+export bucket_name=$(cat ${S3CLI_CONFIGS_DIR}/bucket_name)
+s3cmd_host=$(cat ${S3CLI_CONFIGS_DIR}/s3_endpoint_host)
 
 export S3CMD_CONFIG_FILE="s3cmd.s3cfg"
 cat > "${S3CMD_CONFIG_FILE}" << EOF
@@ -50,8 +56,7 @@ EOF
 
 bats_file=test.bats
 cat s3cli-src/ci/assets/setup-template.bats > ${bats_file}
-export S3CLI_CONFIGS_DIR=${configs_dir}
-for file in ${configs_dir}/*-s3cli_config.json; do
+for file in ${S3CLI_CONFIGS_DIR}/*-s3cli_config.json; do
   export S3CLI_CONFIG_FILE=${file}
 
   # We pass the `shell-format` parameter to envsubst to limit which environment
