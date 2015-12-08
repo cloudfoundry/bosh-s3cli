@@ -9,7 +9,27 @@ groups:
       - s3-compatible-integration
       - promote
 
+  - name: versioning
+    jobs:
+      - bump-minor
+      - bump-major
+      - promote
+
 jobs:
+  - name: bump-minor
+    public: true
+    plan:
+      - get: version-semver
+        params: {bump: minor}
+      - {put: version-semver, params: {file: version-semver/number}}
+
+  - name: bump-major
+    public: true
+    plan:
+      - get: version-semver
+        params: {bump: major}
+      - {put: version-semver, params: {file: version-semver/number}}
+
   - name: unit
     serial: true
     plan:
@@ -147,7 +167,7 @@ jobs:
 
       - put: s3cli-src
         resource: s3cli-out
-        params: {repository: s3cli-src, tag: version-semver/number, tag_prefix: v}
+        params: {repository: s3cli-src}
 
 resources:
   - name: s3cli-in
