@@ -11,11 +11,15 @@ check_param s3_endpoint_host
 check_param s3_endpoint_port
 
 cd ${PWD}/configs
+test_types=( generic negative_sig_version negative_region_invalid )
+for test_type in "${test_types[@]}"; do
+  mkdir -p ${test_type}
+done
 
 echo ${s3_endpoint_host} > s3_endpoint_host
 echo ${bucket_name} > bucket_name
 
-cat > "s3_compatible_w_ssl-s3cli_config.json"<< EOF
+cat > "generic/s3_compatible_w_ssl-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
@@ -27,7 +31,7 @@ cat > "s3_compatible_w_ssl-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "s3_compatible_wout_ssl-s3cli_config.json"<< EOF
+cat > "generic/s3_compatible_wout_ssl-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
@@ -39,7 +43,7 @@ cat > "s3_compatible_wout_ssl-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "s3_compatible_w_port_wout_ssl-s3cli_config.json"<< EOF
+cat > "generic/s3_compatible_w_port_wout_ssl-s3cli_config.json"<< EOF
 {
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",

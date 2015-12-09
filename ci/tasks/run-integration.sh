@@ -31,9 +31,7 @@ if [ -e ${S3CLI_CONFIGS_DIR}/test_host_ip ]; then
   Host *
     StrictHostKeyChecking no
 EOF
-
-  ssh ec2-user@${test_host} "mkdir -p /home/ec2-user/configs"
-  scp -r ${S3CLI_CONFIGS_DIR}/*.json  ec2-user@${test_host}:/home/ec2-user/configs/
+  scp -r ${S3CLI_CONFIGS_DIR} ec2-user@${test_host}:/home/ec2-user/
   scp ${S3CLI_EXE} ec2-user@${test_host}:/home/ec2-user/s3cli
   S3CLI_EXE="/home/ec2-user/s3cli"
 fi
@@ -56,15 +54,20 @@ EOF
 
 bats_file=test.bats
 cat s3cli-src/ci/assets/setup-template.bats > ${bats_file}
-for file in ${S3CLI_CONFIGS_DIR}/*-s3cli_config.json; do
-  export S3CLI_CONFIG_FILE=${file}
+test_types=( generic negative_sig_version negative_region_invalid )
+for test_type in "${test_types[@]}"; do
+  for file in ${S3CLI_CONFIGS_DIR}/${test_type}/*-s3cli_config.json; do
+    if [ -e "${file}" ]; then
+      export S3CLI_CONFIG_FILE=${file}
 
-  # We pass the `shell-format` parameter to envsubst to limit which environment
-  # variables should be interpolated, leaving the rest to be interpolated at bats runtime.
-  # See: https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html
+      # We pass the `shell-format` parameter to envsubst to limit which environment
+      # variables should be interpolated, leaving the rest to be interpolated at bats runtime.
+      # See: https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html
 
-  cat s3cli-src/ci/assets/examples-template.bats | \
-  envsubst "\$S3CLI_CONFIG_FILE \$bucket_name \$S3CMD_CONFIG_FILE" >> "${bats_file}"
+      cat s3cli-src/ci/assets/${test_type}-examples-template.bats | \
+      envsubst "\$S3CLI_CONFIG_FILE \$bucket_name \$S3CMD_CONFIG_FILE" >> "${bats_file}"
+    fi
+  done
 done
 
 bats ${bats_file}

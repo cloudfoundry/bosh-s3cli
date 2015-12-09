@@ -20,6 +20,7 @@ type S3Cli struct {
 	Region             string `json:"region"`
 	SSLVerifyPeer      bool   `json:"ssl_verify_peer"`
 	UseSSL             bool   `json:"use_ssl"`
+	SignatureVersion   int    `json:"signature_version,string"`
 	UseV2SigningMethod bool
 }
 
@@ -87,10 +88,17 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, errors.New("Cannot set both region and host at the same time")
 	}
 
-	if c.Region == "" && c.Host != "" {
-		isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
-		if !isHostAWS || c.CredentialsSource == StaticCredentialsSource {
-			c.UseV2SigningMethod = true
+	switch c.SignatureVersion {
+	case 2:
+		c.UseV2SigningMethod = true
+	case 4:
+		c.UseV2SigningMethod = false
+	default:
+		if c.Region == "" && c.Host != "" {
+			isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
+			if !isHostAWS || c.CredentialsSource == StaticCredentialsSource {
+				c.UseV2SigningMethod = true
+			}
 		}
 	}
 

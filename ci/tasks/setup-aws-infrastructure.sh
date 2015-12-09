@@ -23,8 +23,8 @@ cmd="aws cloudformation create-stack \
     --template-body file://${PWD}/s3cli-src/ci/assets/cloudformation-s3cli-iam.template.json \
     --capabilities  CAPABILITY_IAM
     --parameters    ${cloudformation_parameters}"
-
 echo "Running: ${cmd}"; ${cmd}
+
 while true; do
   stack_status=$(get_stack_status $stack_name)
   echo "StackStatus ${stack_status}"
@@ -46,65 +46,130 @@ s3_endpoint_host=$(get_stack_info_of "${stack_info}" "S3EndpointHost")
 test_host_ip=$(get_stack_info_of "${stack_info}" "TestHostIP")
 
 cd ${PWD}/configs
+test_types=( generic negative_sig_version negative_region_invalid )
+for test_type in "${test_types[@]}"; do
+  mkdir -p ${test_type}
+done
 
 echo ${s3_endpoint_host} > s3_endpoint_host
 echo ${test_host_ip} > test_host_ip
 echo ${bucket_name} > bucket_name
 
-cat > "static_wout_host_w_region-s3cli_config.json"<< EOF
+cat > "generic/region_minimal-s3cli_config.json"<< EOF
 {
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
+}
+EOF
+
+cat > "generic/v4_static_wout_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
-  "region": "${region_name}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "region": "${region_name}"
+}
+EOF
+
+cat > "generic/v4_profile_wout_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "credentials_source": "env_or_profile",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
 }
 EOF
 
 if [ "${region_optional}" = true ]; then
-  cat > "static_w_host_wout_region-s3cli_config.json"<< EOF
+  cat > "generic/minimal-s3cli_config.json"<< EOF
 {
-  "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "bucket_name": "${bucket_name}"
 }
 EOF
 
-  cat > "static_wout_host_wout_region-s3cli_config.json"<< EOF
+  cat > "generic/v2_minimal-s3cli_config.json"<< EOF
 {
+  "signature_version": "2",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}"
+}
+EOF
+
+  cat > "generic/v2_static_w_host_wout_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "2",
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "host": "${s3_endpoint_host}"
+}
+EOF
+
+  cat > "generic/w_host_wout_region-s3cli_config.json"<< EOF
+{
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}"
+}
+EOF
+
+  cat > "generic/v2_static_wout_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "2",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
+}
+EOF
+
+  cat > "generic/profile_wout_host_wout_region-s3cli_config.json"<< EOF
+{
+  "credentials_source": "env_or_profile",
+  "bucket_name": "${bucket_name}"
+}
+EOF
+
+  cat > "negative_region_invalid/v4_w_host_wout_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}"
+}
+EOF
+else
+  cat > "negative_sig_version/v2_wout_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "2",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
 }
 EOF
 fi
 
-cat > "profile_wout_host_w_region-s3cli_config.json"<< EOF
+if [ ! -z "${alt_host}" ]; then
+  cat > "generic/v2_static_w_alt_host_wout_region-s3cli_config.json"<< EOF
 {
-  "credentials_source": "env_or_profile",
+  "signature_version": "2",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
-  "region": "${region_name}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
-}
-EOF
-
-if [ "${region_optional}" = true ]; then
-  cat > "profile_wout_host_wout_region-s3cli_config.json"<< EOF
-{
-  "credentials_source": "env_or_profile",
-  "bucket_name": "${bucket_name}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "host": "${alt_host}"
 }
 EOF
 fi

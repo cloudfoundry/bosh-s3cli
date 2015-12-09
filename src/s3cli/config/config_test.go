@@ -5,6 +5,7 @@ import (
 	"errors"
 	"s3cli/config"
 
+	"encoding/json"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -123,10 +124,11 @@ var _ = Describe("BlobstoreClient configuration", func() {
 
 		Describe("configuring signing method", func() {
 			var s3CliConfig config.S3Cli
-			var configJson []byte
+			var configToTest map[string]interface{}
 			JustBeforeEach(func() {
+				configJson, err := json.Marshal(configToTest)
+				Expect(err).ToNot(HaveOccurred())
 				dummyJSONReader := bytes.NewReader(configJson)
-				var err error
 				s3CliConfig, err = config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -135,13 +137,13 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Context("when the hostname contains 'amazonaws'", func() {
 					Context("when the credential source is static", func() {
 						BeforeEach(func() {
-							configJson = []byte(`{
+							configToTest = map[string]interface{}{
 								"credentials_source": "static",
-								"access_key_id": "id",
-								"secret_access_key": "key",
-								"bucket_name": "some-bucket",
-								"host": "something.amazonaws.com.something"
-							}`)
+								"access_key_id":      "id",
+								"secret_access_key":  "key",
+								"bucket_name":        "some-bucket",
+								"host":               "something.amazonaws.com.something",
+							}
 						})
 
 						It("uses v2 signing", func() {
@@ -151,11 +153,47 @@ var _ = Describe("BlobstoreClient configuration", func() {
 
 					Context("when the credential source is env_or_profile", func() {
 						BeforeEach(func() {
-							configJson = []byte(`{
+							configToTest = map[string]interface{}{
 								"credentials_source": "env_or_profile",
-								"bucket_name": "some-bucket",
-								"host": "something.amazonaws.com.something"
-							}`)
+								"bucket_name":        "some-bucket",
+								"host":               "something.amazonaws.com.something",
+							}
+						})
+
+						It("uses v4 signing", func() {
+							Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+						})
+
+						Context("when signing_version is overriden", func() {
+							BeforeEach(func() {
+								configToTest["signature_version"] = "2"
+							})
+
+							It("uses v2 signing", func() {
+								Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
+							})
+						})
+					})
+				})
+
+				Context("when the hostname does not contain 'amazonaws'", func() {
+					BeforeEach(func() {
+						configToTest = map[string]interface{}{
+							"credentials_source": "static",
+							"access_key_id":      "id",
+							"secret_access_key":  "key",
+							"bucket_name":        "some-bucket",
+							"host":               "s3-compatible.com",
+						}
+					})
+
+					It("uses v2 signing", func() {
+						Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
+					})
+
+					Context("when signing_version is overriden", func() {
+						BeforeEach(func() {
+							configToTest["signature_version"] = "4"
 						})
 
 						It("uses v4 signing", func() {
@@ -163,32 +201,16 @@ var _ = Describe("BlobstoreClient configuration", func() {
 						})
 					})
 				})
-
-				Context("when the hostname does not contain 'amazonaws'", func() {
-					BeforeEach(func() {
-						configJson = []byte(`{
-						 "credentials_source": "static",
-							"access_key_id": "id",
-							"secret_access_key": "key",
-							"bucket_name": "some-bucket",
-							"host": "s3-compatible.com"
-						}`)
-					})
-
-					It("uses v2 signing", func() {
-						Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
-					})
-				})
 			})
 
 			Context("when there is no host and no region defined", func() {
 				BeforeEach(func() {
-					configJson = []byte(`{
+					configToTest = map[string]interface{}{
 						"credentials_source": "static",
-						"access_key_id": "id",
-						"secret_access_key": "key",
-						"bucket_name": "some-bucket"
-					}`)
+						"access_key_id":      "id",
+						"secret_access_key":  "key",
+						"bucket_name":        "some-bucket",
+					}
 				})
 
 				It("uses v4 signing", func() {
@@ -198,13 +220,13 @@ var _ = Describe("BlobstoreClient configuration", func() {
 
 			Context("when there is no host and region defined", func() {
 				BeforeEach(func() {
-					configJson = []byte(`{
+					configToTest = map[string]interface{}{
 						"credentials_source": "static",
-						"access_key_id": "id",
-						"secret_access_key": "key",
-						"bucket_name": "some-bucket",
-						"region": "some-region-3"
-					}`)
+						"access_key_id":      "id",
+						"secret_access_key":  "key",
+						"bucket_name":        "some-bucket",
+						"region":             "some-region-3",
+					}
 				})
 
 				It("uses v4 signing", func() {
