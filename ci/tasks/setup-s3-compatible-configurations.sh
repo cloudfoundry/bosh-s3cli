@@ -19,39 +19,47 @@ done
 echo ${s3_endpoint_host} > s3_endpoint_host
 echo ${bucket_name} > bucket_name
 
-cat > "generic/s3_compatible_w_ssl-s3cli_config.json"<< EOF
+cat > "generic/s3_compatible_minimal-s3cli_config.json"<< EOF
 {
-  "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}",
-  "ssl_verify_peer": true,
-  "use_ssl": true
+  "host": "${s3_endpoint_host}"
 }
 EOF
 
-cat > "generic/s3_compatible_wout_ssl-s3cli_config.json"<< EOF
+cat > "generic/s3_compatible_maximal-s3cli_config.json"<< EOF
 {
-  "credentials_source": "static",
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}",
-  "ssl_verify_peer": false,
-  "use_ssl": false
-}
-EOF
-
-cat > "generic/s3_compatible_w_port_wout_ssl-s3cli_config.json"<< EOF
-{
+  "signature_version": "2",
   "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
   "host": "${s3_endpoint_host}",
   "port": ${s3_endpoint_port},
-  "ssl_verify_peer": false,
+  "use_ssl": true,
+  "ssl_verify_peer": true
+}
+EOF
+
+cat > "generic/s3_compatible_wout_ssl-s3cli_config.json"<< EOF
+{
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}",
   "use_ssl": false
 }
 EOF
+
+cat > "negative_sig_version/v4_static-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}"
+}
+EOF
+
