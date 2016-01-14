@@ -11,7 +11,7 @@ check_param s3_endpoint_host
 check_param s3_endpoint_port
 
 cd ${PWD}/configs
-test_types=( generic negative_sig_version negative_region_invalid )
+test_types=( generic negative_sig_version negative_region_invalid negative_region_and_host )
 for test_type in "${test_types[@]}"; do
   mkdir -p ${test_type}
 done
@@ -62,4 +62,3 @@ cat > "negative_sig_version/v4_static-s3cli_config.json"<< EOF
   "host": "${s3_endpoint_host}"
 }
 EOF
-

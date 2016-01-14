@@ -46,12 +46,15 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 
 			Context("when both host and region have been set", func() {
-				It("returns an error", func() {
+				It("reports that region and endpoint should be used for SDK configuration", func() {
 					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region"}`)
 					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
-					_, err := config.NewFromReader(dummyJSONReader)
-					Expect(err).To(MatchError("Cannot set both region and host at the same time"))
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.UseRegion()).To(BeTrue())
+					Expect(c.Host).To(Equal("some-host"))
+					Expect(c.Region).To(Equal("some-region"))
 				})
 			})
 
@@ -265,16 +268,32 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal("some-host-name:443"))
 			})
+			It("returns a empty string URI if `host` is empty", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "", "port": 443}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
-			Context("when port is not provided", func() {
-				It("returns a URI in the form `host` only", func() {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host-name"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal(""))
+			})
+		})
 
-					c, err := config.NewFromReader(dummyJSONReader)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(c.S3Endpoint()).To(Equal("some-host-name"))
-				})
+		Context("when port is not provided", func() {
+			It("returns a URI in the form `host` only", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host-name"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal("some-host-name"))
+			})
+			It("returns a empty string URI if `host` is empty", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": ""}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal(""))
 			})
 		})
 	})

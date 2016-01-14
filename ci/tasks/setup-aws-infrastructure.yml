@@ -16,3 +16,4 @@ params:
   ec2_ami:           replace-me
   public_key_name:   replace-me
   alt_host:
+  invalid_host:

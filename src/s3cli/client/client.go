@@ -42,7 +42,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		WithHTTPClient(httpClient)
 
 	if c.UseRegion() {
-		s3Config = s3Config.WithRegion(c.Region)
+		s3Config = s3Config.WithRegion(c.Region).WithEndpoint(c.S3Endpoint())
 	} else {
 		s3Config = s3Config.WithRegion(config.EmptyRegion).WithEndpoint(c.S3Endpoint())
 	}

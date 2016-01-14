@@ -46,7 +46,7 @@ s3_endpoint_host=$(get_stack_info_of "${stack_info}" "S3EndpointHost")
 test_host_ip=$(get_stack_info_of "${stack_info}" "TestHostIP")
 
 cd ${PWD}/configs
-test_types=( generic negative_sig_version negative_region_invalid )
+test_types=( generic negative_sig_version negative_region_invalid negative_region_and_host )
 for test_type in "${test_types[@]}"; do
   mkdir -p ${test_type}
 done
@@ -157,6 +157,20 @@ else
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
   "region": "${region_name}"
+}
+EOF
+fi
+
+if [ ! -z "${invalid_host}" ]; then
+cat > "negative_region_and_host/v4_static_w_wrong_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}",
+  "host": "${invalid_host}"
 }
 EOF
 fi

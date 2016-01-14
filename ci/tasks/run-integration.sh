@@ -54,7 +54,7 @@ EOF
 
 bats_file=test.bats
 cat s3cli-src/ci/assets/setup-template.bats > ${bats_file}
-test_types=( generic negative_sig_version negative_region_invalid )
+test_types=( generic negative_sig_version negative_region_invalid negative_region_and_host )
 for test_type in "${test_types[@]}"; do
   for file in ${S3CLI_CONFIGS_DIR}/${test_type}/*-s3cli_config.json; do
     if [ -e "${file}" ]; then

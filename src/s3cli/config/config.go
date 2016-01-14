@@ -84,10 +84,6 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		c.Region = defaultRegion
 	}
 
-	if c.Region != "" && c.Host != "" {
-		return S3Cli{}, errors.New("Cannot set both region and host at the same time")
-	}
-
 	switch c.SignatureVersion {
 	case 2:
 		c.UseV2SigningMethod = true
@@ -105,16 +101,16 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	return c, nil
 }
 
-// UseRegion signals to users of the S3Cli whether to use Endpoint or Region information
+// UseRegion signals to users of the S3Cli whether to use Region information
 func (c *S3Cli) UseRegion() bool {
-	if c.Region != "" && c.Host == "" {
-		return true
-	}
-	return false
+	return c.Region != ""
 }
 
 // S3Endpoint returns the S3 URI to use if custom host information has been provided
 func (c *S3Cli) S3Endpoint() string {
+	if c.Host == "" {
+		return ""
+	}
 	if c.Port != 0 {
 		return fmt.Sprintf("%s:%d", c.Host, c.Port)
 	}
