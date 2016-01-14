@@ -31,8 +31,16 @@ if [ -e ${S3CLI_CONFIGS_DIR}/test_host_ip ]; then
   Host *
     StrictHostKeyChecking no
 EOF
-  scp -r ${S3CLI_CONFIGS_DIR} ec2-user@${test_host}:/home/ec2-user/
-  scp ${S3CLI_EXE} ec2-user@${test_host}:/home/ec2-user/s3cli
+  # Retry connecting via SSH on failure
+  for i in {1..5}; do
+    scp -r ${S3CLI_CONFIGS_DIR} ec2-user@${test_host}:/home/ec2-user/ && break || echo "Failed SCP..."
+    sleep 15
+  done
+  # Timeout and retry SCP after 3 minutes
+  for i in {1..5}; do
+    timeout --foreground -s 9 3m scp ${S3CLI_EXE} ec2-user@${test_host}:/home/ec2-user/s3cli && break || echo "Failed SCP of s3cli..."
+    sleep 15
+  done
   S3CLI_EXE="/home/ec2-user/s3cli"
 fi
 
