@@ -127,7 +127,7 @@ jobs:
             bucket_name:       {{bucket_name__s3_compat}}
             s3_endpoint_host:  {{host__s3_compat}}
             s3_endpoint_port:  {{port__s3_compat}}
-
+            region:            invalid-region
       - task: test
         file: s3cli-src/ci/tasks/run-integration.yml
         config:

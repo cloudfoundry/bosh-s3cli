@@ -13,3 +13,4 @@ params:
   bucket_name:       replace-me
   s3_endpoint_host:  replace-me
   s3_endpoint_port:  replace-me
+  region_name:
