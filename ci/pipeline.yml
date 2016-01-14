@@ -35,6 +35,7 @@ jobs:
             region_optional:   true
             ec2_ami:           {{ec2_ami__aws_us}}
             public_key_name:   {{public_key_name__aws_us}}
+            alt_region:        us-west-1
             alt_host:          s3-external-1.amazonaws.com
             valid_host:        s3-external-1.amazonaws.com
 

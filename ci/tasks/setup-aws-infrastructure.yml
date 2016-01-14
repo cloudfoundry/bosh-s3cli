@@ -18,3 +18,4 @@ params:
   alt_host:
   invalid_host:
   valid_host:
+  alt_region:

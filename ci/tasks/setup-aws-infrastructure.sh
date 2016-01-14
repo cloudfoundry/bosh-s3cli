@@ -14,6 +14,7 @@ check_param public_key_name
 check_param alt_host
 check_param invalid_host
 check_param valid_host
+check_param alt_region
 
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
@@ -203,4 +204,17 @@ if [ ! -z "${alt_host}" ]; then
   "host": "${alt_host}"
 }
 EOF
+  if [ ! -z "${alt_region}" ]; then
+    cat > "generic/v2_static_w_alt_host_w_alt_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "2",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${alt_host}",
+  "region": "${alt_region}"
+}
+EOF
+  fi
 fi
