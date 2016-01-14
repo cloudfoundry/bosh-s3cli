@@ -11,6 +11,9 @@ check_param stack_name
 check_param region_optional
 check_param ec2_ami
 check_param public_key_name
+check_param alt_host
+check_param invalid_host
+check_param valid_host
 
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
@@ -172,6 +175,20 @@ cat > "negative_region_and_host/v4_static_w_wrong_host_w_region-s3cli_config.jso
   "region": "${region_name}",
   "host": "${invalid_host}"
 }
+EOF
+fi
+
+if [ ! -z "${valid_host}" ]; then
+  cat > "generic/v4_static_w_host_w_region-s3cli_config.json"<< EOF
+{
+    "signature_version": "4",
+    "credentials_source": "static",
+    "access_key_id": "${access_key_id}",
+    "secret_access_key": "${secret_access_key}",
+    "bucket_name": "${bucket_name}",
+    "host": "${valid_host}",
+    "region": "${region_name}"
+  }
 EOF
 fi
 

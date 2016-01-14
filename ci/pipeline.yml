@@ -36,6 +36,7 @@ jobs:
             ec2_ami:           {{ec2_ami__aws_us}}
             public_key_name:   {{public_key_name__aws_us}}
             alt_host:          s3-external-1.amazonaws.com
+            valid_host:        s3-external-1.amazonaws.com
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration.yml
@@ -67,6 +68,7 @@ jobs:
             ec2_ami:           {{ec2_ami__aws_china}}
             public_key_name:   {{public_key_name__aws_china}}
             invalid_host:      s3-external-1.amazonaws.com
+            valid_host:        s3.cn-north-1.amazonaws.com.cn
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration.yml
