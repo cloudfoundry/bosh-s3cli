@@ -180,7 +180,7 @@ EOF
 fi
 
 if [ ! -z "${valid_host}" ]; then
-  cat > "generic/v4_static_w_host_w_region-s3cli_config.json"<< EOF
+  cat > "generic/v4_static_maximal-s3cli_config.json"<< EOF
 {
     "signature_version": "4",
     "credentials_source": "static",
@@ -188,8 +188,24 @@ if [ ! -z "${valid_host}" ]; then
     "secret_access_key": "${secret_access_key}",
     "bucket_name": "${bucket_name}",
     "host": "${valid_host}",
+    "port": 443,
+    "use_ssl": true,
+    "ssl_verify_peer": true,
     "region": "${region_name}"
   }
+EOF
+
+  cat > "generic/v4_profile_maximal-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "credentials_source": "env_or_profile",
+  "bucket_name": "${bucket_name}",
+  "host": "${valid_host}",
+  "port": 443,
+  "use_ssl": true,
+  "ssl_verify_peer": true,
+  "region": "${region_name}"
+}
 EOF
 fi
 

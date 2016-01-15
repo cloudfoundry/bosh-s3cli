@@ -100,6 +100,7 @@ jobs:
             region_optional:   false
             ec2_ami:           {{ec2_ami__aws_frankfurt}}
             public_key_name:   {{public_key_name__aws_frankfurt}}
+            valid_host:        s3.eu-central-1.amazonaws.com
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration.yml
