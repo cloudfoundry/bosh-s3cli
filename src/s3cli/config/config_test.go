@@ -338,6 +338,16 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(err).To(MatchError("can't use access_key_id and secret_access_key with env_or_profile credentials_source"))
 			})
 		})
+
+		Context("when credentials source is `none`", func() {
+			It("validates that access key and secret key are equals to empty values", func() {
+				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "credentials_source": "none"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				_, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
 	})
 })
 

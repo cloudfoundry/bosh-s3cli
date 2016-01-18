@@ -30,6 +30,8 @@ const EmptyRegion = " "
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
+// NoneCredentialsSource specifies that credentials will be empty. The blobstore client operates in read only mode.
+const NoneCredentialsSource = "none"
 
 const (
 	credentialsSourceEnvOrProfile = "env_or_profile"
@@ -76,6 +78,7 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		if c.AccessKeyID != "" || c.SecretAccessKey != "" {
 			return S3Cli{}, errorStaticCredentialsPresent
 		}
+	case NoneCredentialsSource:
 	default:
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}

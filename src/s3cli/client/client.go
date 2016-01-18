@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"errors"
 
 	"s3cli/config"
 
@@ -20,6 +21,8 @@ type S3Blobstore struct {
 	s3Client    *s3.S3
 	s3cliConfig config.S3Cli
 }
+
+var errorInvalidCredentialsSourceValue = errors.New("the client operates in read only mode. Change 'credentials_source' parameter value ")
 
 // New returns a BlobstoreClient if the configuration file backing configFile is valid
 func New(configFile io.Reader) (S3Blobstore, error) {
@@ -51,6 +54,10 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(c.AccessKeyID, c.SecretAccessKey, ""))
 	}
 
+	if c.CredentialsSource == config.NoneCredentialsSource {
+		s3Config = s3Config.WithCredentials(credentials.AnonymousCredentials)
+	}
+
 	s3Session := session.New(s3Config)
 	s3Client := s3.New(s3Session)
 
@@ -80,6 +87,10 @@ func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
 
 // Put uploads a blob to an S3 compatible blobstore
 func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
+	if client.s3cliConfig.CredentialsSource == config.NoneCredentialsSource {
+		return errorInvalidCredentialsSourceValue
+	}
+
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
 	putResult, err := uploader.Upload(&s3manager.UploadInput{
 		Body:   src,
