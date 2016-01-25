@@ -6,6 +6,7 @@ import (
 	"s3cli/config"
 
 	"encoding/json"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -101,27 +102,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.UseSSL).To(BeTrue())
 				Expect(c.SSLVerifyPeer).To(BeTrue())
-			})
-		})
-
-		Describe("when credentials source is not specified", func() {
-			It("defaults credentials source to static", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
-				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
-				c, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(c.CredentialsSource).To(Equal("static"))
-			})
-		})
-
-		Describe("when credentials source is invalid", func() {
-			It("returns an error", func() {
-				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "credentials_source": "magical_unicorns"}`)
-				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
-				_, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).To(MatchError("Invalid credentials_source: magical_unicorns"))
 			})
 		})
 
@@ -299,17 +279,56 @@ var _ = Describe("BlobstoreClient configuration", func() {
 	})
 
 	Describe("validating credentials", func() {
+		Describe("when credentials source is not specified", func() {
+			Context("when a secret key and access key are provided", func() {
+				It("defaults to static credentials", func() {
+					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
+					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.CredentialsSource).To(Equal("static"))
+				})
+			})
+
+			Context("when either the secret key or access key are missing", func() {
+				It("raises an error", func() {
+					dummyJSONBytes := []byte(`{"secret_access_key": "key", "bucket_name": "some-bucket"}`)
+					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+					_, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).To(MatchError("access_key_id and secret_access_key must be provided"))
+				})
+			})
+
+			Context("when neither an access key or secret key are provided", func() {
+				It("defaults credentials source to anonymous", func() {
+					dummyJSONBytes := []byte(`{"bucket_name": "some-bucket"}`)
+					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.CredentialsSource).To(Equal("none"))
+				})
+			})
+
+			Describe("when credentials source is invalid", func() {
+				It("returns an error", func() {
+					dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "credentials_source": "magical_unicorns"}`)
+					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+					_, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).To(MatchError("Invalid credentials_source: magical_unicorns"))
+				})
+			})
+
+		})
+
 		Context("when credential source is `static`", func() {
 			It("validates that access key and secret key are set", func() {
-				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket"}`)
+				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "access_key_id": "some_id"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
 				_, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).To(MatchError("access_key_id and secret_access_key must be provided"))
-
-				dummyJSONBytes = []byte(`{"bucket_name": "some-bucket", "access_key_id": "some_id"}`)
-				dummyJSONReader = bytes.NewReader(dummyJSONBytes)
-				_, err = config.NewFromReader(dummyJSONReader)
 				Expect(err).To(MatchError("access_key_id and secret_access_key must be provided"))
 
 				dummyJSONBytes = []byte(`{"bucket_name": "some-bucket", "access_key_id": "some_id", "secret_access_key": "some_secret"}`)
@@ -339,13 +358,12 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 		})
 
-		Context("when credentials source is `none`", func() {
-			It("validates that access key and secret key are equals to empty values", func() {
-				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "credentials_source": "none"}`)
+		Context("when the credentials source is `none`", func() {
+			It("validates that access key and secret key are not set", func() {
+				dummyJSONBytes := []byte(`{"bucket_name": "some-bucket", "credentials_source": "none", "access_key_id": "some_id"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-
 				_, err := config.NewFromReader(dummyJSONReader)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(err).To(MatchError("can't use access_key_id and secret_access_key with none credentials_source"))
 			})
 		})
 	})

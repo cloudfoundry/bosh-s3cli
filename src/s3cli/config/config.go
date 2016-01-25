@@ -28,20 +28,36 @@ type S3Cli struct {
 // the concept of a region
 const EmptyRegion = " "
 
+const (
+	defaultRegion   = "us-east-1"
+	euCentralRegion = "eu-central-1"
+	cnNorthRegion   = "cn-north-1"
+)
+
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
+
 // NoneCredentialsSource specifies that credentials will be empty. The blobstore client operates in read only mode.
 const NoneCredentialsSource = "none"
 
-const (
-	credentialsSourceEnvOrProfile = "env_or_profile"
-	defaultRegion                 = "us-east-1"
-	euCentralRegion               = "eu-central-1"
-	cnNorthRegion                 = "cn-north-1"
-)
+const credentialsSourceEnvOrProfile = "env_or_profile"
+
+// Nothing was provided in configuration
+const noCredentialsSourceProvided = ""
 
 var errorStaticCredentialsMissing = errors.New("access_key_id and secret_access_key must be provided")
-var errorStaticCredentialsPresent = errors.New("can't use access_key_id and secret_access_key with env_or_profile credentials_source")
+
+type errorStaticCredentialsPresent struct {
+	credentialsSource string
+}
+
+func (e errorStaticCredentialsPresent) Error() string {
+	return fmt.Sprintf("can't use access_key_id and secret_access_key with %s credentials_source", e.credentialsSource)
+}
+
+func newStaticCredentialsPresentError(desiredSource string) error {
+	return errorStaticCredentialsPresent{credentialsSource: desiredSource}
+}
 
 // NewFromReader returns a new s3cli configuration struct from the contents of reader.
 // reader.Read() is expected to return valid JSON
@@ -65,10 +81,6 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, errors.New("bucket_name must be set")
 	}
 
-	if c.CredentialsSource == "" {
-		c.CredentialsSource = StaticCredentialsSource
-	}
-
 	switch c.CredentialsSource {
 	case StaticCredentialsSource:
 		if c.AccessKeyID == "" || c.SecretAccessKey == "" {
@@ -76,9 +88,21 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		}
 	case credentialsSourceEnvOrProfile:
 		if c.AccessKeyID != "" || c.SecretAccessKey != "" {
-			return S3Cli{}, errorStaticCredentialsPresent
+			return S3Cli{}, newStaticCredentialsPresentError(credentialsSourceEnvOrProfile)
 		}
 	case NoneCredentialsSource:
+		if c.AccessKeyID != "" || c.SecretAccessKey != "" {
+			return S3Cli{}, newStaticCredentialsPresentError(NoneCredentialsSource)
+		}
+
+	case noCredentialsSourceProvided:
+		if c.SecretAccessKey != "" && c.AccessKeyID != "" {
+			c.CredentialsSource = StaticCredentialsSource
+		} else if c.SecretAccessKey == "" && c.AccessKeyID == "" {
+			c.CredentialsSource = NoneCredentialsSource
+		} else {
+			return S3Cli{}, errorStaticCredentialsMissing
+		}
 	default:
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}
