@@ -9,6 +9,7 @@ check_param secret_access_key
 check_param region_name
 check_param stack_name
 check_param region_optional
+check_param s3_endpoint_host
 
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
@@ -38,6 +39,8 @@ stack_info=$(get_stack_info ${stack_name})
 bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
 
 cd ${PWD}/configs
+echo ${s3_endpoint_host} > s3_endpoint_host
+
 test_types=( public_read )
 for test_type in "${test_types[@]}"; do
   mkdir -p ${test_type}

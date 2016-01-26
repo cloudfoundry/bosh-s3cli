@@ -13,3 +13,4 @@ params:
   region_name:       replace-me
   stack_name:        replace-me
   region_optional:   replace-me
+  s3_endpoint_host:  replace-me

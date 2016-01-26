@@ -67,6 +67,7 @@ jobs:
             region_name:       {{region_name__aws_us}}
             stack_name:        {{stack_name_public_bucket__aws_us}}
             region_optional:   true
+            s3_endpoint_host:  s3.amazonaws.com
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration.yml
