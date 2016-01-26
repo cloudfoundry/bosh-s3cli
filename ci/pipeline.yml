@@ -6,6 +6,7 @@ groups:
       - aws-s3-us-integration
       - aws-s3-china-integration
       - aws-s3-frankfurt-integration
+      - aws-s3-public-read-integration
       - s3-compatible-integration
       - promote
 
@@ -51,6 +52,33 @@ jobs:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
           config: *aws-us-infrastructure-config
+
+  - name: aws-s3-public-read-integration
+    serial: true
+    plan:
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: setup
+        file: s3cli-src/ci/tasks/setup-public-s3-bucket-infrastructure.yml
+        config: &aws-us-public-read-infrastructure-config
+          params:
+            access_key_id:     {{access_key_id__aws_us}}
+            secret_access_key: {{secret_access_key__aws_us}}
+            region_name:       {{region_name__aws_us}}
+            stack_name:        {{stack_name_public_bucket__aws_us}}
+            region_optional:   true
+
+      - task: test
+        file: s3cli-src/ci/tasks/run-integration.yml
+        config:
+          params:
+            access_key_id:     {{access_key_id__aws_us}}
+            secret_access_key: {{secret_access_key__aws_us}}
+            region_name:       {{region_name__aws_us}}
+        ensure:
+          task: teardown
+          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
+          config: *aws-us-public-read-infrastructure-config
 
   - name: aws-s3-china-integration
     serial: true
@@ -140,7 +168,7 @@ jobs:
   - name: promote
     plan:
       - aggregate:
-          - {trigger: true, get: s3cli-src, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration], resource: s3cli-in}
+          - {trigger: true, get: s3cli-src, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration aws-s3-public-read-integration], resource: s3cli-in}
           - {trigger: false, get: version-semver, params: {bump: patch} }
 
       - {put: version-semver, params: {file: version-semver/number}}
