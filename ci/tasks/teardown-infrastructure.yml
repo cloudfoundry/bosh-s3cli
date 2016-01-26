@@ -8,5 +8,5 @@ run:
 params:
   access_key_id:         replace-me
   secret_access_key:     replace-me
-  region_name:               replace-me
-  stack_name:                replace-me
+  region_name:           replace-me
+  stack_name:            replace-me
