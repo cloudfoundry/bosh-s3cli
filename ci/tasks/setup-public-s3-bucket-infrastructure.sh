@@ -16,7 +16,7 @@ export AWS_DEFAULT_REGION=${region_name}
 
 cmd="aws cloudformation create-stack \
     --stack-name    ${stack_name} \
-    --template-body file://${PWD}/s3cli-src/ci/assets/cloudformation-s3cli-public-bucket.template"
+    --template-body file://${PWD}/s3cli-src/ci/assets/cloudformation-s3cli-public-bucket.template.json"
 echo "Running: ${cmd}"; ${cmd}
 
 while true; do
