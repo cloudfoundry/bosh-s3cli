@@ -30,8 +30,6 @@ const EmptyRegion = " "
 
 const (
 	defaultRegion   = "us-east-1"
-	euCentralRegion = "eu-central-1"
-	cnNorthRegion   = "cn-north-1"
 )
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
@@ -117,11 +115,10 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	case 4:
 		c.UseV2SigningMethod = false
 	default:
-		if c.Region == "" && c.Host != "" {
-			isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
-			if !isHostAWS || c.CredentialsSource == StaticCredentialsSource {
-				c.UseV2SigningMethod = true
-			}
+		if c.isHostAWS() {
+			c.UseV2SigningMethod = false
+		} else {
+			c.UseV2SigningMethod = true
 		}
 	}
 
@@ -142,4 +139,12 @@ func (c *S3Cli) S3Endpoint() string {
 		return fmt.Sprintf("%s:%d", c.Host, c.Port)
 	}
 	return c.Host
+}
+
+func (c *S3Cli) isHostAWS() bool {
+	if c.Host == "" {
+		return true
+	}
+	isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
+	return isHostAWS
 }

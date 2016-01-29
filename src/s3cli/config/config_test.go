@@ -5,8 +5,6 @@ import (
 	"errors"
 	"s3cli/config"
 
-	"encoding/json"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -106,115 +104,61 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 
 		Describe("configuring signing method", func() {
-			var s3CliConfig config.S3Cli
-			var configToTest map[string]interface{}
-			JustBeforeEach(func() {
-				configJson, err := json.Marshal(configToTest)
+
+			It("uses v4 signing when there is no host defined", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
-				dummyJSONReader := bytes.NewReader(configJson)
-				s3CliConfig, err = config.NewFromReader(dummyJSONReader)
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+			})
+
+			It("uses v4 signing when the hostname contains 'amazonaws'", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "something.amazonaws.com.something"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
 			})
 
-			Context("when there is a host and no region defined", func() {
-				Context("when the hostname contains 'amazonaws'", func() {
-					Context("when the credential source is static", func() {
-						BeforeEach(func() {
-							configToTest = map[string]interface{}{
-								"credentials_source": "static",
-								"access_key_id":      "id",
-								"secret_access_key":  "key",
-								"bucket_name":        "some-bucket",
-								"host":               "something.amazonaws.com.something",
-							}
-						})
+			It("uses v2 signing when the hostname does not contain 'amazonaws'", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "s3-compatible.com"
+				}`)
 
-						It("uses v2 signing", func() {
-							Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
-						})
-					})
-
-					Context("when the credential source is env_or_profile", func() {
-						BeforeEach(func() {
-							configToTest = map[string]interface{}{
-								"credentials_source": "env_or_profile",
-								"bucket_name":        "some-bucket",
-								"host":               "something.amazonaws.com.something",
-							}
-						})
-
-						It("uses v4 signing", func() {
-							Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
-						})
-
-						Context("when signing_version is overriden", func() {
-							BeforeEach(func() {
-								configToTest["signature_version"] = "2"
-							})
-
-							It("uses v2 signing", func() {
-								Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
-							})
-						})
-					})
-				})
-
-				Context("when the hostname does not contain 'amazonaws'", func() {
-					BeforeEach(func() {
-						configToTest = map[string]interface{}{
-							"credentials_source": "static",
-							"access_key_id":      "id",
-							"secret_access_key":  "key",
-							"bucket_name":        "some-bucket",
-							"host":               "s3-compatible.com",
-						}
-					})
-
-					It("uses v2 signing", func() {
-						Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
-					})
-
-					Context("when signing_version is overriden", func() {
-						BeforeEach(func() {
-							configToTest["signature_version"] = "4"
-						})
-
-						It("uses v4 signing", func() {
-							Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
-						})
-					})
-				})
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
 			})
 
-			Context("when there is no host and no region defined", func() {
-				BeforeEach(func() {
-					configToTest = map[string]interface{}{
-						"credentials_source": "static",
-						"access_key_id":      "id",
-						"secret_access_key":  "key",
-						"bucket_name":        "some-bucket",
-					}
-				})
+			It("uses override signing value when signing_version is overriden", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "something.amazonaws.com.something",
+					"signature_version":  "2"
+				}`)
 
-				It("uses v4 signing", func() {
-					Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
-				})
-			})
-
-			Context("when there is no host and region defined", func() {
-				BeforeEach(func() {
-					configToTest = map[string]interface{}{
-						"credentials_source": "static",
-						"access_key_id":      "id",
-						"secret_access_key":  "key",
-						"bucket_name":        "some-bucket",
-						"region":             "some-region-3",
-					}
-				})
-
-				It("uses v4 signing", func() {
-					Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
-				})
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
 			})
 		})
 
