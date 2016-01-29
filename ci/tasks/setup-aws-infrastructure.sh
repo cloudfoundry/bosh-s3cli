@@ -88,14 +88,6 @@ cat > "generic/v4_profile_wout_host_w_region-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "generic/minimal-s3cli_config.json"<< EOF
-{
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}"
-}
-EOF
-
 cat > "generic/w_host_wout_region-s3cli_config.json"<< EOF
 {
   "access_key_id": "${access_key_id}",
@@ -105,12 +97,6 @@ cat > "generic/w_host_wout_region-s3cli_config.json"<< EOF
 }
 EOF
 
-cat > "generic/profile_wout_host_wout_region-s3cli_config.json"<< EOF
-{
-  "credentials_source": "env_or_profile",
-  "bucket_name": "${bucket_name}"
-}
-EOF
 
 cat > "generic/v4_w_host_wout_region-s3cli_config.json"<< EOF
 {
@@ -133,6 +119,21 @@ if [ "${is_v4_only_region}" = true ]; then
 }
 EOF
 else
+  cat > "generic/minimal-s3cli_config.json"<< EOF
+{
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}"
+}
+EOF
+
+  cat > "generic/profile_wout_host_wout_region-s3cli_config.json"<< EOF
+{
+  "credentials_source": "env_or_profile",
+  "bucket_name": "${bucket_name}"
+}
+EOF
+
   cat > "generic/v2_static_wout_host_w_region-s3cli_config.json"<< EOF
 {
   "signature_version": "2",
