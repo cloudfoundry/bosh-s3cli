@@ -33,7 +33,6 @@ jobs:
             secret_access_key: {{secret_access_key__aws_us}}
             region_name:       {{region_name__aws_us}}
             stack_name:        {{stack_name__aws_us}}
-            region_optional:   true
             ec2_ami:           {{ec2_ami__aws_us}}
             public_key_name:   {{public_key_name__aws_us}}
             alt_region:        us-west-1
@@ -66,7 +65,6 @@ jobs:
             secret_access_key: {{secret_access_key__aws_us}}
             region_name:       {{region_name__aws_us}}
             stack_name:        {{stack_name_public_bucket__aws_us}}
-            region_optional:   true
             s3_endpoint_host:  s3.amazonaws.com
 
       - task: test
@@ -94,7 +92,7 @@ jobs:
             secret_access_key: {{secret_access_key__aws_china}}
             region_name:       {{region_name__aws_china}}
             stack_name:        {{stack_name__aws_china}}
-            region_optional:   false
+            is_v4_only_region: true
             ec2_ami:           {{ec2_ami__aws_china}}
             public_key_name:   {{public_key_name__aws_china}}
             invalid_host:      s3-external-1.amazonaws.com
@@ -126,7 +124,7 @@ jobs:
             secret_access_key: {{secret_access_key__aws_frankfurt}}
             region_name:       {{region_name__aws_frankfurt}}
             stack_name:        {{stack_name__aws_frankfurt}}
-            region_optional:   false
+            is_v4_only_region: true
             ec2_ami:           {{ec2_ami__aws_frankfurt}}
             public_key_name:   {{public_key_name__aws_frankfurt}}
             valid_host:        s3.eu-central-1.amazonaws.com

@@ -8,7 +8,6 @@ check_param access_key_id
 check_param secret_access_key
 check_param region_name
 check_param stack_name
-check_param region_optional
 check_param s3_endpoint_host
 
 export AWS_ACCESS_KEY_ID=${access_key_id}

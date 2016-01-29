@@ -12,7 +12,7 @@ check_param s3_endpoint_port
 check_param region_name
 
 cd ${PWD}/configs
-test_types=( generic negative_sig_version negative_region_invalid negative_region_and_host )
+test_types=( generic negative_sig_version negative_region_and_host )
 for test_type in "${test_types[@]}"; do
   mkdir -p ${test_type}
 done

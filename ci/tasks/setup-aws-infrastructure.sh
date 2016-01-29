@@ -8,7 +8,7 @@ check_param access_key_id
 check_param secret_access_key
 check_param region_name
 check_param stack_name
-check_param region_optional
+check_param is_v4_only_region
 check_param ec2_ami
 check_param public_key_name
 check_param alt_host
@@ -50,7 +50,7 @@ s3_endpoint_host=$(get_stack_info_of "${stack_info}" "S3EndpointHost")
 test_host_ip=$(get_stack_info_of "${stack_info}" "TestHostIP")
 
 cd ${PWD}/configs
-test_types=( generic negative_sig_version negative_region_invalid negative_region_and_host )
+test_types=( generic negative_sig_version negative_region_and_host )
 for test_type in "${test_types[@]}"; do
   mkdir -p ${test_type}
 done
@@ -88,8 +88,7 @@ cat > "generic/v4_profile_wout_host_w_region-s3cli_config.json"<< EOF
 }
 EOF
 
-if [ "${region_optional}" = true ]; then
-  cat > "generic/minimal-s3cli_config.json"<< EOF
+cat > "generic/minimal-s3cli_config.json"<< EOF
 {
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
@@ -97,12 +96,51 @@ if [ "${region_optional}" = true ]; then
 }
 EOF
 
-  cat > "generic/v2_minimal-s3cli_config.json"<< EOF
+cat > "generic/w_host_wout_region-s3cli_config.json"<< EOF
+{
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}"
+}
+EOF
+
+cat > "generic/profile_wout_host_wout_region-s3cli_config.json"<< EOF
+{
+  "credentials_source": "env_or_profile",
+  "bucket_name": "${bucket_name}"
+}
+EOF
+
+cat > "generic/v4_w_host_wout_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "4",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "host": "${s3_endpoint_host}"
+}
+EOF
+
+if [ "${is_v4_only_region}" = true ]; then
+  cat > "negative_sig_version/v2_w_v4_region-s3cli_config.json"<< EOF
 {
   "signature_version": "2",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}"
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
+}
+EOF
+else
+  cat > "generic/v2_static_wout_host_w_region-s3cli_config.json"<< EOF
+{
+  "signature_version": "2",
+  "credentials_source": "static",
+  "access_key_id": "${access_key_id}",
+  "secret_access_key": "${secret_access_key}",
+  "bucket_name": "${bucket_name}",
+  "region": "${region_name}"
 }
 EOF
 
@@ -117,50 +155,12 @@ EOF
 }
 EOF
 
-  cat > "generic/w_host_wout_region-s3cli_config.json"<< EOF
-{
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}"
-}
-EOF
-
-  cat > "generic/v2_static_wout_host_w_region-s3cli_config.json"<< EOF
+  cat > "generic/v2_minimal-s3cli_config.json"<< EOF
 {
   "signature_version": "2",
-  "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "region": "${region_name}"
-}
-EOF
-
-  cat > "generic/profile_wout_host_wout_region-s3cli_config.json"<< EOF
-{
-  "credentials_source": "env_or_profile",
   "bucket_name": "${bucket_name}"
-}
-EOF
-
-  cat > "negative_region_invalid/v4_w_host_wout_region-s3cli_config.json"<< EOF
-{
-  "signature_version": "4",
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "host": "${s3_endpoint_host}"
-}
-EOF
-else
-  cat > "negative_sig_version/v2_wout_host_w_region-s3cli_config.json"<< EOF
-{
-  "signature_version": "2",
-  "access_key_id": "${access_key_id}",
-  "secret_access_key": "${secret_access_key}",
-  "bucket_name": "${bucket_name}",
-  "region": "${region_name}"
 }
 EOF
 fi
@@ -210,10 +210,8 @@ EOF
 fi
 
 if [ ! -z "${alt_host}" ]; then
-  cat > "generic/v2_static_w_alt_host_wout_region-s3cli_config.json"<< EOF
+  cat > "generic/alt_host_wout_region-s3cli_config.json"<< EOF
 {
-  "signature_version": "2",
-  "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",
@@ -221,10 +219,8 @@ if [ ! -z "${alt_host}" ]; then
 }
 EOF
   if [ ! -z "${alt_region}" ]; then
-    cat > "generic/v2_static_w_alt_host_w_alt_region-s3cli_config.json"<< EOF
+    cat > "generic/alt_host_w_alt_region-s3cli_config.json"<< EOF
 {
-  "signature_version": "2",
-  "credentials_source": "static",
   "access_key_id": "${access_key_id}",
   "secret_access_key": "${secret_access_key}",
   "bucket_name": "${bucket_name}",

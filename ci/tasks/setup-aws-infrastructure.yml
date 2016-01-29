@@ -12,7 +12,7 @@ params:
   secret_access_key: replace-me
   region_name:       replace-me
   stack_name:        replace-me
-  region_optional:   replace-me
+  is_v4_only_region: false
   ec2_ami:           replace-me
   public_key_name:   replace-me
   alt_host:

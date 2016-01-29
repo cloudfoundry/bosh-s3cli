@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"regexp"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -29,7 +28,7 @@ type S3Cli struct {
 const EmptyRegion = " "
 
 const (
-	defaultRegion   = "us-east-1"
+	defaultRegion = "us-east-1"
 )
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
@@ -105,8 +104,8 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}
 
-	if c.Region == "" && c.Host == "" {
-		c.Region = defaultRegion
+	if c.Region == "" {
+		c.Region = c.getRegionFromHost()
 	}
 
 	switch c.SignatureVersion {
@@ -115,7 +114,7 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	case 4:
 		c.UseV2SigningMethod = false
 	default:
-		if c.isHostAWS() {
+		if c.isV4Region() {
 			c.UseV2SigningMethod = false
 		} else {
 			c.UseV2SigningMethod = true
@@ -141,10 +140,19 @@ func (c *S3Cli) S3Endpoint() string {
 	return c.Host
 }
 
-func (c *S3Cli) isHostAWS() bool {
+func (c *S3Cli) isV4Region() bool {
+	return c.getRegionFromHost() != ""
+}
+
+func (c *S3Cli) getRegionFromHost() string {
 	if c.Host == "" {
-		return true
+		return defaultRegion
 	}
-	isHostAWS, _ := regexp.MatchString("amazonaws", c.Host)
-	return isHostAWS
+
+	region, hasKey := endpointsToRegions[c.Host]
+	if hasKey {
+		return region
+	}
+
+	return ""
 }

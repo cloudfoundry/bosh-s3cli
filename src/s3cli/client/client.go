@@ -2,10 +2,10 @@ package client
 
 import (
 	"crypto/tls"
+	"errors"
 	"io"
 	"log"
 	"net/http"
-	"errors"
 
 	"s3cli/config"
 

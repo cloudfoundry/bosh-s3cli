@@ -18,11 +18,25 @@ var _ = Describe("BlobstoreClient configuration", func() {
 
 	Describe("building a configuration", func() {
 		Describe("checking that either host or region has been set", func() {
-			Context("when host has been set but not region", func() {
-				It("reports that region should not be used for SDK configuration", func() {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
+			Context("when AWS endpoint has been set but not region", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "s3-eu-central-1.amazonaws.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				It("sets the AWS region based on the hostname", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.UseRegion()).To(BeTrue(), "Expected UseRegion to be true")
+					Expect(c.Host).To(Equal("s3-eu-central-1.amazonaws.com"))
+					Expect(c.Region).To(Equal("eu-central-1"))
+				})
+			})
+
+			Context("when non-AWS endpoint has been set but not region", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				It("reports that region should not be used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.UseRegion()).To(BeFalse())
@@ -32,10 +46,10 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 
 			Context("when region has been set but not host", func() {
-				It("reports that region should be used for SDK configuration", func() {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "region": "some-region"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "region": "some-region"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
+				It("reports that region should be used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.UseRegion()).To(BeTrue())
@@ -45,10 +59,10 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 
 			Context("when both host and region have been set", func() {
-				It("reports that region and endpoint should be used for SDK configuration", func() {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
+				It("reports that region and endpoint should be used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.UseRegion()).To(BeTrue())
@@ -58,10 +72,10 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 
 			Context("when neither host and region have been set", func() {
-				It("defaults region to us-east-1", func() {
-					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
-					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
+				It("defaults region to us-east-1", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.Host).To(Equal(""))
@@ -71,20 +85,20 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 
 		Describe("when bucket is not specified", func() {
-			It("returns an error", func() {
-				emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key"}`)
-				emptyJSONReader := bytes.NewReader(emptyJSONBytes)
+			emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key"}`)
+			emptyJSONReader := bytes.NewReader(emptyJSONBytes)
 
+			It("returns an error", func() {
 				_, err := config.NewFromReader(emptyJSONReader)
 				Expect(err).To(MatchError("bucket_name must be set"))
 			})
 		})
 
 		Describe("when bucket is specified", func() {
-			It("uses the given bucket", func() {
-				emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
-				emptyJSONReader := bytes.NewReader(emptyJSONBytes)
+			emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
+			emptyJSONReader := bytes.NewReader(emptyJSONBytes)
 
+			It("uses the given bucket", func() {
 				c, err := config.NewFromReader(emptyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.BucketName).To(Equal("some-bucket"))
@@ -92,10 +106,10 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 
 		Describe("Default SSL options", func() {
-			It("defaults to use SSL and peer verification", func() {
-				emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
-				emptyJSONReader := bytes.NewReader(emptyJSONBytes)
+			emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
+			emptyJSONReader := bytes.NewReader(emptyJSONBytes)
 
+			It("defaults to use SSL and peer verification", func() {
 				c, err := config.NewFromReader(emptyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.UseSSL).To(BeTrue())
@@ -118,12 +132,12 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
 			})
 
-			It("uses v4 signing when the hostname contains 'amazonaws'", func() {
+			It("uses v4 signing when the hostname maps to a known Amazon region", func() {
 				configBytes := []byte(`{
 					"access_key_id":      "id",
 					"secret_access_key":  "key",
 					"bucket_name":        "some-bucket",
-					"host":               "something.amazonaws.com.something"
+					"host":               "s3-external-1.amazonaws.com"
 				}`)
 
 				configReader := bytes.NewReader(configBytes)
@@ -132,7 +146,36 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
 			})
 
-			It("uses v2 signing when the hostname does not contain 'amazonaws'", func() {
+			It("uses v4 signing when both the hostname and the region map to a known Amazon region", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "s3-external-1.amazonaws.com",
+					"region":							"eu-central-1"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+			})
+
+			It("uses v2 signing when the hostname does not map to a known Amazon region", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "s3.private-region.amazonaws.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
+			})
+
+			It("uses v2 signing when the hostname is a non-Amazon endpoint", func() {
 				configBytes := []byte(`{
 					"access_key_id":      "id",
 					"secret_access_key":  "key",
@@ -151,7 +194,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					"access_key_id":      "id",
 					"secret_access_key":  "key",
 					"bucket_name":        "some-bucket",
-					"host":               "something.amazonaws.com.something",
+					"host":               "s3-external-1.amazonaws.com",
 					"signature_version":  "2"
 				}`)
 
