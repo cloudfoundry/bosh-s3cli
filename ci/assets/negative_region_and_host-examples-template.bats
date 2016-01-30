@@ -10,6 +10,7 @@
   s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/${s3_filename}
 
   [ "${status}" -ne 0 ]
-  regex="the region '.*' is wrong; expecting '.*'"
-  [[ $output =~ $regex ]]
+  non_isolated_region_regex="the region '.*' is wrong; expecting '.*'"
+  isolated_region_regex="InvalidAccessKeyId"
+  [[ $output =~ $non_isolated_region_regex || $output =~ $isolated_region_regex ]]
 }
