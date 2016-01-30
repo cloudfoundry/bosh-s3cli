@@ -1,6 +1,6 @@
 package config
 
-var endpointsToRegions = map[string]string{
+var awsHostToRegion = map[string]string{
 	"s3.amazonaws.com":            "us-east-1",
 	"s3-external-1.amazonaws.com": "us-east-1",
 

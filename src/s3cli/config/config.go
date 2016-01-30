@@ -104,7 +104,10 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}
 
-	if c.Region == "" {
+	if c.Region == "" && c.Host == "" {
+		c.Region = defaultRegion
+	}
+	if c.Host != "" && c.isAWSHost() {
 		c.Region = c.getRegionFromHost()
 	}
 
@@ -114,7 +117,7 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	case 4:
 		c.UseV2SigningMethod = false
 	default:
-		if c.isV4Region() {
+		if c.Host == "" || c.isAWSHost() {
 			c.UseV2SigningMethod = false
 		} else {
 			c.UseV2SigningMethod = true
@@ -140,19 +143,11 @@ func (c *S3Cli) S3Endpoint() string {
 	return c.Host
 }
 
-func (c *S3Cli) isV4Region() bool {
-	return c.getRegionFromHost() != ""
+func (c *S3Cli) isAWSHost() bool {
+	_, hasKey := awsHostToRegion[c.Host]
+	return hasKey
 }
 
 func (c *S3Cli) getRegionFromHost() string {
-	if c.Host == "" {
-		return defaultRegion
-	}
-
-	region, hasKey := endpointsToRegions[c.Host]
-	if hasKey {
-		return region
-	}
-
-	return ""
+	return awsHostToRegion[c.Host]
 }
