@@ -31,14 +31,19 @@ func main() {
 	}
 
 	nonFlagArgs := flag.Args()
-	if len(nonFlagArgs) != 3 {
-		log.Fatalf("Expected 3 arguments got %d\n", len(nonFlagArgs))
+	if len(nonFlagArgs) < 2 {
+		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
 	}
 
-	cmd, src, dst := nonFlagArgs[0], nonFlagArgs[1], nonFlagArgs[2]
+	cmd := nonFlagArgs[0]
 
 	switch cmd {
 	case "put":
+		if len(nonFlagArgs) != 3 {
+			log.Fatalf("Put method expected 3 arguments got %d\n", len(nonFlagArgs))
+		}
+		src, dst := nonFlagArgs[1], nonFlagArgs[2]
+
 		var sourceFile *os.File
 		sourceFile, err = os.Open(src)
 		if err != nil {
@@ -48,6 +53,11 @@ func main() {
 		defer sourceFile.Close()
 		err = blobstoreClient.Put(sourceFile, dst)
 	case "get":
+		if len(nonFlagArgs) != 3 {
+			log.Fatalf("Get method expected 3 arguments got %d\n", len(nonFlagArgs))
+		}
+		src, dst := nonFlagArgs[1], nonFlagArgs[2]
+
 		var dstFile *os.File
 		dstFile, err = os.Create(dst)
 		if err != nil {
@@ -56,6 +66,12 @@ func main() {
 
 		defer dstFile.Close()
 		err = blobstoreClient.Get(src, dstFile)
+	case "del":
+		if len(nonFlagArgs) != 2 {
+			log.Fatalf("Delete method expected 2 arguments got %d\n", len(nonFlagArgs))
+		}
+
+		err = blobstoreClient.Delete(nonFlagArgs[1])
 	default:
 		log.Fatalf("unknown command: '%s'\n", cmd)
 	}

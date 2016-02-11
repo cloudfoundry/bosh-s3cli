@@ -105,3 +105,23 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	log.Println("Successfully uploaded file to", putResult.Location)
 	return nil
 }
+
+// Delete remove a blob from an S3 compatible blobstore
+func (client *S3Blobstore) Delete(dest string) error {
+	if client.s3cliConfig.CredentialsSource == config.NoneCredentialsSource {
+		return errorInvalidCredentialsSourceValue
+	}
+
+	deleteParams := &s3.DeleteObjectInput{
+		Bucket: aws.String(client.s3cliConfig.BucketName),
+		Key:    aws.String(dest),
+	}
+
+	_, err := client.s3Client.DeleteObject(deleteParams)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
