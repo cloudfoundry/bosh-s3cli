@@ -72,3 +72,32 @@
 
   [ "${status}" -eq 0 ]
 }
+
+@test "Invoking s3cli exist on existing file should return 0 as a status value using config: ${S3CLI_CONFIG_FILE}" {
+  local expected_string=${BATS_RANDOM_ID}
+  local s3_filename="existing_file_in_s3"
+
+  echo -n ${expected_string} > ${s3_filename}
+  s3cmd --config ${S3CMD_CONFIG_FILE} put ${s3_filename} s3://${bucket_name}/
+
+  current_config_file=${S3CLI_CONFIG_FILE}
+  run_local_or_remote "${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} exist ${s3_filename}"
+
+  s3cmd --config ${S3CMD_CONFIG_FILE} del s3://${bucket_name}/${s3_filename}
+
+  nonerror_output="File '.*' exist in bucket '.*'"
+  [ "${status}" -eq 0 ]
+  [[ ${output} =~ ${nonerror_output} ]]
+}
+
+@test "Invoking s3cli exist on nonexistent file should return 3 as a status value using config: ${S3CLI_CONFIG_FILE}" {
+  local expected_string=${BATS_RANDOM_ID}
+  local s3_filename="non_existing_file_in_s3"
+
+  current_config_file=${S3CLI_CONFIG_FILE}
+  run_local_or_remote "${S3CLI_EXE} -c ${S3CLI_CONFIG_FILE} exist ${s3_filename}"
+
+  error_output="File '.*' does not exist in bucket '.*'"
+  [ "${status}" -eq 3 ]
+  [[ ${output} =~ ${error_output} ]]
+}

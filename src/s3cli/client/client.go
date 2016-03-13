@@ -10,6 +10,7 @@ import (
 	"s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -124,4 +125,28 @@ func (client *S3Blobstore) Delete(dest string) error {
 	}
 
 	return nil
+}
+
+// Exist checks if blob exists in an S3 compatible blobstore
+func (client *S3Blobstore) Exist(dest string) (bool, error) {
+
+	existsParams := &s3.HeadObjectInput{
+		Bucket: aws.String(client.s3cliConfig.BucketName),
+		Key:    aws.String(dest),
+	}
+
+	_, err := client.s3Client.HeadObject(existsParams)
+
+	if err != nil {
+		if reqErr, ok := err.(awserr.RequestFailure); ok {
+			if reqErr.StatusCode() == 404 {
+				log.Printf("File '%s' does not exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
+				return false, nil
+			}
+		}
+		return false, err
+	}
+
+	log.Printf("File '%s' exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
+	return true, nil
 }
