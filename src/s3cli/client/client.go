@@ -137,16 +137,16 @@ func (client *S3Blobstore) Exist(dest string) (bool, error) {
 
 	_, err := client.s3Client.HeadObject(existsParams)
 
-	if err != nil {
-		if reqErr, ok := err.(awserr.RequestFailure); ok {
-			if reqErr.StatusCode() == 404 {
-				log.Printf("File '%s' does not exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
-				return false, nil
-			}
-		}
-		return false, err
+	if err == nil {
+		log.Printf("File '%s' exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
+		return true, nil
 	}
 
-	log.Printf("File '%s' exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
-	return true, nil
+	if reqErr, ok := err.(awserr.RequestFailure); ok {
+		if reqErr.StatusCode() == 404 {
+			log.Printf("File '%s' does not exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
+			return false, nil
+		}
+	}
+	return false, err
 }
