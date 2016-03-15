@@ -127,8 +127,8 @@ func (client *S3Blobstore) Delete(dest string) error {
 	return nil
 }
 
-// Exist checks if blob exists in an S3 compatible blobstore
-func (client *S3Blobstore) Exist(dest string) (bool, error) {
+// Exists checks if blob exists in an S3 compatible blobstore
+func (client *S3Blobstore) Exists(dest string) (bool, error) {
 
 	existsParams := &s3.HeadObjectInput{
 		Bucket: aws.String(client.s3cliConfig.BucketName),
@@ -138,7 +138,7 @@ func (client *S3Blobstore) Exist(dest string) (bool, error) {
 	_, err := client.s3Client.HeadObject(existsParams)
 
 	if err == nil {
-		log.Printf("File '%s' exist in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
+		log.Printf("File '%s' exists in bucket '%s'\n", dest, client.s3cliConfig.BucketName)
 		return true, nil
 	}
 

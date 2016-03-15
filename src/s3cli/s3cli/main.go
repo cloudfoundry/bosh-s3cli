@@ -72,17 +72,17 @@ func main() {
 		}
 
 		err = blobstoreClient.Delete(nonFlagArgs[1])
-	case "exist":
+	case "exists":
 		if len(nonFlagArgs) != 2 {
-			log.Fatalf("Exist method expected 2 arguments got %d\n", len(nonFlagArgs))
+			log.Fatalf("Exists method expected 2 arguments got %d\n", len(nonFlagArgs))
 		}
 
-		var exist bool
-		exist, err = blobstoreClient.Exist(nonFlagArgs[1])
+		var exists bool
+		exists, err = blobstoreClient.Exists(nonFlagArgs[1])
 
-		// In case object exist return value is 0 and 3 otherwise
-		// We are using `3` since `1` and `2` are aleready meaningful used
-		if err == nil && !exist {
+		// If the object exists the exit status is 0, otherwise it is 3
+		// We are using `3` since `1` and `2` have special meanings
+		if err == nil && !exists {
 			os.Exit(3)
 		}
 
