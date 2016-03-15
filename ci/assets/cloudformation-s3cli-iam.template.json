@@ -217,9 +217,10 @@
               "Statement": [
                 {
                   "Action": [
-                    "s3:Get*",
-                    "s3:Put*",
-                    "s3:List*"
+                    "s3:GetObject*",
+                    "s3:PutObject*",
+                    "s3:List*",
+                    "s3:DeleteObject*"
                   ],
                   "Effect": "Allow",
                   "Resource": [
