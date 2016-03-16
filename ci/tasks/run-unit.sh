@@ -23,8 +23,8 @@ pushd s3cli-src > /dev/null
   echo -e "\n Checking with golint..."
   golint s3cli/...
 
-  echo -e "\n Testing packages..."
-  ginkgo -r -race src/s3cli
+  echo -e "\n Unit testing packages..."
+  ginkgo -r -race -skipPackage=integration src/s3cli/
 
   echo -e "\n Running build script to confirm everything compiles..."
   go build -ldflags "-X main.version ${version}" -o out/s3cli s3cli/s3cli
@@ -35,4 +35,3 @@ pushd s3cli-src > /dev/null
 
   echo -e "\n suite success"
 popd > /dev/null
-
