@@ -3,7 +3,6 @@ package integration
 import (
 	"crypto/rand"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"math/big"
 	"os/exec"
@@ -56,7 +55,8 @@ func MakeContentFile(content string) string {
 // RunS3CLI runs the s3cli and outputs the session after waiting for it to finish
 func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...string) (*gexec.Session, error) {
 	cmdArgs := []string{
-		fmt.Sprintf("-c %s", configPath),
+		"-c",
+		configPath,
 		subcommand,
 	}
 	cmdArgs = append(cmdArgs, args...)
