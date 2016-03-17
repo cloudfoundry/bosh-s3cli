@@ -36,6 +36,7 @@ pushd s3cli-src > /dev/null
   --function-name ${lambda_function_name} \
   --zip-file fileb://payload.zip \
   --role ${iam_role_arn} \
+  --timeout 300
   --handler lambda_function.test_runner_handler \
   --runtime python2.7
 
@@ -45,5 +46,13 @@ pushd s3cli-src > /dev/null
   --region ${region_name} \
   --log-type Tail \
   --payload "${lambda_payload}" \
-  ${lambda_log}
+  ${lambda_log} | tee lambda_output.json
+
+  aws lambda delete-function \
+  --function-name ${lambda_function_name}
+
+  fn_err=$(cat lambda_output.json | jq -r ".FunctionError")
+  if [ ("${fn_err}" == "Handled") -o ("${fn_err}" == "Unhandled") ]; then
+    exit 1
+  fi
 popd > /dev/null
