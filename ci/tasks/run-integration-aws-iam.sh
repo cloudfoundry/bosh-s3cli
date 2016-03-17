@@ -51,8 +51,8 @@ pushd s3cli-src > /dev/null
   aws lambda delete-function \
   --function-name ${lambda_function_name}
 
-  fn_err=$(cat lambda_output.json | jq -r ".FunctionError")
-  if [ ("${fn_err}" == "Handled") -o ("${fn_err}" == "Unhandled") ]; then
-    exit 1
-  fi
+  echo "Lambda execution log output"
+  cat lambda_output.json | jq -r ".LogResult" | base64 -d
+
+  cat lambda_output.json | jq -r ".FunctionError" | grep -v -e "Handled" -e "Unhandled"
 popd > /dev/null
