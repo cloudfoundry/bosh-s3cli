@@ -4,9 +4,11 @@ image: docker:///boshcpi/s3cli
 inputs:
   - name: s3cli-src
 run:
-  path: s3cli-src/ci/tasks/setup-aws-infrastructure.sh
+  path: s3cli-src/ci/tasks/run-integration-aws.sh
 params:
   access_key_id:
   secret_access_key:
   region_name:
   stack_name:
+  focus_regex:
+  s3_endpoint_host:

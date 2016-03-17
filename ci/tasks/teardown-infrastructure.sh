@@ -4,10 +4,10 @@ set -e
 
 source s3cli-src/ci/tasks/utils.sh
 
-check_param access_key_id
-check_param secret_access_key
-check_param region_name
-check_param stack_name
+: ${access_key_id:?}
+: ${secret_access_key:?}
+: ${region_name:?}
+: ${stack_name:?}
 
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}

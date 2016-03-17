@@ -5,4 +5,3 @@ inputs:
 - name: s3cli-src
 run:
   path: s3cli-src/ci/tasks/run-unit.sh
-params: {}

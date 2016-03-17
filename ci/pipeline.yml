@@ -14,8 +14,7 @@ jobs:
   - name: unit
     serial: true
     plan:
-      - aggregate:
-          - {trigger: true, get: s3cli-src, resource: s3cli-in}
+      - {trigger: true, get: s3cli-src, resource: s3cli-in}
 
       - task: test
         file: s3cli-src/ci/tasks/run-unit.yml
@@ -27,30 +26,28 @@ jobs:
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        config: &aws-us-infrastructure-config
-          params:
-            access_key_id:     {{access_key_id__aws_us}}
-            secret_access_key: {{secret_access_key__aws_us}}
-            region_name:       {{region_name__aws_us}}
-            stack_name:        {{stack_name__aws_us}}
-            ec2_ami:           {{ec2_ami__aws_us}}
-            public_key_name:   {{public_key_name__aws_us}}
-            alt_region:        us-west-1
-            alt_host:          s3-external-1.amazonaws.com
-            valid_host:        s3-external-1.amazonaws.com
+        params: &aws-us-infrastructure-params
+          access_key_id:     {{access_key_id__aws_us}}
+          secret_access_key: {{secret_access_key__aws_us}}
+          region_name:       us-east-1
+          stack_name:        s3cli-iam
 
-      - task: test
-        file: s3cli-src/ci/tasks/run-integration.yml
-        config:
+      - aggregate:
+        - task: test-static-credentials
+          file: s3cli-src/ci/tasks/run-integration-aws.yml
+          <<: *aws-us-infrastructure-params
           params:
-            access_key_id:     {{access_key_id__aws_us}}
-            secret_access_key: {{secret_access_key__aws_us}}
-            region_name:       {{region_name__aws_us}}
-            private_key_data:  {{private_key_data__aws_us}}
+            focus_regex:      "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
+            s3_endpoint_host: s3.amazonaws.com
+        - task: test-env-or-profile
+          file: s3cli-src/ci/tasks/run-integration-aws-iam.yml
+          <<: *aws-us-infrastructure-params
+          params:
+            s3_endpoint_host: s3.amazonaws.com
         ensure:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          config: *aws-us-infrastructure-config
+          params: *aws-us-infrastructure-params
 
   - name: aws-s3-public-read-integration
     serial: true
@@ -58,26 +55,22 @@ jobs:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
 
       - task: setup
-        file: s3cli-src/ci/tasks/setup-public-s3-bucket-infrastructure.yml
-        config: &aws-us-public-read-infrastructure-config
-          params:
-            access_key_id:     {{access_key_id__aws_us}}
-            secret_access_key: {{secret_access_key__aws_us}}
-            region_name:       {{region_name__aws_us}}
-            stack_name:        {{stack_name_public_bucket__aws_us}}
-            s3_endpoint_host:  s3.amazonaws.com
+        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
+        params: &aws-us-public-read-infrastructure-params
+          access_key_id:     {{access_key_id__aws_us}}
+          secret_access_key: {{secret_access_key__aws_us}}
+          region_name:       us-east-1
+          stack_name:        s3cli-public-bucket
 
       - task: test
-        file: s3cli-src/ci/tasks/run-integration.yml
-        config:
-          params:
-            access_key_id:     {{access_key_id__aws_us}}
-            secret_access_key: {{secret_access_key__aws_us}}
-            region_name:       {{region_name__aws_us}}
+        file: s3cli-src/ci/tasks/run-integration-aws.yml
+        <<: *aws-us-public-read-infrastructure-params
+        params:
+          focus_regex: "PUBLIC READ ONLY"
         ensure:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          config: *aws-us-public-read-infrastructure-config
+          params: *aws-us-public-read-infrastructure-params
 
   - name: aws-s3-china-integration
     serial: true
@@ -86,30 +79,22 @@ jobs:
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        config: &aws-china-infrastructure-config
-          params:
-            access_key_id:     {{access_key_id__aws_china}}
-            secret_access_key: {{secret_access_key__aws_china}}
-            region_name:       {{region_name__aws_china}}
-            stack_name:        {{stack_name__aws_china}}
-            is_v4_only_region: true
-            ec2_ami:           {{ec2_ami__aws_china}}
-            public_key_name:   {{public_key_name__aws_china}}
-            invalid_host:      s3-external-1.amazonaws.com
-            valid_host:        s3.cn-north-1.amazonaws.com.cn
+        params: &aws-china-infrastructure-params
+          access_key_id:     {{access_key_id__aws_china}}
+          secret_access_key: {{secret_access_key__aws_china}}
+          region_name:       cn-north-1
+          stack_name:        s3cli-private-bucket
 
       - task: test
-        file: s3cli-src/ci/tasks/run-integration.yml
-        config:
-          params:
-            access_key_id:     {{access_key_id__aws_china}}
-            secret_access_key: {{secret_access_key__aws_china}}
-            region_name:       {{region_name__aws_china}}
-            private_key_data:  {{private_key_data__aws_china}}
+        file: s3cli-src/ci/tasks/run-integration-aws.yml
+        <<: *aws-china-infrastructure-params
+        params:
+          focus_regex:      "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
+          s3_endpoint_host: s3.amazonaws.com.cn
         ensure:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          config: *aws-china-infrastructure-config
+          params: *aws-china-infrastructure-params
 
   - name: aws-s3-frankfurt-integration
     serial: true
@@ -118,37 +103,30 @@ jobs:
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        config: &aws-frankfurt-infrastructure-config
-          params:
-            access_key_id:     {{access_key_id__aws_frankfurt}}
-            secret_access_key: {{secret_access_key__aws_frankfurt}}
-            region_name:       {{region_name__aws_frankfurt}}
-            stack_name:        {{stack_name__aws_frankfurt}}
-            is_v4_only_region: true
-            ec2_ami:           {{ec2_ami__aws_frankfurt}}
-            public_key_name:   {{public_key_name__aws_frankfurt}}
-            valid_host:        s3.eu-central-1.amazonaws.com
+        params: &aws-frankfurt-infrastructure-params
+          access_key_id:     {{access_key_id__aws_frankfurt}}
+          secret_access_key: {{secret_access_key__aws_frankfurt}}
+          region_name:       eu-central-1
+          stack_name:        s3cli-private-bucket
 
       - task: test
-        file: s3cli-src/ci/tasks/run-integration.yml
-        config:
-          params:
-            access_key_id:     {{access_key_id__aws_frankfurt}}
-            secret_access_key: {{secret_access_key__aws_frankfurt}}
-            region_name:       {{region_name__aws_frankfurt}}
-            private_key_data:  {{private_key_data__aws_frankfurt}}
+        file: s3cli-src/ci/tasks/run-integration-aws.yml
+        <<: *aws-frankfurt-infrastructure-params
+        params:
+          focus_regex:       "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
+          s3_endpoint_host:  s3.eu-central-1.amazonaws.com
         ensure:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          config: *aws-frankfurt-infrastructure-config
+          params: *aws-frankfurt-infrastructure-params
 
   - name: s3-compatible-integration
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
 
-      - task: setup
-        file: s3cli-src/ci/tasks/setup-s3-compatible-configurations.yml
+      - task: test
+        file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
         config:
           params:
             access_key_id:     {{access_key_id__s3_compat}}
@@ -156,13 +134,6 @@ jobs:
             bucket_name:       {{bucket_name__s3_compat}}
             s3_endpoint_host:  {{host__s3_compat}}
             s3_endpoint_port:  {{port__s3_compat}}
-            region:            invalid-region
-      - task: test
-        file: s3cli-src/ci/tasks/run-integration.yml
-        config:
-          params:
-            access_key_id:     {{access_key_id__s3_compat}}
-            secret_access_key: {{secret_access_key__s3_compat}}
 
   - name: promote
     plan:

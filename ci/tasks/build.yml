@@ -8,4 +8,3 @@ outputs:
 - name: out
 run:
   path: s3cli-src/ci/tasks/build.sh
-params: {}
