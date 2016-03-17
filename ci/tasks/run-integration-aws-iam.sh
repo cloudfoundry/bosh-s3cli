@@ -20,7 +20,7 @@ iam_role_arn=$(get_stack_info_of "${stack_info}" "IamRoleArn")
 lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_name}\", \"s3_host\": \"s3.amazonaws.com\"}"
 lambda_log=$(realpath $(mktemp "XXXXXX-lambda.log"))
 
-trap EXIT cat ${lambda_log}
+trap "cat ${lambda_log}" EXIT
 
 pushd s3cli-src > /dev/null
   . .envrc
