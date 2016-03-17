@@ -64,7 +64,7 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 
 			gottenBytes, err := ioutil.ReadFile("public-file")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(gottenBytes).To(Equal(s3FileContents))
+			Expect(string(gottenBytes)).To(Equal(s3FileContents))
 
 			s3CLISession, err = integration.RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
 			Expect(err).ToNot(HaveOccurred())

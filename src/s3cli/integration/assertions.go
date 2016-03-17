@@ -41,7 +41,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 
 	gottenBytes, err := ioutil.ReadFile(tmpLocalFile.Name())
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(gottenBytes).To(gomega.Equal(expectedString))
+	gomega.Expect(string(gottenBytes)).To(gomega.Equal(expectedString))
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
