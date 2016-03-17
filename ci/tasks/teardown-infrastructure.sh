@@ -13,7 +13,7 @@ export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
 
-
+stack_info=$(get_stack_info ${stack_name})
 bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
 aws s3 rm s3://${bucket_name} --recursive
 
