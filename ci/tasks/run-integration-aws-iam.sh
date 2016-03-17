@@ -41,7 +41,7 @@ pushd s3cli-src > /dev/null
   --function-name ${lambda_function_name} \
   --region ${region_name} \
   --log-type Tail \
-  --payload $lambda_payload \
+  --payload "${lambda_payload}" \
   lambda.log
 
 popd > /dev/null
