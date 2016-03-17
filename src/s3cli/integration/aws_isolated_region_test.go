@@ -36,8 +36,7 @@ var _ = Describe("Testing in any AWS region isolated from the US standard region
 				Region:            region,
 				Host:              "s3-external-1.amazonaws.com",
 			}
-			s3Filename, err := integration.GenerateRandomString()
-			Expect(err).ToNot(HaveOccurred())
+			s3Filename := integration.GenerateRandomString()
 
 			configPath := integration.MakeConfigFile(cfg)
 			defer func() { _ = os.Remove(configPath) }()

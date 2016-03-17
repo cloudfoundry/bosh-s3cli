@@ -34,8 +34,7 @@ var _ = Describe("Testing in any AWS region that only supports v4 signature vers
 				BucketName:       bucketName,
 				Region:           region,
 			}
-			s3Filename, err := integration.GenerateRandomString()
-			Expect(err).ToNot(HaveOccurred())
+			s3Filename := integration.GenerateRandomString()
 
 			configPath := integration.MakeConfigFile(cfg)
 			defer func() { _ = os.Remove(configPath) }()

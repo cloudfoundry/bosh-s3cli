@@ -18,17 +18,15 @@ import (
 const alphanum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // GenerateRandomString generates a random string of len 25
-func GenerateRandomString() (string, error) {
+func GenerateRandomString() string {
 	size := 25
 	randBytes := make([]byte, size)
 	for i := range randBytes {
 		randInt, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphanum))))
-		if err != nil {
-			return "", err
-		}
+		gomega.Expect(err).ToNot(gomega.HaveOccurred())
 		randBytes[i] = alphanum[randInt.Uint64()]
 	}
-	return string(randBytes), nil
+	return string(randBytes)
 }
 
 // MakeConfigFile creates a config file from a S3Cli config struct

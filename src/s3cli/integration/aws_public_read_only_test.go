@@ -33,17 +33,15 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			region := os.Getenv("REGION")
 			Expect(region).ToNot(BeEmpty(), "REGION must be set")
 
-			s3Filename, err := integration.GenerateRandomString()
-			Expect(err).ToNot(HaveOccurred())
-			s3FileContents, err := integration.GenerateRandomString()
-			Expect(err).ToNot(HaveOccurred())
+			s3Filename := integration.GenerateRandomString()
+			s3FileContents := integration.GenerateRandomString()
 
 			s3Client := s3.New(session.New(&aws.Config{
 				Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
 				Region:      aws.String(region),
 			}))
 
-			_, err = s3Client.PutObject(&s3.PutObjectInput{
+			_, err := s3Client.PutObject(&s3.PutObjectInput{
 				Body:   strings.NewReader(s3FileContents),
 				Bucket: &bucketName,
 				Key:    &s3Filename,

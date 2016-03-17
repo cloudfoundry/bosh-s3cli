@@ -87,8 +87,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				BucketName:       bucketName,
 				Host:             s3Host,
 			}
-			s3Filename, err := integration.GenerateRandomString()
-			Expect(err).ToNot(HaveOccurred())
+			s3Filename := integration.GenerateRandomString()
 
 			configPath := integration.MakeConfigFile(cfg)
 			defer func() { _ = os.Remove(configPath) }()

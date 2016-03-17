@@ -11,11 +11,8 @@ import (
 // AssertLifecycleWorks tests the main blobstore object lifecycle from
 // creation to deletion
 func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
-	expectedString, err := GenerateRandomString()
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-
-	s3Filename, err := GenerateRandomString()
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	expectedString := GenerateRandomString()
+	s3Filename := GenerateRandomString()
 
 	configPath := MakeConfigFile(cfg)
 	defer func() { _ = os.Remove(configPath) }()
