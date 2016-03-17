@@ -11,13 +11,6 @@ source s3cli-src/ci/tasks/utils.sh
 : ${focus_regex:?}
 : ${s3_endpoint_host:=unset}
 
-pushd s3cli-src > /dev/null
-  . .envrc
-  go install s3cli/s3cli
-
-  export S3_CLI_PATH=$(which s3cli)
-popd > /dev/null
-
 # Just need these to get the stack info
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
@@ -31,4 +24,11 @@ export REGION=${region_name}
 export BUCKET_NAME=$(get_stack_info_of "${stack_info}" "BucketName")
 export S3_HOST=${s3_endpoint_host}
 
-ginkgo -r -focus="${focus_regex}" src/s3cli/integration/
+pushd s3cli-src > /dev/null
+  . .envrc
+  go install s3cli/s3cli
+
+  export S3_CLI_PATH=$(which s3cli)
+
+  ginkgo -r -focus="${focus_regex}" src/s3cli/integration/
+popd > /dev/null

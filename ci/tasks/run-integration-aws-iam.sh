@@ -24,7 +24,7 @@ pushd s3cli-src > /dev/null
   GOOS=linux GOARCH=amd64 go build s3cli/s3cli
   GOOS=linux GOARCH=amd64 ginkgo build src/s3cli/integration
 
-  zip -j payload.zip src/s3cli/integration.test s3cli ci/assets/lambda_function.py
+  zip -j payload.zip src/s3cli/integration/integration.test s3cli ci/assets/lambda_function.py
 
   lambda_function_name=s3cli-integration-$(date +%s)
 
@@ -34,7 +34,7 @@ pushd s3cli-src > /dev/null
   --zip-file fileb://payload.zip \
   --role ${iam_role_arn} \
   --handler payload.test_runner_handler \
-  --runtime python
+  --runtime python2.7
 
   aws lambda invoke \
   --invocation-type RequestResponse \
