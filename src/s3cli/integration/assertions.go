@@ -27,7 +27,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
-	gomega.Expect(s3CLISession.Out.Contents()).To(gomega.MatchRegexp("File '.*' exists in bucket '.*'"))
+	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.MatchRegexp("File '.*' exists in bucket '.*'"))
 
 	tmpLocalFile, err := ioutil.TempFile("", "s3cli-download")
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
@@ -50,7 +50,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.Equal(3))
-	gomega.Expect(s3CLISession.Out.Contents()).To(gomega.MatchRegexp("File '.*' does not exist in bucket '.*'"))
+	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.MatchRegexp("File '.*' does not exist in bucket '.*'"))
 }
 
 // AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object
@@ -64,7 +64,7 @@ func AssertGetNonexistentFails(s3CLIPath string, cfg *config.S3Cli) {
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "get", nonExistentFile, nonExistentFile)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).ToNot(gomega.BeZero())
-	gomega.Expect(s3CLISession.Out.Contents()).To(gomega.ContainSubstring("NoSuchKey"))
+	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.ContainSubstring("NoSuchKey"))
 }
 
 // AssertDeleteNonexistentWorks asserts that `s3cli delete` on a non-existent

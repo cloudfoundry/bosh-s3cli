@@ -69,7 +69,7 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			s3CLISession, err = integration.RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).To(BeZero())
-			Expect(s3CLISession.Out.Contents()).To(MatchRegexp("File '.*' exists in bucket '.*'"))
+			Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' exists in bucket '.*'"))
 		})
 	})
 })
