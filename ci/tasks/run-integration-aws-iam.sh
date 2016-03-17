@@ -36,7 +36,7 @@ pushd s3cli-src > /dev/null
   --function-name ${lambda_function_name} \
   --zip-file fileb://payload.zip \
   --role ${iam_role_arn} \
-  --timeout 300
+  --timeout 300 \
   --handler lambda_function.test_runner_handler \
   --runtime python2.7
 
