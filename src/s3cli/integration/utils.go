@@ -56,7 +56,7 @@ func MakeContentFile(content string) string {
 // RunS3CLI runs the s3cli and outputs the session after waiting for it to finish
 func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...string) (*gexec.Session, error) {
 	cmdArgs := []string{
-		fmt.Sprintf("--config %s", configPath),
+		fmt.Sprintf("-c %s", configPath),
 		subcommand,
 	}
 	cmdArgs = append(cmdArgs, args...)
