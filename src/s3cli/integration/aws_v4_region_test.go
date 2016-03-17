@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("Testing in any AWS region that supports v4 signature version", func() {
-	Context("with V4 REGION (static creds) configurations", func() {
+	Context("with AWS V4 REGION (static creds) configurations", func() {
 		s3CLIPath := os.Getenv("S3_CLI_PATH")
 		accessKeyID := os.Getenv("ACCESS_KEY_ID")
 		secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")

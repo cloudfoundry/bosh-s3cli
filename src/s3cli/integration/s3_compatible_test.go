@@ -1,8 +1,6 @@
 package integration_test
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 	"s3cli/config"
 	"s3cli/integration"
@@ -95,11 +93,10 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			configPath := integration.MakeConfigFile(cfg)
 			defer func() { _ = os.Remove(configPath) }()
 
-			err = ioutil.WriteFile(s3Filename, []byte("test"), 0644)
-			Expect(err).ToNot(HaveOccurred())
-			defer func() { _ = os.Remove(s3Filename) }()
+			contentFile := integration.MakeContentFile("test")
+			defer func() { _ = os.Remove(contentFile) }()
 
-			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "put", s3Filename, fmt.Sprintf("s3://%s/", bucketName))
+			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
 

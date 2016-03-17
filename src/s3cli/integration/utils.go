@@ -44,6 +44,17 @@ func MakeConfigFile(cfg *config.S3Cli) string {
 	return tmpFile.Name()
 }
 
+// MakeContentFile creates a temporary file with content to upload to S3
+func MakeContentFile(content string) string {
+	tmpFile, err := ioutil.TempFile("", "s3cli-test-content")
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	_, err = tmpFile.Write([]byte(content))
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	err = tmpFile.Close()
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	return tmpFile.Name()
+}
+
 // RunS3CLI runs the s3cli and outputs the session after waiting for it to finish
 func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...string) (*gexec.Session, error) {
 	cmdArgs := []string{

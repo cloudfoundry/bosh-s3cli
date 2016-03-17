@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"s3cli/config"
@@ -21,11 +20,10 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	configPath := MakeConfigFile(cfg)
 	defer func() { _ = os.Remove(configPath) }()
 
-	err = ioutil.WriteFile(s3Filename, []byte(expectedString), 0644)
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	defer func() { _ = os.Remove(s3Filename) }()
+	contentFile := MakeContentFile(expectedString)
+	defer func() { _ = os.Remove(contentFile) }()
 
-	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", s3Filename, fmt.Sprintf("s3://%s/", cfg.BucketName))
+	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
 
@@ -34,13 +32,17 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
 	gomega.Expect(s3CLISession.Out.Contents()).To(gomega.MatchRegexp("File '.*' exists in bucket '.*'"))
 
-	tmpLocalFile := fmt.Sprintf("%s-dupe", s3Filename)
-	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "get", s3Filename, tmpLocalFile)
+	tmpLocalFile, err := ioutil.TempFile("", "s3cli-download")
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	defer func() { _ = os.Remove(tmpLocalFile) }()
+	err = tmpLocalFile.Close()
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	defer func() { _ = os.Remove(tmpLocalFile.Name()) }()
+
+	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "get", s3Filename, tmpLocalFile.Name())
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
 
-	gottenBytes, err := ioutil.ReadFile(tmpLocalFile)
+	gottenBytes, err := ioutil.ReadFile(tmpLocalFile.Name())
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(gottenBytes).To(gomega.Equal(expectedString))
 
