@@ -45,6 +45,7 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 				Body:   strings.NewReader(s3FileContents),
 				Bucket: &bucketName,
 				Key:    &s3Filename,
+				ACL:    aws.String(s3.ObjectCannedACLPublicRead),
 			})
 			Expect(err).ToNot(HaveOccurred())
 
