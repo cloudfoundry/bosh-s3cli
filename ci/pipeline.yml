@@ -35,14 +35,14 @@ jobs:
       - aggregate:
         - task: test-static-credentials
           file: s3cli-src/ci/tasks/run-integration-aws.yml
-          <<: *aws-us-infrastructure-params
           params:
+            <<: *aws-us-infrastructure-params
             focus_regex:      "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
             s3_endpoint_host: s3.amazonaws.com
         - task: test-env-or-profile
           file: s3cli-src/ci/tasks/run-integration-aws-iam.yml
-          <<: *aws-us-infrastructure-params
           params:
+            <<: *aws-us-infrastructure-params
             s3_endpoint_host: s3.amazonaws.com
         ensure:
           task: teardown
@@ -64,8 +64,8 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-aws.yml
-        <<: *aws-us-public-read-infrastructure-params
         params:
+          <<: *aws-us-public-read-infrastructure-params
           focus_regex: "PUBLIC READ ONLY"
         ensure:
           task: teardown
@@ -87,10 +87,10 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-aws.yml
-        <<: *aws-china-infrastructure-params
         params:
+          <<: *aws-china-infrastructure-params
           focus_regex:      "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
-          s3_endpoint_host: s3.amazonaws.com.cn
+          s3_endpoint_host: s3.cn-north-1.amazonaws.com.cn
         ensure:
           task: teardown
           file: s3cli-src/ci/tasks/teardown-infrastructure.yml
@@ -111,8 +111,8 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-aws.yml
-        <<: *aws-frankfurt-infrastructure-params
         params:
+          <<: *aws-frankfurt-infrastructure-params
           focus_regex:       "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
           s3_endpoint_host:  s3.eu-central-1.amazonaws.com
         ensure:
