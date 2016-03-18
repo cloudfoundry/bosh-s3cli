@@ -127,13 +127,12 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
-        config:
-          params:
-            access_key_id:     {{access_key_id__s3_compat}}
-            secret_access_key: {{secret_access_key__s3_compat}}
-            bucket_name:       {{bucket_name__s3_compat}}
-            s3_endpoint_host:  {{host__s3_compat}}
-            s3_endpoint_port:  {{port__s3_compat}}
+        params:
+          access_key_id:     {{access_key_id__s3_compat}}
+          secret_access_key: {{secret_access_key__s3_compat}}
+          bucket_name:       {{bucket_name__s3_compat}}
+          s3_endpoint_host:  {{host__s3_compat}}
+          s3_endpoint_port:  {{port__s3_compat}}
 
   - name: promote
     plan:
