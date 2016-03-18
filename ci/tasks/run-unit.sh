@@ -14,9 +14,6 @@ pushd s3cli-src > /dev/null
 
   . .envrc
 
-  go install github.com/onsi/ginkgo/ginkgo
-  go install github.com/golang/lint/golint
-
   echo -e "\n Vetting packages for potential issues..."
   go vet s3cli/...
 

@@ -17,7 +17,7 @@ RUN mkdir -p /opt/go
 ENV GOPATH /opt/go
 ENV PATH /usr/local/go/bin:/opt/go/bin:$PATH
 
-RUN go get github.com/onsi/ginkgo/ginkgo
+RUN go get github.com/onsi/ginkgo/ginkgo; go get github.com/golang/lint/golint
 
 RUN cd /tmp && \
     curl -O -L https://github.com/s3tools/s3cmd/archive/v1.6.0.tar.gz && \
