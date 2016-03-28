@@ -8,6 +8,7 @@ groups:
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - s3-compatible-integration
+      - gcs-s3-compatible-integration
       - promote
 
 jobs:
@@ -133,6 +134,20 @@ jobs:
           bucket_name:       {{bucket_name__s3_compat}}
           s3_endpoint_host:  {{host__s3_compat}}
           s3_endpoint_port:  {{port__s3_compat}}
+
+  - name: gcs-s3-compatible-integration
+    serial: true
+    plan:
+      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+
+      - task: test
+        file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
+        params:
+          access_key_id:     {{access_key_id__gcs}}
+          secret_access_key: {{secret_access_key__gcs}}
+          bucket_name:       {{bucket_name__gcs}}
+          s3_endpoint_host:  {{host__gcs}}
+          s3_endpoint_port:  {{port__gcs}}
 
   - name: promote
     plan:
