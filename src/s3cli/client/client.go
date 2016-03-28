@@ -107,7 +107,8 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	return nil
 }
 
-// Delete remove a blob from an S3 compatible blobstore
+// Delete removes a blob from an S3 compatible blobstore. If the object does
+// not exist, Delete does not return an error.
 func (client *S3Blobstore) Delete(dest string) error {
 	if client.s3cliConfig.CredentialsSource == config.NoneCredentialsSource {
 		return errorInvalidCredentialsSourceValue
@@ -120,11 +121,16 @@ func (client *S3Blobstore) Delete(dest string) error {
 
 	_, err := client.s3Client.DeleteObject(deleteParams)
 
-	if err != nil {
-		return err
+	if err == nil {
+		return nil
 	}
 
-	return nil
+	if reqErr, ok := err.(awserr.RequestFailure); ok {
+		if reqErr.StatusCode() == 404 {
+			return nil
+		}
+	}
+	return err
 }
 
 // Exists checks if blob exists in an S3 compatible blobstore
