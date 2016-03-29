@@ -152,8 +152,19 @@ jobs:
   - name: promote
     plan:
       - aggregate:
-          - {trigger: true, get: s3cli-src, passed: [unit, aws-s3-us-integration, aws-s3-china-integration, aws-s3-frankfurt-integration, s3-compatible-integration, aws-s3-public-read-integration], resource: s3cli-in}
-          - {trigger: false, get: version-semver, params: {bump: patch} }
+        - get: s3cli-src
+          resource: s3cli-in
+          trigger: true
+          passed: [
+            unit,
+            aws-s3-us-integration,
+            aws-s3-china-integration,
+            aws-s3-frankfurt-integration,
+            s3-compatible-integration,
+            aws-s3-public-read-integration,
+            gcs-s3-compatible-integration
+          ]
+        - {trigger: false, get: version-semver, params: {bump: patch} }
 
       - {put: version-semver, params: {file: version-semver/number}}
 
