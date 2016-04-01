@@ -40,6 +40,8 @@ pushd s3cli-src > /dev/null
   --handler lambda_function.test_runner_handler \
   --runtime python2.7
 
+  sleep 2
+
   aws lambda invoke \
   --invocation-type RequestResponse \
   --function-name ${lambda_function_name} \
@@ -53,7 +55,7 @@ pushd s3cli-src > /dev/null
 
     logs_command="aws logs describe-log-streams --log-group-name=${log_group_name}"
     tries=0
-    
+
     log_streams_json=$(${logs_command})
     while [[ ( $? -ne 0 ) && ( $tries -ne 5 ) ]] ; do
       sleep 2
@@ -65,11 +67,25 @@ pushd s3cli-src > /dev/null
 
   log_stream_name=$(echo "${log_streams_json}" | jq -r ".logStreams[0].logStreamName")
 
-  echo "Lambda execution log output"
-  aws logs get-log-events --log-group-name=${log_group_name} --log-stream-name=${log_stream_name} | jq -r ".events | map(.message) | .[]"
+  echo "Lambda execution log output for ${log_stream_name}"
+
+  tries=0
+  > lambda_output.log
+  while [[ ( "$(du lambda_output.log | cut -f 1)" -eq "0" ) && ( $tries -ne 20 ) ]] ; do
+    sleep 2
+    tries=$((tries + 1))
+    echo "Retrieving CloudWatch events; attempt: $tries"
+
+    aws logs get-log-events \
+      --log-group-name=${log_group_name} \
+      --log-stream-name=${log_stream_name} \
+    | jq -r ".events | map(.message) | .[]" | tee lambda_output.log
+  done
 
   aws lambda delete-function \
   --function-name ${lambda_function_name}
+
+  aws logs delete-log-group --log-group-name=${log_group_name}
 
   cat lambda_output.json | jq -r ".FunctionError" | grep -v -e "Handled" -e "Unhandled"
 popd > /dev/null
