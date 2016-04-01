@@ -15,7 +15,7 @@ export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
 
 stack_info=$(get_stack_info ${stack_name})
-bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
+bucket_name="bosh-s3cli-bogus" # $(get_stack_info_of "${stack_info}" "BucketName")
 iam_role_arn=$(get_stack_info_of "${stack_info}" "IamRoleArn")
 lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_name}\", \"s3_host\": \"s3.amazonaws.com\"}"
 lambda_log=$(realpath $(mktemp "XXXXXX-lambda.log"))
@@ -48,11 +48,19 @@ pushd s3cli-src > /dev/null
   --payload "${lambda_payload}" \
   ${lambda_log} | tee lambda_output.json
 
-  aws lambda delete-function \
-  --function-name ${lambda_function_name}
+  set +e
+    log_group_name="/aws/lambda/${lambda_function_name}"
+    log_streams_json=$(aws logs describe-log-streams --log-group-name=${log_group_name})
+    while [ $? -ne 0 ]; do !!; done
+  set -e
+
+  log_stream_name=$(echo "${log_streams_json}" | jq -r ".logStreams[0].logStreamName")
 
   echo "Lambda execution log output"
-  cat lambda_output.json | jq -r ".LogResult" | base64 -d
+  aws logs get-log-events --log-group-name=${log_group_name} --log-stream-name=${log_stream_name} | jq -r ".events | map(.message) | .[]"
+
+  aws lambda delete-function \
+  --function-name ${lambda_function_name}
 
   cat lambda_output.json | jq -r ".FunctionError" | grep -v -e "Handled" -e "Unhandled"
 popd > /dev/null

@@ -12,7 +12,7 @@ def test_runner_handler(event, context):
     logger.setLevel(logging.DEBUG)
 
     try:
-        output = subprocess.check_output(['./integration.test', '-ginkgo.focus', 'AWS STANDARD IAM ROLE', '-ginkgo.noColor'],
+        output = subprocess.check_output(['./integration.test', '-ginkgo.focus', 'AWS STANDARD IAM ROLE'],
                                 env=os.environ, stderr=subprocess.STDOUT)
         logger.debug("INTEGRATION TEST OUTPUT:")
         logger.debug(output)
