@@ -50,8 +50,17 @@ pushd s3cli-src > /dev/null
 
   set +e
     log_group_name="/aws/lambda/${lambda_function_name}"
-    log_streams_json=$(aws logs describe-log-streams --log-group-name=${log_group_name})
-    while [ $? -ne 0 ]; do !!; done
+
+    logs_command="aws logs describe-log-streams --log-group-name=${log_group_name}"
+    log_streams_json=$(${logs_command})
+
+    tries=0
+    while [[ ( $? -ne 0 ) && ( $tries -ne 5 ) ]] ; do
+      sleep 2
+      echo "Retrieving CloudWatch logs; attempt: $tries"
+      tries=$((tries + 1))
+      log_streams_json=$(${logs_command})
+    done
   set -e
 
   log_stream_name=$(echo "${log_streams_json}" | jq -r ".logStreams[0].logStreamName")
