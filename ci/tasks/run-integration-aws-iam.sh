@@ -15,7 +15,7 @@ export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
 
 stack_info=$(get_stack_info ${stack_name})
-bucket_name="bosh-s3cli-bogus" # $(get_stack_info_of "${stack_info}" "BucketName")
+bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
 iam_role_arn=$(get_stack_info_of "${stack_info}" "IamRoleArn")
 lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_name}\", \"s3_host\": \"s3.amazonaws.com\"}"
 lambda_log=$(realpath $(mktemp "XXXXXX-lambda.log"))
