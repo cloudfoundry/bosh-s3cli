@@ -88,15 +88,18 @@ func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
 
 // Put uploads a blob to an S3 compatible blobstore
 func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
-	if client.s3cliConfig.CredentialsSource == config.NoneCredentialsSource {
+	cfg := client.s3cliConfig
+	if cfg.CredentialsSource == config.NoneCredentialsSource {
 		return errorInvalidCredentialsSourceValue
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
 	putResult, err := uploader.Upload(&s3manager.UploadInput{
-		Body:   src,
-		Bucket: aws.String(client.s3cliConfig.BucketName),
-		Key:    aws.String(dest),
+		Body:                 src,
+		Bucket:               aws.String(cfg.BucketName),
+		Key:                  aws.String(dest),
+		ServerSideEncryption: cfg.ServerSideEncryption,
+		SSEKMSKeyID:          cfg.SSEKMSKeyID,
 	})
 
 	if err != nil {
