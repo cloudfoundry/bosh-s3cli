@@ -2,15 +2,22 @@
 
 set -e
 
-source s3cli-src/ci/tasks/utils.sh
+my_dir="$( cd $(dirname $0) && pwd )"
+release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd .. && pwd )"
 
+source ${release_dir}/ci/tasks/utils.sh
 
-semver=`cat version-semver/number`
-timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+# inputs
+semver_dir="${workspace_dir}/version-semver"
 
-output_dir=${PWD}/out
+# outputs
+output_dir=${workspace_dir}/out
 
-pushd s3cli-src > /dev/null
+semver="$(cat ${semver_dir}/number)"
+timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+pushd ${release_dir} > /dev/null
   git_rev=`git rev-parse --short HEAD`
   version="${semver}-${git_rev}-${timestamp}"
 

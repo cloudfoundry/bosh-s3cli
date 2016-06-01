@@ -2,7 +2,10 @@
 
 set -e
 
-source s3cli-src/ci/tasks/utils.sh
+my_dir="$( cd $(dirname $0) && pwd )"
+release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+
+source ${release_dir}/ci/tasks/utils.sh
 
 : ${access_key_id:?}
 : ${secret_access_key:?}
@@ -18,11 +21,11 @@ stack_info=$(get_stack_info ${stack_name})
 bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
 iam_role_arn=$(get_stack_info_of "${stack_info}" "IamRoleArn")
 lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_name}\", \"s3_host\": \"s3.amazonaws.com\"}"
-lambda_log=$(realpath $(mktemp "XXXXXX-lambda.log"))
 
+lambda_log=$(mktemp -t "XXXXXX-lambda.log")
 trap "cat ${lambda_log}" EXIT
 
-pushd s3cli-src > /dev/null
+pushd ${release_dir} > /dev/null
   . .envrc
   GOOS=linux GOARCH=amd64 go build s3cli/s3cli
   GOOS=linux GOARCH=amd64 ginkgo build src/s3cli/integration

@@ -2,13 +2,15 @@
 
 set -e
 
-source s3cli-src/ci/tasks/utils.sh
+my_dir="$( cd $(dirname $0) && pwd )"
+release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
 
+source ${release_dir}/ci/tasks/utils.sh
 
 semver='1.2.3.4'
 timestamp=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
 
-pushd s3cli-src > /dev/null
+pushd ${release_dir} > /dev/null
   git_rev=`git rev-parse --short HEAD`
   version="${semver}-${git_rev}-${timestamp}"
 
