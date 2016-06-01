@@ -12,9 +12,6 @@ import (
 var _ = Describe("Testing in any AWS region isolated from the US standard regions (i.e., cn-north-1)", func() {
 	Context("with AWS ISOLATED REGION (static creds) configurations", func() {
 		It("fails with a config that specifies a valid region but invalid host", func() {
-			s3CLIPath := os.Getenv("S3_CLI_PATH")
-			Expect(s3CLIPath).ToNot(BeEmpty(), "S3_CLI_PATH must be set")
-
 			accessKeyID := os.Getenv("ACCESS_KEY_ID")
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 

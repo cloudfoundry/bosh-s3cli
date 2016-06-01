@@ -12,7 +12,6 @@ import (
 
 var _ = Describe("Testing in any AWS region that supports v4 signature version", func() {
 	Context("with AWS V4 REGION (static creds) configurations", func() {
-		s3CLIPath := os.Getenv("S3_CLI_PATH")
 		accessKeyID := os.Getenv("ACCESS_KEY_ID")
 		secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")
 		bucketName := os.Getenv("BUCKET_NAME")
@@ -20,7 +19,6 @@ var _ = Describe("Testing in any AWS region that supports v4 signature version",
 		s3Host := os.Getenv("S3_HOST")
 
 		BeforeEach(func() {
-			Expect(s3CLIPath).ToNot(BeEmpty(), "S3_CLI_PATH must be set")
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 			Expect(secretAccessKey).ToNot(BeEmpty(), "SECRET_ACCESS_KEY must be set")
 			Expect(bucketName).ToNot(BeEmpty(), "BUCKET_NAME must be set")

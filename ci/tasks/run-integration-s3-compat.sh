@@ -18,9 +18,5 @@ export S3_PORT=${s3_endpoint_port}
 
 pushd s3cli-src > /dev/null
   . .envrc
-  go install s3cli/s3cli
-
-  export S3_CLI_PATH=$(which s3cli)
-
   ginkgo -r -focus="S3 COMPATIBLE" src/s3cli/integration/
 popd > /dev/null

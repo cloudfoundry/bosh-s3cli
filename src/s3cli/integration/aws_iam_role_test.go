@@ -12,13 +12,11 @@ import (
 
 var _ = Describe("Testing inside an AWS compute resource with an IAM role", func() {
 	Context("with AWS STANDARD IAM ROLE (env_or_profile creds) configurations", func() {
-		s3CLIPath := os.Getenv("S3_CLI_PATH")
 		bucketName := os.Getenv("BUCKET_NAME")
 		region := os.Getenv("REGION")
 		s3Host := os.Getenv("S3_HOST")
 
 		BeforeEach(func() {
-			Expect(s3CLIPath).ToNot(BeEmpty(), "S3_CLI_PATH must be set")
 			Expect(bucketName).ToNot(BeEmpty(), "BUCKET_NAME must be set")
 			Expect(region).ToNot(BeEmpty(), "REGION must be set")
 			Expect(s3Host).ToNot(BeEmpty(), "S3_HOST must be set")

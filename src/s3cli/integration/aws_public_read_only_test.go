@@ -18,9 +18,6 @@ import (
 var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 	Context("with PUBLIC READ ONLY (no creds) configuration", func() {
 		It("can successfully get a publicly readable file", func() {
-			s3CLIPath := os.Getenv("S3_CLI_PATH")
-			Expect(s3CLIPath).ToNot(BeEmpty(), "S3_CLI_PATH must be set")
-
 			accessKeyID := os.Getenv("ACCESS_KEY_ID")
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 
