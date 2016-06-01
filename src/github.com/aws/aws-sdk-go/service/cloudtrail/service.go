@@ -20,16 +20,17 @@ import (
 // IP address, the request parameters, and the response elements returned by
 // the service.
 //
-//  As an alternative to using the API, you can use one of the AWS SDKs, which
-// consist of libraries and sample code for various programming languages and
-// platforms (Java, Ruby, .NET, iOS, Android, etc.). The SDKs provide a convenient
-// way to create programmatic access to AWSCloudTrail. For example, the SDKs
-// take care of cryptographically signing requests, managing errors, and retrying
+//  As an alternative to the API, you can use one of the AWS SDKs, which consist
+// of libraries and sample code for various programming languages and platforms
+// (Java, Ruby, .NET, iOS, Android, etc.). The SDKs provide a convenient way
+// to create programmatic access to AWSCloudTrail. For example, the SDKs take
+// care of cryptographically signing requests, managing errors, and retrying
 // requests automatically. For information about the AWS SDKs, including how
 // to download and install them, see the Tools for Amazon Web Services page
-// (http://aws.amazon.com/tools/).  See the CloudTrail User Guide for information
-// about the data that is included with each AWS API call listed in the log
-// files.
+// (http://aws.amazon.com/tools/).
+//
+//  See the CloudTrail User Guide for information about the data that is included
+// with each AWS API call listed in the log files.
 //The service client's operations are safe to be used concurrently.
 // It is not safe to mutate any of the client's properties though.
 type CloudTrail struct {
@@ -79,10 +80,10 @@ func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegio
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(jsonrpc.Build)
-	svc.Handlers.Unmarshal.PushBack(jsonrpc.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(jsonrpc.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(jsonrpc.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(jsonrpc.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(jsonrpc.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(jsonrpc.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(jsonrpc.UnmarshalErrorHandler)
 
 	// Run custom client initialization if present
 	if initClient != nil {

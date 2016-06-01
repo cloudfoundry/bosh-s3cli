@@ -592,7 +592,8 @@
         "loadBalancers":{"shape":"LoadBalancers"},
         "desiredCount":{"shape":"BoxedInteger"},
         "clientToken":{"shape":"String"},
-        "role":{"shape":"String"}
+        "role":{"shape":"String"},
+        "deploymentConfiguration":{"shape":"DeploymentConfiguration"}
       }
     },
     "CreateServiceResponse":{
@@ -639,6 +640,13 @@
         "runningCount":{"shape":"Integer"},
         "createdAt":{"shape":"Timestamp"},
         "updatedAt":{"shape":"Timestamp"}
+      }
+    },
+    "DeploymentConfiguration":{
+      "type":"structure",
+      "members":{
+        "maximumPercent":{"shape":"BoxedInteger"},
+        "minimumHealthyPercent":{"shape":"BoxedInteger"}
       }
     },
     "Deployments":{
@@ -870,6 +878,7 @@
       "type":"structure",
       "members":{
         "familyPrefix":{"shape":"String"},
+        "status":{"shape":"TaskDefinitionFamilyStatus"},
         "nextToken":{"shape":"String"},
         "maxResults":{"shape":"BoxedInteger"}
       }
@@ -950,7 +959,8 @@
         "syslog",
         "journald",
         "gelf",
-        "fluentd"
+        "fluentd",
+        "awslogs"
       ]
     },
     "Long":{"type":"long"},
@@ -1096,9 +1106,11 @@
         "runningCount":{"shape":"Integer"},
         "pendingCount":{"shape":"Integer"},
         "taskDefinition":{"shape":"String"},
+        "deploymentConfiguration":{"shape":"DeploymentConfiguration"},
         "deployments":{"shape":"Deployments"},
         "roleArn":{"shape":"String"},
-        "events":{"shape":"ServiceEvents"}
+        "events":{"shape":"ServiceEvents"},
+        "createdAt":{"shape":"Timestamp"}
       }
     },
     "ServiceEvent":{
@@ -1240,6 +1252,14 @@
         "requiresAttributes":{"shape":"RequiresAttributes"}
       }
     },
+    "TaskDefinitionFamilyStatus":{
+      "type":"string",
+      "enum":[
+        "ACTIVE",
+        "INACTIVE",
+        "ALL"
+      ]
+    },
     "TaskDefinitionStatus":{
       "type":"string",
       "enum":[
@@ -1329,7 +1349,8 @@
         "cluster":{"shape":"String"},
         "service":{"shape":"String"},
         "desiredCount":{"shape":"BoxedInteger"},
-        "taskDefinition":{"shape":"String"}
+        "taskDefinition":{"shape":"String"},
+        "deploymentConfiguration":{"shape":"DeploymentConfiguration"}
       }
     },
     "UpdateServiceResponse":{

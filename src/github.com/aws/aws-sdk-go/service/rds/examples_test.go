@@ -167,6 +167,7 @@ func ExampleRDS_CopyDBSnapshot() {
 		SourceDBSnapshotIdentifier: aws.String("String"), // Required
 		TargetDBSnapshotIdentifier: aws.String("String"), // Required
 		CopyTags:                   aws.Bool(true),
+		KmsKeyId:                   aws.String("String"),
 		Tags: []*rds.Tag{
 			{ // Required
 				Key:   aws.String("String"),
@@ -234,10 +235,13 @@ func ExampleRDS_CreateDBCluster() {
 		DBSubnetGroupName:           aws.String("String"),
 		DatabaseName:                aws.String("String"),
 		EngineVersion:               aws.String("String"),
+		KmsKeyId:                    aws.String("String"),
 		OptionGroupName:             aws.String("String"),
 		Port:                        aws.Int64(1),
-		PreferredBackupWindow:      aws.String("String"),
-		PreferredMaintenanceWindow: aws.String("String"),
+		PreferredBackupWindow:       aws.String("String"),
+		PreferredMaintenanceWindow:  aws.String("String"),
+		ReplicationSourceIdentifier: aws.String("String"),
+		StorageEncrypted:            aws.Bool(true),
 		Tags: []*rds.Tag{
 			{ // Required
 				Key:   aws.String("String"),
@@ -339,17 +343,22 @@ func ExampleRDS_CreateDBInstance() {
 			// More values...
 		},
 		DBSubnetGroupName:  aws.String("String"),
+		Domain:             aws.String("String"),
+		DomainIAMRoleName:  aws.String("String"),
 		EngineVersion:      aws.String("String"),
 		Iops:               aws.Int64(1),
 		KmsKeyId:           aws.String("String"),
 		LicenseModel:       aws.String("String"),
 		MasterUserPassword: aws.String("String"),
 		MasterUsername:     aws.String("String"),
+		MonitoringInterval: aws.Int64(1),
+		MonitoringRoleArn:  aws.String("String"),
 		MultiAZ:            aws.Bool(true),
 		OptionGroupName:    aws.String("String"),
 		Port:               aws.Int64(1),
 		PreferredBackupWindow:      aws.String("String"),
 		PreferredMaintenanceWindow: aws.String("String"),
+		PromotionTier:              aws.Int64(1),
 		PubliclyAccessible:         aws.Bool(true),
 		StorageEncrypted:           aws.Bool(true),
 		StorageType:                aws.String("String"),
@@ -392,6 +401,8 @@ func ExampleRDS_CreateDBInstanceReadReplica() {
 		DBInstanceClass:            aws.String("String"),
 		DBSubnetGroupName:          aws.String("String"),
 		Iops:                       aws.Int64(1),
+		MonitoringInterval:         aws.Int64(1),
+		MonitoringRoleArn:          aws.String("String"),
 		OptionGroupName:            aws.String("String"),
 		Port:                       aws.Int64(1),
 		PubliclyAccessible:         aws.Bool(true),
@@ -901,6 +912,25 @@ func ExampleRDS_DescribeDBClusterParameters() {
 	fmt.Println(resp)
 }
 
+func ExampleRDS_DescribeDBClusterSnapshotAttributes() {
+	svc := rds.New(session.New())
+
+	params := &rds.DescribeDBClusterSnapshotAttributesInput{
+		DBClusterSnapshotIdentifier: aws.String("String"), // Required
+	}
+	resp, err := svc.DescribeDBClusterSnapshotAttributes(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleRDS_DescribeDBClusterSnapshots() {
 	svc := rds.New(session.New())
 
@@ -917,9 +947,11 @@ func ExampleRDS_DescribeDBClusterSnapshots() {
 			},
 			// More values...
 		},
-		Marker:       aws.String("String"),
-		MaxRecords:   aws.Int64(1),
-		SnapshotType: aws.String("String"),
+		IncludePublic: aws.Bool(true),
+		IncludeShared: aws.Bool(true),
+		Marker:        aws.String("String"),
+		MaxRecords:    aws.Int64(1),
+		SnapshotType:  aws.String("String"),
 	}
 	resp, err := svc.DescribeDBClusterSnapshots(params)
 
@@ -1163,7 +1195,7 @@ func ExampleRDS_DescribeDBSnapshotAttributes() {
 	svc := rds.New(session.New())
 
 	params := &rds.DescribeDBSnapshotAttributesInput{
-		DBSnapshotIdentifier: aws.String("String"),
+		DBSnapshotIdentifier: aws.String("String"), // Required
 	}
 	resp, err := svc.DescribeDBSnapshotAttributes(params)
 
@@ -1745,6 +1777,34 @@ func ExampleRDS_ModifyDBClusterParameterGroup() {
 	fmt.Println(resp)
 }
 
+func ExampleRDS_ModifyDBClusterSnapshotAttribute() {
+	svc := rds.New(session.New())
+
+	params := &rds.ModifyDBClusterSnapshotAttributeInput{
+		AttributeName:               aws.String("String"), // Required
+		DBClusterSnapshotIdentifier: aws.String("String"), // Required
+		ValuesToAdd: []*string{
+			aws.String("String"), // Required
+			// More values...
+		},
+		ValuesToRemove: []*string{
+			aws.String("String"), // Required
+			// More values...
+		},
+	}
+	resp, err := svc.ModifyDBClusterSnapshotAttribute(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleRDS_ModifyDBInstance() {
 	svc := rds.New(session.New())
 
@@ -1759,18 +1819,24 @@ func ExampleRDS_ModifyDBInstance() {
 		CopyTagsToSnapshot:       aws.Bool(true),
 		DBInstanceClass:          aws.String("String"),
 		DBParameterGroupName:     aws.String("String"),
+		DBPortNumber:             aws.Int64(1),
 		DBSecurityGroups: []*string{
 			aws.String("String"), // Required
 			// More values...
 		},
+		Domain:                     aws.String("String"),
+		DomainIAMRoleName:          aws.String("String"),
 		EngineVersion:              aws.String("String"),
 		Iops:                       aws.Int64(1),
 		MasterUserPassword:         aws.String("String"),
+		MonitoringInterval:         aws.Int64(1),
+		MonitoringRoleArn:          aws.String("String"),
 		MultiAZ:                    aws.Bool(true),
 		NewDBInstanceIdentifier:    aws.String("String"),
 		OptionGroupName:            aws.String("String"),
 		PreferredBackupWindow:      aws.String("String"),
 		PreferredMaintenanceWindow: aws.String("String"),
+		PromotionTier:              aws.Int64(1),
 		PubliclyAccessible:         aws.Bool(true),
 		StorageType:                aws.String("String"),
 		TdeCredentialArn:           aws.String("String"),
@@ -1831,8 +1897,8 @@ func ExampleRDS_ModifyDBSnapshotAttribute() {
 	svc := rds.New(session.New())
 
 	params := &rds.ModifyDBSnapshotAttributeInput{
+		AttributeName:        aws.String("String"), // Required
 		DBSnapshotIdentifier: aws.String("String"), // Required
-		AttributeName:        aws.String("String"),
 		ValuesToAdd: []*string{
 			aws.String("String"), // Required
 			// More values...
@@ -2154,6 +2220,7 @@ func ExampleRDS_RestoreDBClusterFromSnapshot() {
 		DBSubnetGroupName: aws.String("String"),
 		DatabaseName:      aws.String("String"),
 		EngineVersion:     aws.String("String"),
+		KmsKeyId:          aws.String("String"),
 		OptionGroupName:   aws.String("String"),
 		Port:              aws.Int64(1),
 		Tags: []*rds.Tag{
@@ -2188,6 +2255,7 @@ func ExampleRDS_RestoreDBClusterToPointInTime() {
 		DBClusterIdentifier:       aws.String("String"), // Required
 		SourceDBClusterIdentifier: aws.String("String"), // Required
 		DBSubnetGroupName:         aws.String("String"),
+		KmsKeyId:                  aws.String("String"),
 		OptionGroupName:           aws.String("String"),
 		Port:                      aws.Int64(1),
 		RestoreToTime:             aws.Time(time.Now()),
@@ -2229,6 +2297,8 @@ func ExampleRDS_RestoreDBInstanceFromDBSnapshot() {
 		DBInstanceClass:         aws.String("String"),
 		DBName:                  aws.String("String"),
 		DBSubnetGroupName:       aws.String("String"),
+		Domain:                  aws.String("String"),
+		DomainIAMRoleName:       aws.String("String"),
 		Engine:                  aws.String("String"),
 		Iops:                    aws.Int64(1),
 		LicenseModel:            aws.String("String"),
@@ -2272,6 +2342,8 @@ func ExampleRDS_RestoreDBInstanceToPointInTime() {
 		DBInstanceClass:            aws.String("String"),
 		DBName:                     aws.String("String"),
 		DBSubnetGroupName:          aws.String("String"),
+		Domain:                     aws.String("String"),
+		DomainIAMRoleName:          aws.String("String"),
 		Engine:                     aws.String("String"),
 		Iops:                       aws.Int64(1),
 		LicenseModel:               aws.String("String"),

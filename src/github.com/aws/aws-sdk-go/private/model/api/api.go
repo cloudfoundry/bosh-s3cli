@@ -4,6 +4,7 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -32,6 +33,11 @@ type API struct {
 
 	// Set to true to not generate API service name constants
 	NoConstServiceNames bool
+
+	// Set to true to not generate validation shapes
+	NoValidataShapeMethods bool
+
+	SvcClientImportPath string
 
 	initialized bool
 	imports     map[string]bool
@@ -130,6 +136,17 @@ func (a *API) OperationList() []*Operation {
 	return list
 }
 
+// OperationHasOutputPlaceholder returns if any of the API operation input
+// or output shapes are place holders.
+func (a *API) OperationHasOutputPlaceholder() bool {
+	for _, op := range a.Operations {
+		if op.OutputRef.Shape.Placeholder {
+			return true
+		}
+	}
+	return false
+}
+
 // ShapeNames returns a slice of names for each shape used by the API.
 func (a *API) ShapeNames() []string {
 	i, names := 0, make([]string, len(a.Shapes))
@@ -212,6 +229,18 @@ func (a *API) APIGoCode() string {
 	delete(a.imports, "github.com/aws/aws-sdk-go/aws")
 	a.imports["github.com/aws/aws-sdk-go/aws/awsutil"] = true
 	a.imports["github.com/aws/aws-sdk-go/aws/request"] = true
+	if a.OperationHasOutputPlaceholder() {
+		a.imports["github.com/aws/aws-sdk-go/private/protocol/"+a.ProtocolPackage()] = true
+		a.imports["github.com/aws/aws-sdk-go/private/protocol"] = true
+	}
+
+	for _, op := range a.Operations {
+		if op.AuthType == "none" {
+			a.imports["github.com/aws/aws-sdk-go/aws/credentials"] = true
+			break
+		}
+	}
+
 	var buf bytes.Buffer
 	err := tplAPI.Execute(&buf, a)
 	if err != nil {
@@ -279,10 +308,10 @@ func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegio
 	// Handlers
 	svc.Handlers.Sign.PushBack({{if eq .Metadata.SignatureVersion "v2"}}v2{{else}}v4{{end}}.Sign)
 	{{if eq .Metadata.SignatureVersion "v2"}}svc.Handlers.Sign.PushBackNamed(corehandlers.BuildContentLengthHandler)
-	{{end}}svc.Handlers.Build.PushBack({{ .ProtocolPackage }}.Build)
-	svc.Handlers.Unmarshal.PushBack({{ .ProtocolPackage }}.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack({{ .ProtocolPackage }}.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack({{ .ProtocolPackage }}.UnmarshalError)
+	{{end}}svc.Handlers.Build.PushBackNamed({{ .ProtocolPackage }}.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed({{ .ProtocolPackage }}.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed({{ .ProtocolPackage }}.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed({{ .ProtocolPackage }}.UnmarshalErrorHandler)
 
 	{{ if .UseInitMethods }}// Run custom client initialization if present
 	if initClient != nil {
@@ -346,7 +375,7 @@ func (a *API) ExampleGoCode() string {
 		"time",
 		"github.com/aws/aws-sdk-go/aws",
 		"github.com/aws/aws-sdk-go/aws/session",
-		"github.com/aws/aws-sdk-go/service/"+a.PackageName(),
+		path.Join(a.SvcClientImportPath, a.PackageName()),
 		strings.Join(exs, "\n\n"),
 	)
 	return code
@@ -370,8 +399,8 @@ var _ {{ .StructName }}API = (*{{ .PackageName }}.{{ .StructName }})(nil)
 func (a *API) InterfaceGoCode() string {
 	a.resetImports()
 	a.imports = map[string]bool{
-		"github.com/aws/aws-sdk-go/aws/request":                true,
-		"github.com/aws/aws-sdk-go/service/" + a.PackageName(): true,
+		"github.com/aws/aws-sdk-go/aws/request":           true,
+		path.Join(a.SvcClientImportPath, a.PackageName()): true,
 	}
 
 	var buf bytes.Buffer
@@ -389,4 +418,68 @@ func (a *API) InterfaceGoCode() string {
 // with its package name. Takes a string depicting the Config.
 func (a *API) NewAPIGoCodeWithPkgName(cfg string) string {
 	return fmt.Sprintf("%s.New(%s)", a.PackageName(), cfg)
+}
+
+// computes the validation chain for all input shapes
+func (a *API) addShapeValidations() {
+	for _, o := range a.Operations {
+		resolveShapeValidations(o.InputRef.Shape)
+	}
+}
+
+// Updates the source shape and all nested shapes with the validations that
+// could possibly be needed.
+func resolveShapeValidations(s *Shape, ancestry ...*Shape) {
+	for _, a := range ancestry {
+		if a == s {
+			return
+		}
+	}
+
+	children := []string{}
+	for _, name := range s.MemberNames() {
+		ref := s.MemberRefs[name]
+
+		if s.IsRequired(name) && !s.Validations.Has(ref, ShapeValidationRequired) {
+			s.Validations = append(s.Validations, ShapeValidation{
+				Name: name, Ref: ref, Type: ShapeValidationRequired,
+			})
+		}
+
+		if ref.Shape.Min != 0 && !s.Validations.Has(ref, ShapeValidationMinVal) {
+			s.Validations = append(s.Validations, ShapeValidation{
+				Name: name, Ref: ref, Type: ShapeValidationMinVal,
+			})
+		}
+
+		switch ref.Shape.Type {
+		case "map", "list", "structure":
+			children = append(children, name)
+		}
+	}
+
+	ancestry = append(ancestry, s)
+	for _, name := range children {
+		ref := s.MemberRefs[name]
+		nestedShape := ref.Shape.NestedShape()
+
+		var v *ShapeValidation
+		if len(nestedShape.Validations) > 0 {
+			v = &ShapeValidation{
+				Name: name, Ref: ref, Type: ShapeValidationNested,
+			}
+		} else {
+			resolveShapeValidations(nestedShape, ancestry...)
+			if len(nestedShape.Validations) > 0 {
+				v = &ShapeValidation{
+					Name: name, Ref: ref, Type: ShapeValidationNested,
+				}
+			}
+		}
+
+		if v != nil && !s.Validations.Has(v.Ref, v.Type) {
+			s.Validations = append(s.Validations, *v)
+		}
+	}
+	ancestry = ancestry[:len(ancestry)-1]
 }

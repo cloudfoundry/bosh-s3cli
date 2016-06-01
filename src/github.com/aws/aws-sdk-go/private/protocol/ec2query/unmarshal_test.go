@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/awstesting"
+	"github.com/aws/aws-sdk-go/private/protocol"
 	"github.com/aws/aws-sdk-go/private/protocol/ec2query"
 	"github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil"
 	"github.com/aws/aws-sdk-go/private/signer/v4"
@@ -30,12 +32,16 @@ var _ json.Marshaler
 var _ time.Time
 var _ xmlutil.XMLNode
 var _ xml.Attr
-var _ = awstesting.GenerateAssertions
 var _ = ioutil.Discard
 var _ = util.Trim("")
 var _ = url.Values{}
 var _ = io.EOF
 var _ = aws.String
+var _ = fmt.Println
+
+func init() {
+	protocol.RandReader = &awstesting.ZeroReader{}
+}
 
 //The service client's operations are safe to be used concurrently.
 // It is not safe to mutate any of the client's properties though.
@@ -75,10 +81,10 @@ func newOutputService1ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -177,10 +183,10 @@ func newOutputService2ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -224,6 +230,7 @@ type OutputService2TestShapeOutputService2TestCaseOperation1Input struct {
 type OutputService2TestShapeOutputService2TestCaseOperation1Output struct {
 	_ struct{} `type:"structure"`
 
+	// Blob is automatically base64 encoded/decoded by the SDK.
 	Blob []byte `type:"blob"`
 }
 
@@ -265,10 +272,10 @@ func newOutputService3ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -353,10 +360,10 @@ func newOutputService4ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -441,10 +448,10 @@ func newOutputService5ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -529,10 +536,10 @@ func newOutputService6ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -623,10 +630,10 @@ func newOutputService7ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -711,10 +718,10 @@ func newOutputService8ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }
@@ -799,10 +806,10 @@ func newOutputService9ProtocolTestClient(cfg aws.Config, handlers request.Handle
 
 	// Handlers
 	svc.Handlers.Sign.PushBack(v4.Sign)
-	svc.Handlers.Build.PushBack(ec2query.Build)
-	svc.Handlers.Unmarshal.PushBack(ec2query.Unmarshal)
-	svc.Handlers.UnmarshalMeta.PushBack(ec2query.UnmarshalMeta)
-	svc.Handlers.UnmarshalError.PushBack(ec2query.UnmarshalError)
+	svc.Handlers.Build.PushBackNamed(ec2query.BuildHandler)
+	svc.Handlers.Unmarshal.PushBackNamed(ec2query.UnmarshalHandler)
+	svc.Handlers.UnmarshalMeta.PushBackNamed(ec2query.UnmarshalMetaHandler)
+	svc.Handlers.UnmarshalError.PushBackNamed(ec2query.UnmarshalErrorHandler)
 
 	return svc
 }

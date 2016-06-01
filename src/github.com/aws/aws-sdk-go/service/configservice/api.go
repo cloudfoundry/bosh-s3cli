@@ -4,10 +4,13 @@
 package configservice
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/private/protocol"
+	"github.com/aws/aws-sdk-go/private/protocol/jsonrpc"
 )
 
 const opDeleteConfigRule = "DeleteConfigRule"
@@ -25,6 +28,8 @@ func (c *ConfigService) DeleteConfigRuleRequest(input *DeleteConfigRuleInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteConfigRuleOutput{}
 	req.Data = output
 	return
@@ -34,7 +39,7 @@ func (c *ConfigService) DeleteConfigRuleRequest(input *DeleteConfigRuleInput) (r
 //
 // AWS Config sets the state of a rule to DELETING until the deletion is complete.
 // You cannot update a rule while it is in this state. If you make a PutConfigRule
-// request for the rule, you will receive a ResourceInUseException.
+// or DeleteConfigRule request for the rule, you will receive a ResourceInUseException.
 //
 // You can check the state of a rule by using the DescribeConfigRules request.
 func (c *ConfigService) DeleteConfigRule(input *DeleteConfigRuleInput) (*DeleteConfigRuleOutput, error) {
@@ -58,6 +63,8 @@ func (c *ConfigService) DeleteDeliveryChannelRequest(input *DeleteDeliveryChanne
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteDeliveryChannelOutput{}
 	req.Data = output
 	return
@@ -136,7 +143,7 @@ func (c *ConfigService) DescribeComplianceByConfigRuleRequest(input *DescribeCom
 // it is noncompliant if any of these resources do not comply.
 //
 // If AWS Config has no current evaluation results for the rule, it returns
-// InsufficientData. This result might indicate one of the following conditions:
+// INSUFFICIENT_DATA. This result might indicate one of the following conditions:
 //  AWS Config has never invoked an evaluation for the rule. To check whether
 // it has, use the DescribeConfigRuleEvaluationStatus action to get the LastSuccessfulInvocationTime
 // and LastFailedInvocationTime. The rule's AWS Lambda function is failing to
@@ -181,7 +188,7 @@ func (c *ConfigService) DescribeComplianceByResourceRequest(input *DescribeCompl
 // these rules.
 //
 // If AWS Config has no current evaluation results for the resource, it returns
-// InsufficientData. This result might indicate one of the following conditions
+// INSUFFICIENT_DATA. This result might indicate one of the following conditions
 // about the rules that evaluate the resource:  AWS Config has never invoked
 // an evaluation for the rule. To check whether it has, use the DescribeConfigRuleEvaluationStatus
 // action to get the LastSuccessfulInvocationTime and LastFailedInvocationTime.
@@ -601,6 +608,8 @@ func (c *ConfigService) PutConfigRuleRequest(input *PutConfigRuleInput) (req *re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &PutConfigRuleOutput{}
 	req.Data = output
 	return
@@ -659,6 +668,8 @@ func (c *ConfigService) PutConfigurationRecorderRequest(input *PutConfigurationR
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &PutConfigurationRecorderOutput{}
 	req.Data = output
 	return
@@ -695,6 +706,8 @@ func (c *ConfigService) PutDeliveryChannelRequest(input *PutDeliveryChannelInput
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &PutDeliveryChannelOutput{}
 	req.Data = output
 	return
@@ -761,6 +774,8 @@ func (c *ConfigService) StartConfigurationRecorderRequest(input *StartConfigurat
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &StartConfigurationRecorderOutput{}
 	req.Data = output
 	return
@@ -792,6 +807,8 @@ func (c *ConfigService) StopConfigurationRecorderRequest(input *StopConfiguratio
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &StopConfigurationRecorderOutput{}
 	req.Data = output
 	return
@@ -811,7 +828,7 @@ type Compliance struct {
 	_ struct{} `type:"structure"`
 
 	// The number of AWS resources or AWS Config rules that cause a result of NON_COMPLIANT,
-	// up to a maximum of 25.
+	// up to a maximum number.
 	ComplianceContributorCount *ComplianceContributorCount `type:"structure"`
 
 	// Indicates whether an AWS resource or AWS Config rule is compliant.
@@ -822,6 +839,13 @@ type Compliance struct {
 	//
 	// A rule is compliant if all of the resources that the rule evaluates comply
 	// with it, and it is noncompliant if any of these resources do not comply.
+	//
+	// AWS Config returns the INSUFFICIENT_DATA value when no evaluation results
+	// are available for the AWS resource or Config rule.
+	//
+	// For the Compliance data type, AWS Config supports only COMPLIANT, NON_COMPLIANT,
+	// and INSUFFICIENT_DATA values. AWS Config does not support the NOT_APPLICABLE
+	// value for the Compliance data type.
 	ComplianceType *string `type:"string" enum:"ComplianceType"`
 }
 
@@ -995,9 +1019,8 @@ func (s ConfigExportDeliveryInfo) GoString() string {
 
 // An AWS Lambda function that evaluates configuration items to assess whether
 // your AWS resources comply with your desired configurations. This function
-// can run when AWS Config detects a configuration change or delivers a configuration
-// snapshot. This function can evaluate any resource in the recording group.
-// To define which of these are evaluated, specify a value for the Scope key.
+// can run when AWS Config detects a configuration change to an AWS resource,
+// or when it delivers a configuration snapshot of the resources in the account.
 //
 // For more information about developing and using AWS Config rules, see Evaluating
 // AWS Resource Configurations with AWS Config (http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config.html)
@@ -1044,11 +1067,12 @@ type ConfigRule struct {
 	// the PutDeliveryChannel action.
 	MaximumExecutionFrequency *string `type:"string" enum:"MaximumExecutionFrequency"`
 
-	// Defines which resources the AWS Config rule evaluates. The scope can include
-	// one or more resource types, a combination of a tag key and value, or a combination
-	// of one resource type and one or more resource IDs. Specify a scope to constrain
-	// the resources that are evaluated. If you do not specify a scope, the AWS
-	// Config Rule evaluates all resources in the recording group.
+	// Defines which resources can trigger an evaluation for the rule. The scope
+	// can include one or more resource types, a combination of one resource type
+	// and one resource ID, or a combination of a tag key and value. Specify a scope
+	// to constrain the resources that can trigger an evaluation for the rule. If
+	// you do not specify a scope, evaluations are triggered when any resource in
+	// the recording group changes.
 	Scope *Scope `type:"structure"`
 
 	// Provides the rule owner (AWS or customer), the rule identifier, and the events
@@ -1064,6 +1088,35 @@ func (s ConfigRule) String() string {
 // GoString returns the string representation
 func (s ConfigRule) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ConfigRule) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ConfigRule"}
+	if s.ConfigRuleName != nil && len(*s.ConfigRuleName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ConfigRuleName", 1))
+	}
+	if s.InputParameters != nil && len(*s.InputParameters) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("InputParameters", 1))
+	}
+	if s.Source == nil {
+		invalidParams.Add(request.NewErrParamRequired("Source"))
+	}
+	if s.Scope != nil {
+		if err := s.Scope.Validate(); err != nil {
+			invalidParams.AddNested("Scope", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Source != nil {
+		if err := s.Source.Validate(); err != nil {
+			invalidParams.AddNested("Source", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Status information for your AWS managed Config rules. The status includes
@@ -1087,15 +1140,31 @@ type ConfigRuleEvaluationStatus struct {
 	// The time that you first activated the AWS Config rule.
 	FirstActivatedTime *time.Time `type:"timestamp" timestampFormat:"unix"`
 
+	// Indicates whether AWS Config has evaluated your resources against the rule
+	// at least once.
+	//
+	//  true - AWS Config has evaluated your AWS resources against the rule at
+	// least once. false - AWS Config has not once finished evaluating your AWS
+	// resources against the rule.
+	FirstEvaluationStarted *bool `type:"boolean"`
+
 	// The error code that AWS Config returned when the rule last failed.
 	LastErrorCode *string `type:"string"`
 
 	// The error message that AWS Config returned when the rule last failed.
 	LastErrorMessage *string `type:"string"`
 
+	// The time that AWS Config last failed to evaluate your AWS resources against
+	// the rule.
+	LastFailedEvaluationTime *time.Time `type:"timestamp" timestampFormat:"unix"`
+
 	// The time that AWS Config last failed to invoke the AWS Config rule to evaluate
 	// your AWS resources.
 	LastFailedInvocationTime *time.Time `type:"timestamp" timestampFormat:"unix"`
+
+	// The time that AWS Config last successfully evaluated your AWS resources against
+	// the rule.
+	LastSuccessfulEvaluationTime *time.Time `type:"timestamp" timestampFormat:"unix"`
 
 	// The time that AWS Config last successfully invoked the AWS Config rule to
 	// evaluate your AWS resources.
@@ -1254,9 +1323,8 @@ type ConfigurationRecorder struct {
 	// the assigned name.
 	Name *string `locationName:"name" min:"1" type:"string"`
 
-	// The recording group specifies either to record configurations for all supported
-	// resources or to provide a list of resource types to record. The list of resource
-	// types must be a subset of supported resource types.
+	// Specifies the types of AWS resource for which AWS Config records configuration
+	// changes.
 	RecordingGroup *RecordingGroup `locationName:"recordingGroup" type:"structure"`
 
 	// Amazon Resource Name (ARN) of the IAM role used to describe the AWS resources
@@ -1272,6 +1340,19 @@ func (s ConfigurationRecorder) String() string {
 // GoString returns the string representation
 func (s ConfigurationRecorder) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ConfigurationRecorder) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ConfigurationRecorder"}
+	if s.Name != nil && len(*s.Name) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Name", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // The current status of the configuration recorder.
@@ -1330,6 +1411,22 @@ func (s DeleteConfigRuleInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteConfigRuleInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteConfigRuleInput"}
+	if s.ConfigRuleName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigRuleName"))
+	}
+	if s.ConfigRuleName != nil && len(*s.ConfigRuleName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ConfigRuleName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteConfigRuleOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -1363,6 +1460,22 @@ func (s DeleteDeliveryChannelInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteDeliveryChannelInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteDeliveryChannelInput"}
+	if s.DeliveryChannelName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeliveryChannelName"))
+	}
+	if s.DeliveryChannelName != nil && len(*s.DeliveryChannelName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("DeliveryChannelName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteDeliveryChannelOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -1393,6 +1506,22 @@ func (s DeliverConfigSnapshotInput) String() string {
 // GoString returns the string representation
 func (s DeliverConfigSnapshotInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeliverConfigSnapshotInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeliverConfigSnapshotInput"}
+	if s.DeliveryChannelName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeliveryChannelName"))
+	}
+	if s.DeliveryChannelName != nil && len(*s.DeliveryChannelName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("DeliveryChannelName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // The output for the DeliverConfigSnapshot action in JSON format.
@@ -1449,6 +1578,19 @@ func (s DeliveryChannel) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeliveryChannel) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeliveryChannel"}
+	if s.Name != nil && len(*s.Name) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Name", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // The status of a specified delivery channel.
 //
 // Valid values: Success | Failure
@@ -1484,7 +1626,9 @@ func (s DeliveryChannelStatus) GoString() string {
 type DescribeComplianceByConfigRuleInput struct {
 	_ struct{} `type:"structure"`
 
-	// Filters the results by compliance. The valid values are Compliant and NonCompliant.
+	// Filters the results by compliance.
+	//
+	// The allowed values are COMPLIANT, NON_COMPLIANT, and INSUFFICIENT_DATA.
 	ComplianceTypes []*string `type:"list"`
 
 	// Specify one or more AWS Config rule names to filter the results by rule.
@@ -1529,7 +1673,9 @@ func (s DescribeComplianceByConfigRuleOutput) GoString() string {
 type DescribeComplianceByResourceInput struct {
 	_ struct{} `type:"structure"`
 
-	// Filters the results by compliance. The valid values are Compliant and NonCompliant.
+	// Filters the results by compliance.
+	//
+	// The allowed values are COMPLIANT, NON_COMPLIANT, and INSUFFICIENT_DATA.
 	ComplianceTypes []*string `type:"list"`
 
 	// The maximum number of evaluation results returned on each page. The default
@@ -1560,6 +1706,22 @@ func (s DescribeComplianceByResourceInput) String() string {
 // GoString returns the string representation
 func (s DescribeComplianceByResourceInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeComplianceByResourceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeComplianceByResourceInput"}
+	if s.ResourceId != nil && len(*s.ResourceId) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ResourceId", 1))
+	}
+	if s.ResourceType != nil && len(*s.ResourceType) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ResourceType", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DescribeComplianceByResourceOutput struct {
@@ -1825,6 +1987,15 @@ type Evaluation struct {
 
 	// Indicates whether the AWS resource complies with the AWS Config rule that
 	// it was evaluated against.
+	//
+	// For the Evaluation data type, AWS Config supports only the COMPLIANT, NON_COMPLIANT,
+	// and NOT_APPLICABLE values. AWS Config does not support the INSUFFICIENT_DATA
+	// value for this data type.
+	//
+	// Similarly, AWS Config does not accept INSUFFICIENT_DATA as the value for
+	// ComplianceType from a PutEvaluations request. For example, an AWS Lambda
+	// function for a custom Config rule cannot pass an INSUFFICIENT_DATA value
+	// to AWS Config.
 	ComplianceType *string `type:"string" required:"true" enum:"ComplianceType"`
 
 	// The time of the event in AWS Config that triggered the evaluation. For event-based
@@ -1844,6 +2015,37 @@ func (s Evaluation) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Evaluation) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Evaluation"}
+	if s.Annotation != nil && len(*s.Annotation) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Annotation", 1))
+	}
+	if s.ComplianceResourceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ComplianceResourceId"))
+	}
+	if s.ComplianceResourceId != nil && len(*s.ComplianceResourceId) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ComplianceResourceId", 1))
+	}
+	if s.ComplianceResourceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ComplianceResourceType"))
+	}
+	if s.ComplianceResourceType != nil && len(*s.ComplianceResourceType) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ComplianceResourceType", 1))
+	}
+	if s.ComplianceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ComplianceType"))
+	}
+	if s.OrderingTimestamp == nil {
+		invalidParams.Add(request.NewErrParamRequired("OrderingTimestamp"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // The details of an AWS Config evaluation. Provides the AWS resource that was
 // evaluated, the compliance of the resource, related timestamps, and supplementary
 // information.
@@ -1855,6 +2057,10 @@ type EvaluationResult struct {
 
 	// Indicates whether the AWS resource complies with the AWS Config rule that
 	// evaluated it.
+	//
+	// For the EvaluationResult data type, AWS Config supports only the COMPLIANT,
+	// NON_COMPLIANT, and NOT_APPLICABLE values. AWS Config does not support the
+	// INSUFFICIENT_DATA value for the EvaluationResult data type.
 	ComplianceType *string `type:"string" enum:"ComplianceType"`
 
 	// The time when the AWS Config rule evaluated the AWS resource.
@@ -1935,8 +2141,9 @@ func (s EvaluationResultQualifier) GoString() string {
 type GetComplianceDetailsByConfigRuleInput struct {
 	_ struct{} `type:"structure"`
 
-	// Specify to filter the results by compliance. The valid values are Compliant,
-	// NonCompliant, and NotApplicable.
+	// Filters the results by compliance.
+	//
+	// The allowed values are COMPLIANT, NON_COMPLIANT, and NOT_APPLICABLE.
 	ComplianceTypes []*string `type:"list"`
 
 	// The name of the AWS Config rule for which you want compliance information.
@@ -1960,6 +2167,22 @@ func (s GetComplianceDetailsByConfigRuleInput) String() string {
 // GoString returns the string representation
 func (s GetComplianceDetailsByConfigRuleInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetComplianceDetailsByConfigRuleInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetComplianceDetailsByConfigRuleInput"}
+	if s.ConfigRuleName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigRuleName"))
+	}
+	if s.ConfigRuleName != nil && len(*s.ConfigRuleName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ConfigRuleName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type GetComplianceDetailsByConfigRuleOutput struct {
@@ -1987,8 +2210,9 @@ func (s GetComplianceDetailsByConfigRuleOutput) GoString() string {
 type GetComplianceDetailsByResourceInput struct {
 	_ struct{} `type:"structure"`
 
-	// Specify to filter the results by compliance. The valid values are Compliant,
-	// NonCompliant, and NotApplicable.
+	// Filters the results by compliance.
+	//
+	// The allowed values are COMPLIANT, NON_COMPLIANT, and NOT_APPLICABLE.
 	ComplianceTypes []*string `type:"list"`
 
 	// The nextToken string returned on a previous page that you use to get the
@@ -2010,6 +2234,28 @@ func (s GetComplianceDetailsByResourceInput) String() string {
 // GoString returns the string representation
 func (s GetComplianceDetailsByResourceInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetComplianceDetailsByResourceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetComplianceDetailsByResourceInput"}
+	if s.ResourceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceId"))
+	}
+	if s.ResourceId != nil && len(*s.ResourceId) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ResourceId", 1))
+	}
+	if s.ResourceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceType"))
+	}
+	if s.ResourceType != nil && len(*s.ResourceType) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ResourceType", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type GetComplianceDetailsByResourceOutput struct {
@@ -2149,6 +2395,22 @@ func (s GetResourceConfigHistoryInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetResourceConfigHistoryInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetResourceConfigHistoryInput"}
+	if s.ResourceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceId"))
+	}
+	if s.ResourceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // The output for the GetResourceConfigHistory action.
 type GetResourceConfigHistoryOutput struct {
 	_ struct{} `type:"structure"`
@@ -2211,6 +2473,19 @@ func (s ListDiscoveredResourcesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListDiscoveredResourcesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListDiscoveredResourcesInput"}
+	if s.ResourceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ListDiscoveredResourcesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -2238,9 +2513,8 @@ type PutConfigRuleInput struct {
 
 	// An AWS Lambda function that evaluates configuration items to assess whether
 	// your AWS resources comply with your desired configurations. This function
-	// can run when AWS Config detects a configuration change or delivers a configuration
-	// snapshot. This function can evaluate any resource in the recording group.
-	// To define which of these are evaluated, specify a value for the Scope key.
+	// can run when AWS Config detects a configuration change to an AWS resource,
+	// or when it delivers a configuration snapshot of the resources in the account.
 	//
 	// For more information about developing and using AWS Config rules, see Evaluating
 	// AWS Resource Configurations with AWS Config (http://docs.aws.amazon.com/config/latest/developerguide/evaluate-config.html)
@@ -2256,6 +2530,24 @@ func (s PutConfigRuleInput) String() string {
 // GoString returns the string representation
 func (s PutConfigRuleInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutConfigRuleInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutConfigRuleInput"}
+	if s.ConfigRule == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigRule"))
+	}
+	if s.ConfigRule != nil {
+		if err := s.ConfigRule.Validate(); err != nil {
+			invalidParams.AddNested("ConfigRule", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type PutConfigRuleOutput struct {
@@ -2291,6 +2583,24 @@ func (s PutConfigurationRecorderInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutConfigurationRecorderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutConfigurationRecorderInput"}
+	if s.ConfigurationRecorder == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigurationRecorder"))
+	}
+	if s.ConfigurationRecorder != nil {
+		if err := s.ConfigurationRecorder.Validate(); err != nil {
+			invalidParams.AddNested("ConfigurationRecorder", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type PutConfigurationRecorderOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -2322,6 +2632,24 @@ func (s PutDeliveryChannelInput) String() string {
 // GoString returns the string representation
 func (s PutDeliveryChannelInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutDeliveryChannelInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutDeliveryChannelInput"}
+	if s.DeliveryChannel == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeliveryChannel"))
+	}
+	if s.DeliveryChannel != nil {
+		if err := s.DeliveryChannel.Validate(); err != nil {
+			invalidParams.AddNested("DeliveryChannel", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type PutDeliveryChannelOutput struct {
@@ -2361,6 +2689,29 @@ func (s PutEvaluationsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutEvaluationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutEvaluationsInput"}
+	if s.ResultToken == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResultToken"))
+	}
+	if s.Evaluations != nil {
+		for i, v := range s.Evaluations {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Evaluations", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type PutEvaluationsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -2378,24 +2729,75 @@ func (s PutEvaluationsOutput) GoString() string {
 	return s.String()
 }
 
-// The group of AWS resource types that AWS Config records when starting the
-// configuration recorder.
+// Specifies the types of AWS resource for which AWS Config records configuration
+// changes.
 //
-// recordingGroup can have one and only one parameter. Choose either allSupported
-// or resourceTypes.
+// In the recording group, you specify whether all supported types or specific
+// types of resources are recorded.
+//
+// By default, AWS Config records configuration changes for all supported types
+// of regional resources that AWS Config discovers in the region in which it
+// is running. Regional resources are tied to a region and can be used only
+// in that region. Examples of regional resources are EC2 instances and EBS
+// volumes.
+//
+// You can also have AWS Config record configuration changes for supported
+// types of global resources (for example, IAM resources). Global resources
+// are not tied to an individual region and can be used in all regions.
+//
+// The configuration details for any global resource are the same in all regions.
+// If you customize AWS Config in multiple regions to record global resources,
+// it will create multiple configuration items each time a global resource changes:
+// one configuration item for each region. These configuration items will contain
+// identical data. To prevent duplicate configuration items, you should consider
+// customizing AWS Config in only one region to record global resources, unless
+// you want the configuration items to be available in multiple regions. If
+// you don't want AWS Config to record all resources, you can specify which
+// types of resources it will record with the resourceTypes parameter.
+//
+// For a list of supported resource types, see Supported resource types (http://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html#supported-resources).
+//
+// For more information, see Selecting Which Resources AWS Config Records (http://docs.aws.amazon.com/config/latest/developerguide/select-resources.html).
 type RecordingGroup struct {
 	_ struct{} `type:"structure"`
 
-	// Records all supported resource types in the recording group. For a list of
-	// supported resource types, see Supported resource types (http://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html#supported-resources).
-	// If you specify allSupported, you cannot enumerate a list of resourceTypes.
+	// Specifies whether AWS Config records configuration changes for every supported
+	// type of regional resource.
+	//
+	// If you set this option to true, when AWS Config adds support for a new type
+	// of regional resource, it automatically starts recording resources of that
+	// type.
+	//
+	// If you set this option to true, you cannot enumerate a list of resourceTypes.
 	AllSupported *bool `locationName:"allSupported" type:"boolean"`
 
-	// A comma-separated list of strings representing valid AWS resource types (for
-	// example, AWS::EC2::Instance or AWS::CloudTrail::Trail). resourceTypes is
-	// only valid if you have chosen not to select allSupported. For a list of valid
-	// resourceTypes values, see the resourceType Value column in the following
-	// topic: Supported AWS Resource Types (http://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html#supported-resources).
+	// Specifies whether AWS Config includes all supported types of global resources
+	// (for example, IAM resources) with the resources that it records.
+	//
+	// Before you can set this option to true, you must set the allSupported option
+	// to true.
+	//
+	// If you set this option to true, when AWS Config adds support for a new type
+	// of global resource, it automatically starts recording resources of that type.
+	//
+	// The configuration details for any global resource are the same in all regions.
+	// To prevent duplicate configuration items, you should consider customizing
+	// AWS Config in only one region to record global resources.
+	IncludeGlobalResourceTypes *bool `locationName:"includeGlobalResourceTypes" type:"boolean"`
+
+	// A comma-separated list that specifies the types of AWS resources for which
+	// AWS Config records configuration changes (for example, AWS::EC2::Instance
+	// or AWS::CloudTrail::Trail).
+	//
+	// Before you can set this option to true, you must set the allSupported option
+	// to false.
+	//
+	// If you set this option to true, when AWS Config adds support for a new type
+	// of resource, it will not record resources of that type unless you manually
+	// add that type to your recording group.
+	//
+	// For a list of valid resourceTypes values, see the resourceType Value column
+	// in Supported AWS Resource Types (http://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html#supported-resources).
 	ResourceTypes []*string `locationName:"resourceTypes" type:"list"`
 }
 
@@ -2464,31 +2866,31 @@ func (s ResourceIdentifier) GoString() string {
 	return s.String()
 }
 
-// Defines which resources AWS Config evaluates against a rule. The scope can
-// include one or more resource types, a combination of a tag key and value,
-// or a combination of one resource type and one or more resource IDs. Specify
-// a scope to constrain the resources to be evaluated. If you do not specify
-// a scope, all resources in your recording group are evaluated against the
-// rule.
+// Defines which resources trigger an evaluation for an AWS Config rule. The
+// scope can include one or more resource types, a combination of a tag key
+// and value, or a combination of one resource type and one resource ID. Specify
+// a scope to constrain which resources trigger an evaluation for a rule. Otherwise,
+// evaluations for the rule are triggered when any resource in your recording
+// group changes in configuration.
 type Scope struct {
 	_ struct{} `type:"structure"`
 
-	// The IDs of only those AWS resources that you want AWS Config to evaluate
-	// against the rule. If you specify a resource ID, you must specify one resource
-	// type for ComplianceResourceTypes.
+	// The IDs of the only AWS resource that you want to trigger an evaluation for
+	// the rule. If you specify a resource ID, you must specify one resource type
+	// for ComplianceResourceTypes.
 	ComplianceResourceId *string `min:"1" type:"string"`
 
-	// The resource types of only those AWS resources that you want AWS Config to
-	// evaluate against the rule. You can specify only one type if you also specify
-	// resource IDs for ComplianceResourceId.
+	// The resource types of only those AWS resources that you want to trigger an
+	// evaluation for the rule. You can only specify one type if you also specify
+	// a resource ID for ComplianceResourceId.
 	ComplianceResourceTypes []*string `type:"list"`
 
-	// The tag key that is applied to only those AWS resources that you want AWS
-	// Config to evaluate against the rule.
+	// The tag key that is applied to only those AWS resources that you want you
+	// want to trigger an evaluation for the rule.
 	TagKey *string `min:"1" type:"string"`
 
-	// The tag value applied to only those AWS resources that you want AWS Config
-	// to evaluate against the rule. If you specify a value for TagValue, you must
+	// The tag value applied to only those AWS resources that you want to trigger
+	// an evaluation for the rule. If you specify a value for TagValue, you must
 	// also specify a value for TagKey.
 	TagValue *string `min:"1" type:"string"`
 }
@@ -2501,6 +2903,25 @@ func (s Scope) String() string {
 // GoString returns the string representation
 func (s Scope) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Scope) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Scope"}
+	if s.ComplianceResourceId != nil && len(*s.ComplianceResourceId) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ComplianceResourceId", 1))
+	}
+	if s.TagKey != nil && len(*s.TagKey) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("TagKey", 1))
+	}
+	if s.TagValue != nil && len(*s.TagValue) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("TagValue", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Provides the AWS Config rule owner (AWS or customer), the rule identifier,
@@ -2531,6 +2952,19 @@ func (s Source) String() string {
 // GoString returns the string representation
 func (s Source) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *Source) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "Source"}
+	if s.SourceIdentifier != nil && len(*s.SourceIdentifier) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("SourceIdentifier", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Provides the source and type of the event that triggers AWS Config to evaluate
@@ -2579,6 +3013,22 @@ func (s StartConfigurationRecorderInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *StartConfigurationRecorderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "StartConfigurationRecorderInput"}
+	if s.ConfigurationRecorderName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigurationRecorderName"))
+	}
+	if s.ConfigurationRecorderName != nil && len(*s.ConfigurationRecorderName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ConfigurationRecorderName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type StartConfigurationRecorderOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -2610,6 +3060,22 @@ func (s StopConfigurationRecorderInput) String() string {
 // GoString returns the string representation
 func (s StopConfigurationRecorderInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *StopConfigurationRecorderInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "StopConfigurationRecorderInput"}
+	if s.ConfigurationRecorderName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConfigurationRecorderName"))
+	}
+	if s.ConfigurationRecorderName != nil && len(*s.ConfigurationRecorderName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ConfigurationRecorderName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type StopConfigurationRecorderOutput struct {
@@ -2718,6 +3184,8 @@ const (
 	// @enum ResourceType
 	ResourceTypeAwsEc2Eip = "AWS::EC2::EIP"
 	// @enum ResourceType
+	ResourceTypeAwsEc2Host = "AWS::EC2::Host"
+	// @enum ResourceType
 	ResourceTypeAwsEc2Instance = "AWS::EC2::Instance"
 	// @enum ResourceType
 	ResourceTypeAwsEc2InternetGateway = "AWS::EC2::InternetGateway"
@@ -2741,4 +3209,12 @@ const (
 	ResourceTypeAwsEc2Vpnconnection = "AWS::EC2::VPNConnection"
 	// @enum ResourceType
 	ResourceTypeAwsEc2Vpngateway = "AWS::EC2::VPNGateway"
+	// @enum ResourceType
+	ResourceTypeAwsIamGroup = "AWS::IAM::Group"
+	// @enum ResourceType
+	ResourceTypeAwsIamPolicy = "AWS::IAM::Policy"
+	// @enum ResourceType
+	ResourceTypeAwsIamRole = "AWS::IAM::Role"
+	// @enum ResourceType
+	ResourceTypeAwsIamUser = "AWS::IAM::User"
 )

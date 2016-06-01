@@ -43,6 +43,10 @@ func ExampleECS_CreateService() {
 		TaskDefinition: aws.String("String"), // Required
 		ClientToken:    aws.String("String"),
 		Cluster:        aws.String("String"),
+		DeploymentConfiguration: &ecs.DeploymentConfiguration{
+			MaximumPercent:        aws.Int64(1),
+			MinimumHealthyPercent: aws.Int64(1),
+		},
 		LoadBalancers: []*ecs.LoadBalancer{
 			{ // Required
 				ContainerName:    aws.String("String"),
@@ -344,6 +348,7 @@ func ExampleECS_ListTaskDefinitionFamilies() {
 		FamilyPrefix: aws.String("String"),
 		MaxResults:   aws.Int64(1),
 		NextToken:    aws.String("String"),
+		Status:       aws.String("TaskDefinitionFamilyStatus"),
 	}
 	resp, err := svc.ListTaskDefinitionFamilies(params)
 
@@ -764,8 +769,12 @@ func ExampleECS_UpdateService() {
 	svc := ecs.New(session.New())
 
 	params := &ecs.UpdateServiceInput{
-		Service:        aws.String("String"), // Required
-		Cluster:        aws.String("String"),
+		Service: aws.String("String"), // Required
+		Cluster: aws.String("String"),
+		DeploymentConfiguration: &ecs.DeploymentConfiguration{
+			MaximumPercent:        aws.Int64(1),
+			MinimumHealthyPercent: aws.Int64(1),
+		},
 		DesiredCount:   aws.Int64(1),
 		TaskDefinition: aws.String("String"),
 	}

@@ -99,6 +99,30 @@ func ExampleDirectoryService_CreateComputer() {
 	fmt.Println(resp)
 }
 
+func ExampleDirectoryService_CreateConditionalForwarder() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.CreateConditionalForwarderInput{
+		DirectoryId: aws.String("DirectoryId"), // Required
+		DnsIpAddrs: []*string{ // Required
+			aws.String("IpAddr"), // Required
+			// More values...
+		},
+		RemoteDomainName: aws.String("RemoteDomainName"), // Required
+	}
+	resp, err := svc.CreateConditionalForwarder(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleDirectoryService_CreateDirectory() {
 	svc := directoryservice.New(session.New())
 
@@ -129,6 +153,35 @@ func ExampleDirectoryService_CreateDirectory() {
 	fmt.Println(resp)
 }
 
+func ExampleDirectoryService_CreateMicrosoftAD() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.CreateMicrosoftADInput{
+		Name:     aws.String("DirectoryName"), // Required
+		Password: aws.String("Password"),      // Required
+		VpcSettings: &directoryservice.DirectoryVpcSettings{ // Required
+			SubnetIds: []*string{ // Required
+				aws.String("SubnetId"), // Required
+				// More values...
+			},
+			VpcId: aws.String("VpcId"), // Required
+		},
+		Description: aws.String("Description"),
+		ShortName:   aws.String("DirectoryShortName"),
+	}
+	resp, err := svc.CreateMicrosoftAD(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleDirectoryService_CreateSnapshot() {
 	svc := directoryservice.New(session.New())
 
@@ -137,6 +190,53 @@ func ExampleDirectoryService_CreateSnapshot() {
 		Name:        aws.String("SnapshotName"),
 	}
 	resp, err := svc.CreateSnapshot(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_CreateTrust() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.CreateTrustInput{
+		DirectoryId:      aws.String("DirectoryId"),      // Required
+		RemoteDomainName: aws.String("RemoteDomainName"), // Required
+		TrustDirection:   aws.String("TrustDirection"),   // Required
+		TrustPassword:    aws.String("TrustPassword"),    // Required
+		ConditionalForwarderIpAddrs: []*string{
+			aws.String("IpAddr"), // Required
+			// More values...
+		},
+		TrustType: aws.String("TrustType"),
+	}
+	resp, err := svc.CreateTrust(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_DeleteConditionalForwarder() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DeleteConditionalForwarderInput{
+		DirectoryId:      aws.String("DirectoryId"),      // Required
+		RemoteDomainName: aws.String("RemoteDomainName"), // Required
+	}
+	resp, err := svc.DeleteConditionalForwarder(params)
 
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
@@ -187,6 +287,69 @@ func ExampleDirectoryService_DeleteSnapshot() {
 	fmt.Println(resp)
 }
 
+func ExampleDirectoryService_DeleteTrust() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DeleteTrustInput{
+		TrustId: aws.String("TrustId"), // Required
+		DeleteAssociatedConditionalForwarder: aws.Bool(true),
+	}
+	resp, err := svc.DeleteTrust(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_DeregisterEventTopic() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DeregisterEventTopicInput{
+		DirectoryId: aws.String("DirectoryId"), // Required
+		TopicName:   aws.String("TopicName"),   // Required
+	}
+	resp, err := svc.DeregisterEventTopic(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_DescribeConditionalForwarders() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DescribeConditionalForwardersInput{
+		DirectoryId: aws.String("DirectoryId"), // Required
+		RemoteDomainNames: []*string{
+			aws.String("RemoteDomainName"), // Required
+			// More values...
+		},
+	}
+	resp, err := svc.DescribeConditionalForwarders(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleDirectoryService_DescribeDirectories() {
 	svc := directoryservice.New(session.New())
 
@@ -199,6 +362,29 @@ func ExampleDirectoryService_DescribeDirectories() {
 		NextToken: aws.String("NextToken"),
 	}
 	resp, err := svc.DescribeDirectories(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_DescribeEventTopics() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DescribeEventTopicsInput{
+		DirectoryId: aws.String("DirectoryId"),
+		TopicNames: []*string{
+			aws.String("TopicName"), // Required
+			// More values...
+		},
+	}
+	resp, err := svc.DescribeEventTopics(params)
 
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
@@ -224,6 +410,31 @@ func ExampleDirectoryService_DescribeSnapshots() {
 		},
 	}
 	resp, err := svc.DescribeSnapshots(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_DescribeTrusts() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.DescribeTrustsInput{
+		DirectoryId: aws.String("DirectoryId"),
+		Limit:       aws.Int64(1),
+		NextToken:   aws.String("NextToken"),
+		TrustIds: []*string{
+			aws.String("TrustId"), // Required
+			// More values...
+		},
+	}
+	resp, err := svc.DescribeTrusts(params)
 
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
@@ -365,6 +576,26 @@ func ExampleDirectoryService_GetSnapshotLimits() {
 	fmt.Println(resp)
 }
 
+func ExampleDirectoryService_RegisterEventTopic() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.RegisterEventTopicInput{
+		DirectoryId: aws.String("DirectoryId"), // Required
+		TopicName:   aws.String("TopicName"),   // Required
+	}
+	resp, err := svc.RegisterEventTopic(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
 func ExampleDirectoryService_RestoreFromSnapshot() {
 	svc := directoryservice.New(session.New())
 
@@ -372,6 +603,30 @@ func ExampleDirectoryService_RestoreFromSnapshot() {
 		SnapshotId: aws.String("SnapshotId"), // Required
 	}
 	resp, err := svc.RestoreFromSnapshot(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_UpdateConditionalForwarder() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.UpdateConditionalForwarderInput{
+		DirectoryId: aws.String("DirectoryId"), // Required
+		DnsIpAddrs: []*string{ // Required
+			aws.String("IpAddr"), // Required
+			// More values...
+		},
+		RemoteDomainName: aws.String("RemoteDomainName"), // Required
+	}
+	resp, err := svc.UpdateConditionalForwarder(params)
 
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and
@@ -404,6 +659,25 @@ func ExampleDirectoryService_UpdateRadius() {
 		},
 	}
 	resp, err := svc.UpdateRadius(params)
+
+	if err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Pretty-print the response data.
+	fmt.Println(resp)
+}
+
+func ExampleDirectoryService_VerifyTrust() {
+	svc := directoryservice.New(session.New())
+
+	params := &directoryservice.VerifyTrustInput{
+		TrustId: aws.String("TrustId"), // Required
+	}
+	resp, err := svc.VerifyTrust(params)
 
 	if err != nil {
 		// Print the error, cast err to awserr.Error to get the Code and

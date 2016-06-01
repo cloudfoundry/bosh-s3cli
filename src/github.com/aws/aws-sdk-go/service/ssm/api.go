@@ -4,6 +4,7 @@
 package ssm
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
@@ -250,6 +251,35 @@ func (c *SSM) DescribeDocument(input *DescribeDocumentInput) (*DescribeDocumentO
 	return out, err
 }
 
+const opDescribeDocumentPermission = "DescribeDocumentPermission"
+
+// DescribeDocumentPermissionRequest generates a request for the DescribeDocumentPermission operation.
+func (c *SSM) DescribeDocumentPermissionRequest(input *DescribeDocumentPermissionInput) (req *request.Request, output *DescribeDocumentPermissionOutput) {
+	op := &request.Operation{
+		Name:       opDescribeDocumentPermission,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeDocumentPermissionInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeDocumentPermissionOutput{}
+	req.Data = output
+	return
+}
+
+// Describes the permissions for an SSM document. If you created the document,
+// you are the owner. If a document is shared, it can either be shared privately
+// (by specifying a user’s AWS account ID) or publicly (All).
+func (c *SSM) DescribeDocumentPermission(input *DescribeDocumentPermissionInput) (*DescribeDocumentPermissionOutput, error) {
+	req, out := c.DescribeDocumentPermissionRequest(input)
+	err := req.Send()
+	return out, err
+}
+
 const opDescribeInstanceInformation = "DescribeInstanceInformation"
 
 // DescribeInstanceInformationRequest generates a request for the DescribeInstanceInformation operation.
@@ -317,6 +347,12 @@ func (c *SSM) ListAssociationsRequest(input *ListAssociationsInput) (req *reques
 		Name:       opListAssociations,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"NextToken"},
+			OutputTokens:    []string{"NextToken"},
+			LimitToken:      "MaxResults",
+			TruncationToken: "",
+		},
 	}
 
 	if input == nil {
@@ -336,6 +372,14 @@ func (c *SSM) ListAssociations(input *ListAssociationsInput) (*ListAssociationsO
 	return out, err
 }
 
+func (c *SSM) ListAssociationsPages(input *ListAssociationsInput, fn func(p *ListAssociationsOutput, lastPage bool) (shouldContinue bool)) error {
+	page, _ := c.ListAssociationsRequest(input)
+	page.Handlers.Build.PushBack(request.MakeAddToUserAgentFreeFormHandler("Paginator"))
+	return page.EachPage(func(p interface{}, lastPage bool) bool {
+		return fn(p.(*ListAssociationsOutput), lastPage)
+	})
+}
+
 const opListCommandInvocations = "ListCommandInvocations"
 
 // ListCommandInvocationsRequest generates a request for the ListCommandInvocations operation.
@@ -344,6 +388,12 @@ func (c *SSM) ListCommandInvocationsRequest(input *ListCommandInvocationsInput) 
 		Name:       opListCommandInvocations,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"NextToken"},
+			OutputTokens:    []string{"NextToken"},
+			LimitToken:      "MaxResults",
+			TruncationToken: "",
+		},
 	}
 
 	if input == nil {
@@ -367,6 +417,14 @@ func (c *SSM) ListCommandInvocations(input *ListCommandInvocationsInput) (*ListC
 	return out, err
 }
 
+func (c *SSM) ListCommandInvocationsPages(input *ListCommandInvocationsInput, fn func(p *ListCommandInvocationsOutput, lastPage bool) (shouldContinue bool)) error {
+	page, _ := c.ListCommandInvocationsRequest(input)
+	page.Handlers.Build.PushBack(request.MakeAddToUserAgentFreeFormHandler("Paginator"))
+	return page.EachPage(func(p interface{}, lastPage bool) bool {
+		return fn(p.(*ListCommandInvocationsOutput), lastPage)
+	})
+}
+
 const opListCommands = "ListCommands"
 
 // ListCommandsRequest generates a request for the ListCommands operation.
@@ -375,6 +433,12 @@ func (c *SSM) ListCommandsRequest(input *ListCommandsInput) (req *request.Reques
 		Name:       opListCommands,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"NextToken"},
+			OutputTokens:    []string{"NextToken"},
+			LimitToken:      "MaxResults",
+			TruncationToken: "",
+		},
 	}
 
 	if input == nil {
@@ -394,6 +458,14 @@ func (c *SSM) ListCommands(input *ListCommandsInput) (*ListCommandsOutput, error
 	return out, err
 }
 
+func (c *SSM) ListCommandsPages(input *ListCommandsInput, fn func(p *ListCommandsOutput, lastPage bool) (shouldContinue bool)) error {
+	page, _ := c.ListCommandsRequest(input)
+	page.Handlers.Build.PushBack(request.MakeAddToUserAgentFreeFormHandler("Paginator"))
+	return page.EachPage(func(p interface{}, lastPage bool) bool {
+		return fn(p.(*ListCommandsOutput), lastPage)
+	})
+}
+
 const opListDocuments = "ListDocuments"
 
 // ListDocumentsRequest generates a request for the ListDocuments operation.
@@ -402,6 +474,12 @@ func (c *SSM) ListDocumentsRequest(input *ListDocumentsInput) (req *request.Requ
 		Name:       opListDocuments,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"NextToken"},
+			OutputTokens:    []string{"NextToken"},
+			LimitToken:      "MaxResults",
+			TruncationToken: "",
+		},
 	}
 
 	if input == nil {
@@ -417,6 +495,44 @@ func (c *SSM) ListDocumentsRequest(input *ListDocumentsInput) (req *request.Requ
 // Describes one or more of your SSM documents.
 func (c *SSM) ListDocuments(input *ListDocumentsInput) (*ListDocumentsOutput, error) {
 	req, out := c.ListDocumentsRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+func (c *SSM) ListDocumentsPages(input *ListDocumentsInput, fn func(p *ListDocumentsOutput, lastPage bool) (shouldContinue bool)) error {
+	page, _ := c.ListDocumentsRequest(input)
+	page.Handlers.Build.PushBack(request.MakeAddToUserAgentFreeFormHandler("Paginator"))
+	return page.EachPage(func(p interface{}, lastPage bool) bool {
+		return fn(p.(*ListDocumentsOutput), lastPage)
+	})
+}
+
+const opModifyDocumentPermission = "ModifyDocumentPermission"
+
+// ModifyDocumentPermissionRequest generates a request for the ModifyDocumentPermission operation.
+func (c *SSM) ModifyDocumentPermissionRequest(input *ModifyDocumentPermissionInput) (req *request.Request, output *ModifyDocumentPermissionOutput) {
+	op := &request.Operation{
+		Name:       opModifyDocumentPermission,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &ModifyDocumentPermissionInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &ModifyDocumentPermissionOutput{}
+	req.Data = output
+	return
+}
+
+// Share a document publicly or privately. If you share a document privately,
+// you must specify the AWS user account IDs for those people who can use the
+// document. If you share a document publicly, you must specify All as the account
+// ID.
+func (c *SSM) ModifyDocumentPermission(input *ModifyDocumentPermissionInput) (*ModifyDocumentPermissionOutput, error) {
+	req, out := c.ModifyDocumentPermissionRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -480,7 +596,7 @@ type Association struct {
 	_ struct{} `type:"structure"`
 
 	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// The name of the SSM document.
 	Name *string `type:"string"`
@@ -504,7 +620,7 @@ type AssociationDescription struct {
 	Date *time.Time `type:"timestamp" timestampFormat:"unix"`
 
 	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// The name of the SSM document.
 	Name *string `type:"string"`
@@ -547,6 +663,25 @@ func (s AssociationFilter) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AssociationFilter) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssociationFilter"}
+	if s.Key == nil {
+		invalidParams.Add(request.NewErrParamRequired("Key"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+	if s.Value != nil && len(*s.Value) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Value", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes an association status.
 type AssociationStatus struct {
 	_ struct{} `type:"structure"`
@@ -574,6 +709,25 @@ func (s AssociationStatus) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AssociationStatus) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssociationStatus"}
+	if s.Date == nil {
+		invalidParams.Add(request.NewErrParamRequired("Date"))
+	}
+	if s.Message == nil {
+		invalidParams.Add(request.NewErrParamRequired("Message"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CancelCommandInput struct {
 	_ struct{} `type:"structure"`
 
@@ -594,6 +748,25 @@ func (s CancelCommandInput) String() string {
 // GoString returns the string representation
 func (s CancelCommandInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelCommandInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelCommandInput"}
+	if s.CommandId == nil {
+		invalidParams.Add(request.NewErrParamRequired("CommandId"))
+	}
+	if s.CommandId != nil && len(*s.CommandId) < 36 {
+		invalidParams.Add(request.NewErrParamMinLen("CommandId", 36))
+	}
+	if s.InstanceIds != nil && len(s.InstanceIds) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("InstanceIds", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Whether or not the command was successfully canceled. There is no guarantee
@@ -684,6 +857,25 @@ func (s CommandFilter) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CommandFilter) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CommandFilter"}
+	if s.Key == nil {
+		invalidParams.Add(request.NewErrParamRequired("Key"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+	if s.Value != nil && len(*s.Value) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Value", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // An invocation is copy of a command sent to a specific instance. A command
 // can apply to one or more instances. A command invocation applies to one instance.
 // For example, if a user executes SendCommand against three instances, then
@@ -705,7 +897,7 @@ type CommandInvocation struct {
 	DocumentName *string `type:"string"`
 
 	// The instance ID in which this invocation was requested.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// The time and date the request was sent to this instance.
 	RequestedDateTime *time.Time `type:"timestamp" timestampFormat:"unix"`
@@ -731,9 +923,9 @@ func (s CommandInvocation) GoString() string {
 type CommandPlugin struct {
 	_ struct{} `type:"structure"`
 
-	// The name of the plugin. Must be one of the following: AWS-JoinDirectoryServiceDomain,
-	// AWS-InstallApplication, AWS-RunPowerShellScript, AWS-InstallPowerShellModule,
-	// AWS-ConfigureCloudWatch.
+	// The name of the plugin. Must be one of the following: aws:updateAgent, aws:domainjoin,
+	// aws:applications, aws:runPowerShellScript, aws:psmodule, aws:cloudWatch,
+	// aws:runShellScript, or aws:updateSSMAgent.
 	Name *string `min:"4" type:"string"`
 
 	// Output of the plugin execution.
@@ -788,6 +980,19 @@ func (s CreateAssociationBatchInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateAssociationBatchInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateAssociationBatchInput"}
+	if s.Entries == nil {
+		invalidParams.Add(request.NewErrParamRequired("Entries"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CreateAssociationBatchOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -813,7 +1018,7 @@ type CreateAssociationBatchRequestEntry struct {
 	_ struct{} `type:"structure"`
 
 	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// The name of the configuration document.
 	Name *string `type:"string"`
@@ -836,12 +1041,12 @@ type CreateAssociationInput struct {
 	_ struct{} `type:"structure"`
 
 	// The instance ID.
-	InstanceId *string `min:"10" type:"string" required:"true"`
+	InstanceId *string `type:"string" required:"true"`
 
 	// The name of the SSM document.
 	Name *string `type:"string" required:"true"`
 
-	// The parameters for the document’s runtime configuration.
+	// The parameters for the documents runtime configuration.
 	Parameters map[string][]*string `type:"map"`
 }
 
@@ -853,6 +1058,22 @@ func (s CreateAssociationInput) String() string {
 // GoString returns the string representation
 func (s CreateAssociationInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateAssociationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateAssociationInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type CreateAssociationOutput struct {
@@ -875,8 +1096,7 @@ func (s CreateAssociationOutput) GoString() string {
 type CreateDocumentInput struct {
 	_ struct{} `type:"structure"`
 
-	// A valid JSON string. For more information about the contents of this string,
-	// see SSM Document (http://docs.aws.amazon.com/ssm/latest/APIReference/aws-ssm-document.html).
+	// A valid JSON string.
 	Content *string `min:"1" type:"string" required:"true"`
 
 	// A name for the SSM document.
@@ -891,6 +1111,25 @@ func (s CreateDocumentInput) String() string {
 // GoString returns the string representation
 func (s CreateDocumentInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateDocumentInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateDocumentInput"}
+	if s.Content == nil {
+		invalidParams.Add(request.NewErrParamRequired("Content"))
+	}
+	if s.Content != nil && len(*s.Content) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Content", 1))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type CreateDocumentOutput struct {
@@ -914,7 +1153,7 @@ type DeleteAssociationInput struct {
 	_ struct{} `type:"structure"`
 
 	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string" required:"true"`
+	InstanceId *string `type:"string" required:"true"`
 
 	// The name of the SSM document.
 	Name *string `type:"string" required:"true"`
@@ -928,6 +1167,22 @@ func (s DeleteAssociationInput) String() string {
 // GoString returns the string representation
 func (s DeleteAssociationInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteAssociationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteAssociationInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DeleteAssociationOutput struct {
@@ -961,6 +1216,19 @@ func (s DeleteDocumentInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteDocumentInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteDocumentInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteDocumentOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -978,8 +1246,8 @@ func (s DeleteDocumentOutput) GoString() string {
 type DescribeAssociationInput struct {
 	_ struct{} `type:"structure"`
 
-	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string" required:"true"`
+	// The instance ID.
+	InstanceId *string `type:"string" required:"true"`
 
 	// The name of the SSM document.
 	Name *string `type:"string" required:"true"`
@@ -993,6 +1261,22 @@ func (s DescribeAssociationInput) String() string {
 // GoString returns the string representation
 func (s DescribeAssociationInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeAssociationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeAssociationInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DescribeAssociationOutput struct {
@@ -1029,6 +1313,19 @@ func (s DescribeDocumentInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeDocumentInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeDocumentInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DescribeDocumentOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -1043,6 +1340,60 @@ func (s DescribeDocumentOutput) String() string {
 
 // GoString returns the string representation
 func (s DescribeDocumentOutput) GoString() string {
+	return s.String()
+}
+
+type DescribeDocumentPermissionInput struct {
+	_ struct{} `type:"structure"`
+
+	// The name of the document for which you are the owner.
+	Name *string `type:"string" required:"true"`
+
+	// The permission type for the document. The permission type can be Share.
+	PermissionType *string `type:"string" required:"true" enum:"DocumentPermissionType"`
+}
+
+// String returns the string representation
+func (s DescribeDocumentPermissionInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeDocumentPermissionInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeDocumentPermissionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeDocumentPermissionInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.PermissionType == nil {
+		invalidParams.Add(request.NewErrParamRequired("PermissionType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+type DescribeDocumentPermissionOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The account IDs that have permission to use this document. The ID can be
+	// either an AWS account or All.
+	AccountIds []*string `locationNameList:"AccountId" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeDocumentPermissionOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeDocumentPermissionOutput) GoString() string {
 	return s.String()
 }
 
@@ -1070,6 +1421,32 @@ func (s DescribeInstanceInformationInput) String() string {
 // GoString returns the string representation
 func (s DescribeInstanceInformationInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeInstanceInformationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeInstanceInformationInput"}
+	if s.InstanceInformationFilterList != nil && len(s.InstanceInformationFilterList) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("InstanceInformationFilterList", 1))
+	}
+	if s.MaxResults != nil && *s.MaxResults < 5 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 5))
+	}
+	if s.InstanceInformationFilterList != nil {
+		for i, v := range s.InstanceInformationFilterList {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "InstanceInformationFilterList", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DescribeInstanceInformationOutput struct {
@@ -1103,8 +1480,21 @@ type DocumentDescription struct {
 	// A description of the document.
 	Description *string `type:"string"`
 
+	// The Sha256 or Sha1 hash created by the system when the document was created.
+	//
+	//  Sha1 hashes have been deprecated.
+	Hash *string `type:"string"`
+
+	// Sha256 or Sha1.
+	//
+	//  Sha1 hashes have been deprecated.
+	HashType *string `type:"string" enum:"DocumentHashType"`
+
 	// The name of the SSM document.
 	Name *string `type:"string"`
+
+	// The AWS user account of the person who created the document.
+	Owner *string `type:"string"`
 
 	// A description of the parameters for a document.
 	Parameters []*DocumentParameter `locationNameList:"DocumentParameter" type:"list"`
@@ -1150,12 +1540,34 @@ func (s DocumentFilter) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DocumentFilter) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DocumentFilter"}
+	if s.Key == nil {
+		invalidParams.Add(request.NewErrParamRequired("Key"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+	if s.Value != nil && len(*s.Value) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Value", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes the name of an SSM document.
 type DocumentIdentifier struct {
 	_ struct{} `type:"structure"`
 
 	// The name of the SSM document.
 	Name *string `type:"string"`
+
+	// The AWS user account of the person who created the document.
+	Owner *string `type:"string"`
 
 	// The operating system platform.
 	PlatformTypes []*string `locationNameList:"PlatformType" type:"list"`
@@ -1171,6 +1583,8 @@ func (s DocumentIdentifier) GoString() string {
 	return s.String()
 }
 
+// Parameters specified in the SSM document that execute on the server when
+// the command is run.
 type DocumentParameter struct {
 	_ struct{} `type:"structure"`
 
@@ -1240,6 +1654,19 @@ func (s GetDocumentInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetDocumentInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetDocumentInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type GetDocumentOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -1268,7 +1695,7 @@ type InstanceInformation struct {
 	AgentVersion *string `type:"string"`
 
 	// The instance ID.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// Indicates whether latest version of the SSM agent is running on your instance.
 	IsLatestVersion *bool `type:"boolean"`
@@ -1320,6 +1747,25 @@ func (s InstanceInformationFilter) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *InstanceInformationFilter) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InstanceInformationFilter"}
+	if s.Key == nil {
+		invalidParams.Add(request.NewErrParamRequired("Key"))
+	}
+	if s.ValueSet == nil {
+		invalidParams.Add(request.NewErrParamRequired("ValueSet"))
+	}
+	if s.ValueSet != nil && len(s.ValueSet) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ValueSet", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ListAssociationsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -1344,6 +1790,35 @@ func (s ListAssociationsInput) String() string {
 // GoString returns the string representation
 func (s ListAssociationsInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListAssociationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListAssociationsInput"}
+	if s.AssociationFilterList == nil {
+		invalidParams.Add(request.NewErrParamRequired("AssociationFilterList"))
+	}
+	if s.AssociationFilterList != nil && len(s.AssociationFilterList) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("AssociationFilterList", 1))
+	}
+	if s.MaxResults != nil && *s.MaxResults < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 1))
+	}
+	if s.AssociationFilterList != nil {
+		for i, v := range s.AssociationFilterList {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "AssociationFilterList", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type ListAssociationsOutput struct {
@@ -1373,8 +1848,8 @@ type ListCommandInvocationsInput struct {
 	// (Optional) The invocations for a specific command ID.
 	CommandId *string `min:"36" type:"string"`
 
-	// (Optional) If set this returns the response of the command executions. By
-	// default this is set to False.
+	// (Optional) If set this returns the response of the command executions and
+	// any command output. By default this is set to False.
 	Details *bool `type:"boolean"`
 
 	// (Optional) One or more filters. Use a filter to return a more specific list
@@ -1382,7 +1857,7 @@ type ListCommandInvocationsInput struct {
 	Filters []*CommandFilter `min:"1" type:"list"`
 
 	// (Optional) The command execution details for a specific instance ID.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// (Optional) The maximum number of items to return for this call. The call
 	// also returns a token that you can specify in a subsequent call to get the
@@ -1402,6 +1877,35 @@ func (s ListCommandInvocationsInput) String() string {
 // GoString returns the string representation
 func (s ListCommandInvocationsInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListCommandInvocationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListCommandInvocationsInput"}
+	if s.CommandId != nil && len(*s.CommandId) < 36 {
+		invalidParams.Add(request.NewErrParamMinLen("CommandId", 36))
+	}
+	if s.Filters != nil && len(s.Filters) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Filters", 1))
+	}
+	if s.MaxResults != nil && *s.MaxResults < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 1))
+	}
+	if s.Filters != nil {
+		for i, v := range s.Filters {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Filters", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type ListCommandInvocationsOutput struct {
@@ -1436,7 +1940,7 @@ type ListCommandsInput struct {
 	Filters []*CommandFilter `min:"1" type:"list"`
 
 	// (Optional) Lists commands issued against this instance ID.
-	InstanceId *string `min:"10" type:"string"`
+	InstanceId *string `type:"string"`
 
 	// (Optional) The maximum number of items to return for this call. The call
 	// also returns a token that you can specify in a subsequent call to get the
@@ -1456,6 +1960,35 @@ func (s ListCommandsInput) String() string {
 // GoString returns the string representation
 func (s ListCommandsInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListCommandsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListCommandsInput"}
+	if s.CommandId != nil && len(*s.CommandId) < 36 {
+		invalidParams.Add(request.NewErrParamMinLen("CommandId", 36))
+	}
+	if s.Filters != nil && len(s.Filters) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("Filters", 1))
+	}
+	if s.MaxResults != nil && *s.MaxResults < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 1))
+	}
+	if s.Filters != nil {
+		for i, v := range s.Filters {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Filters", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type ListCommandsOutput struct {
@@ -1505,6 +2038,32 @@ func (s ListDocumentsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ListDocumentsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListDocumentsInput"}
+	if s.DocumentFilterList != nil && len(s.DocumentFilterList) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("DocumentFilterList", 1))
+	}
+	if s.MaxResults != nil && *s.MaxResults < 1 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 1))
+	}
+	if s.DocumentFilterList != nil {
+		for i, v := range s.DocumentFilterList {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "DocumentFilterList", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ListDocumentsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -1526,12 +2085,82 @@ func (s ListDocumentsOutput) GoString() string {
 	return s.String()
 }
 
+type ModifyDocumentPermissionInput struct {
+	_ struct{} `type:"structure"`
+
+	// The AWS user accounts that should have access to the document. The account
+	// IDs can either be a group of account IDs or All.
+	AccountIdsToAdd []*string `locationNameList:"AccountId" type:"list"`
+
+	// The AWS user accounts that should no longer have access to the document.
+	// The AWS user account can either be a group of account IDs or All. This action
+	// has a higher priority than AccountIdsToAdd. If you specify an account ID
+	// to add and the same ID to remove, the system removes access to the document.
+	AccountIdsToRemove []*string `locationNameList:"AccountId" type:"list"`
+
+	// The name of the document that you want to share.
+	Name *string `type:"string" required:"true"`
+
+	// The permission type for the document. The permission type can be Share.
+	PermissionType *string `type:"string" required:"true" enum:"DocumentPermissionType"`
+}
+
+// String returns the string representation
+func (s ModifyDocumentPermissionInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ModifyDocumentPermissionInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyDocumentPermissionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyDocumentPermissionInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.PermissionType == nil {
+		invalidParams.Add(request.NewErrParamRequired("PermissionType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+type ModifyDocumentPermissionOutput struct {
+	_ struct{} `type:"structure"`
+}
+
+// String returns the string representation
+func (s ModifyDocumentPermissionOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ModifyDocumentPermissionOutput) GoString() string {
+	return s.String()
+}
+
 type SendCommandInput struct {
 	_ struct{} `type:"structure"`
 
 	// User-specified information about the command, such as a brief description
 	// of what the command should do.
 	Comment *string `type:"string"`
+
+	// The Sha256 or Sha1 hash created by the system when the document was created.
+	//
+	//  Sha1 hashes have been deprecated.
+	DocumentHash *string `type:"string"`
+
+	// Sha256 or Sha1.
+	//
+	//  Sha1 hashes have been deprecated.
+	DocumentHashType *string `type:"string" enum:"DocumentHashType"`
 
 	// Required. The name of the SSM document to execute. This can be an SSM public
 	// document or a custom document.
@@ -1566,6 +2195,31 @@ func (s SendCommandInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SendCommandInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SendCommandInput"}
+	if s.DocumentName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DocumentName"))
+	}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+	if s.InstanceIds != nil && len(s.InstanceIds) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("InstanceIds", 1))
+	}
+	if s.OutputS3BucketName != nil && len(*s.OutputS3BucketName) < 3 {
+		invalidParams.Add(request.NewErrParamMinLen("OutputS3BucketName", 3))
+	}
+	if s.TimeoutSeconds != nil && *s.TimeoutSeconds < 30 {
+		invalidParams.Add(request.NewErrParamMinValue("TimeoutSeconds", 30))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type SendCommandOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -1591,7 +2245,7 @@ type UpdateAssociationStatusInput struct {
 	AssociationStatus *AssociationStatus `type:"structure" required:"true"`
 
 	// The ID of the instance.
-	InstanceId *string `min:"10" type:"string" required:"true"`
+	InstanceId *string `type:"string" required:"true"`
 
 	// The name of the SSM document.
 	Name *string `type:"string" required:"true"`
@@ -1605,6 +2259,30 @@ func (s UpdateAssociationStatusInput) String() string {
 // GoString returns the string representation
 func (s UpdateAssociationStatusInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateAssociationStatusInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateAssociationStatusInput"}
+	if s.AssociationStatus == nil {
+		invalidParams.Add(request.NewErrParamRequired("AssociationStatus"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.AssociationStatus != nil {
+		if err := s.AssociationStatus.Validate(); err != nil {
+			invalidParams.AddNested("AssociationStatus", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type UpdateAssociationStatusOutput struct {
@@ -1708,10 +2386,22 @@ const (
 )
 
 const (
+	// @enum DocumentHashType
+	DocumentHashTypeSha256 = "Sha256"
+	// @enum DocumentHashType
+	DocumentHashTypeSha1 = "Sha1"
+)
+
+const (
 	// @enum DocumentParameterType
 	DocumentParameterTypeString = "String"
 	// @enum DocumentParameterType
 	DocumentParameterTypeStringList = "StringList"
+)
+
+const (
+	// @enum DocumentPermissionType
+	DocumentPermissionTypeShare = "Share"
 )
 
 const (

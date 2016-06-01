@@ -4,8 +4,12 @@
 package simpledb
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/private/protocol"
+	"github.com/aws/aws-sdk-go/private/protocol/query"
 )
 
 const opBatchDeleteAttributes = "BatchDeleteAttributes"
@@ -23,6 +27,8 @@ func (c *SimpleDB) BatchDeleteAttributesRequest(input *BatchDeleteAttributesInpu
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &BatchDeleteAttributesOutput{}
 	req.Data = output
 	return
@@ -72,6 +78,8 @@ func (c *SimpleDB) BatchPutAttributesRequest(input *BatchPutAttributesInput) (re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &BatchPutAttributesOutput{}
 	req.Data = output
 	return
@@ -139,6 +147,8 @@ func (c *SimpleDB) CreateDomainRequest(input *CreateDomainInput) (req *request.R
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CreateDomainOutput{}
 	req.Data = output
 	return
@@ -175,6 +185,8 @@ func (c *SimpleDB) DeleteAttributesRequest(input *DeleteAttributesInput) (req *r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteAttributesOutput{}
 	req.Data = output
 	return
@@ -213,6 +225,8 @@ func (c *SimpleDB) DeleteDomainRequest(input *DeleteDomainInput) (req *request.R
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteDomainOutput{}
 	req.Data = output
 	return
@@ -356,6 +370,8 @@ func (c *SimpleDB) PutAttributesRequest(input *PutAttributesInput) (req *request
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &PutAttributesOutput{}
 	req.Data = output
 	return
@@ -493,6 +509,32 @@ func (s BatchDeleteAttributesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *BatchDeleteAttributesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "BatchDeleteAttributesInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+	if s.Items == nil {
+		invalidParams.Add(request.NewErrParamRequired("Items"))
+	}
+	if s.Items != nil {
+		for i, v := range s.Items {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Items", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type BatchDeleteAttributesOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -527,6 +569,32 @@ func (s BatchPutAttributesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *BatchPutAttributesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "BatchPutAttributesInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+	if s.Items == nil {
+		invalidParams.Add(request.NewErrParamRequired("Items"))
+	}
+	if s.Items != nil {
+		for i, v := range s.Items {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Items", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type BatchPutAttributesOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -557,6 +625,19 @@ func (s CreateDomainInput) String() string {
 // GoString returns the string representation
 func (s CreateDomainInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateDomainInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateDomainInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type CreateDomainOutput struct {
@@ -593,6 +674,19 @@ func (s DeletableAttribute) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeletableAttribute) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeletableAttribute"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeletableItem struct {
 	_ struct{} `type:"structure"`
 
@@ -609,6 +703,29 @@ func (s DeletableItem) String() string {
 // GoString returns the string representation
 func (s DeletableItem) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeletableItem) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeletableItem"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.Attributes != nil {
+		for i, v := range s.Attributes {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attributes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DeleteAttributesInput struct {
@@ -639,6 +756,32 @@ func (s DeleteAttributesInput) String() string {
 // GoString returns the string representation
 func (s DeleteAttributesInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteAttributesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteAttributesInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+	if s.ItemName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ItemName"))
+	}
+	if s.Attributes != nil {
+		for i, v := range s.Attributes {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attributes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DeleteAttributesOutput struct {
@@ -672,6 +815,19 @@ func (s DeleteDomainInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteDomainInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteDomainInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteDomainOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -701,6 +857,19 @@ func (s DomainMetadataInput) String() string {
 // GoString returns the string representation
 func (s DomainMetadataInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DomainMetadataInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DomainMetadataInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DomainMetadataOutput struct {
@@ -765,6 +934,22 @@ func (s GetAttributesInput) String() string {
 // GoString returns the string representation
 func (s GetAttributesInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetAttributesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetAttributesInput"}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+	if s.ItemName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ItemName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type GetAttributesOutput struct {
@@ -877,6 +1062,35 @@ func (s PutAttributesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PutAttributesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutAttributesInput"}
+	if s.Attributes == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attributes"))
+	}
+	if s.DomainName == nil {
+		invalidParams.Add(request.NewErrParamRequired("DomainName"))
+	}
+	if s.ItemName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ItemName"))
+	}
+	if s.Attributes != nil {
+		for i, v := range s.Attributes {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attributes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type PutAttributesOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -915,6 +1129,22 @@ func (s ReplaceableAttribute) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceableAttribute) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceableAttribute"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.Value == nil {
+		invalidParams.Add(request.NewErrParamRequired("Value"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ReplaceableItem struct {
 	_ struct{} `type:"structure"`
 
@@ -933,6 +1163,32 @@ func (s ReplaceableItem) String() string {
 // GoString returns the string representation
 func (s ReplaceableItem) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceableItem) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceableItem"}
+	if s.Attributes == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attributes"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.Attributes != nil {
+		for i, v := range s.Attributes {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "Attributes", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type SelectInput struct {
@@ -959,6 +1215,19 @@ func (s SelectInput) String() string {
 // GoString returns the string representation
 func (s SelectInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SelectInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SelectInput"}
+	if s.SelectExpression == nil {
+		invalidParams.Add(request.NewErrParamRequired("SelectExpression"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type SelectOutput struct {

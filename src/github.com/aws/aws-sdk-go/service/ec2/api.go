@@ -4,10 +4,13 @@
 package ec2
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/private/protocol"
+	"github.com/aws/aws-sdk-go/private/protocol/ec2query"
 )
 
 const opAcceptVpcPeeringConnection = "AcceptVpcPeeringConnection"
@@ -115,6 +118,8 @@ func (c *EC2) AssignPrivateIpAddressesRequest(input *AssignPrivateIpAddressesInp
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &AssignPrivateIpAddressesOutput{}
 	req.Data = output
 	return
@@ -195,6 +200,8 @@ func (c *EC2) AssociateDhcpOptionsRequest(input *AssociateDhcpOptionsInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &AssociateDhcpOptionsOutput{}
 	req.Data = output
 	return
@@ -305,6 +312,8 @@ func (c *EC2) AttachInternetGatewayRequest(input *AttachInternetGatewayInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &AttachInternetGatewayOutput{}
 	req.Data = output
 	return
@@ -381,12 +390,18 @@ func (c *EC2) AttachVolumeRequest(input *AttachVolumeInput) (req *request.Reques
 //
 // If a volume has an AWS Marketplace product code:
 //
-//  The volume can be attached only to a stopped instance. AWS Marketplace
-// product codes are copied from the volume to the instance. You must be subscribed
-// to the product. The instance type and operating system of the instance must
-// support the product. For example, you can't detach a volume from a Windows
-// instance and attach it to a Linux instance.  For an overview of the AWS Marketplace,
-// see Introducing AWS Marketplace (https://aws.amazon.com/marketplace/help/200900000).
+//   The volume can be attached only to a stopped instance.
+//
+//   AWS Marketplace product codes are copied from the volume to the instance.
+//
+//   You must be subscribed to the product.
+//
+//   The instance type and operating system of the instance must support the
+// product. For example, you can't detach a volume from a Windows instance and
+// attach it to a Linux instance.
+//
+//   For an overview of the AWS Marketplace, see Introducing AWS Marketplace
+// (https://aws.amazon.com/marketplace/help/200900000).
 //
 // For more information about EBS volumes, see Attaching Amazon EBS Volumes
 // (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-attaching-volume.html)
@@ -441,25 +456,25 @@ func (c *EC2) AuthorizeSecurityGroupEgressRequest(input *AuthorizeSecurityGroupE
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &AuthorizeSecurityGroupEgressOutput{}
 	req.Data = output
 	return
 }
 
-// Adds one or more egress rules to a security group for use with a VPC. Specifically,
-// this action permits instances to send traffic to one or more destination
-// CIDR IP address ranges, or to one or more destination security groups for
-// the same VPC.
+// [EC2-VPC only] Adds one or more egress rules to a security group for use
+// with a VPC. Specifically, this action permits instances to send traffic to
+// one or more destination CIDR IP address ranges, or to one or more destination
+// security groups for the same VPC. This action doesn't apply to security groups
+// for use in EC2-Classic. For more information, see Security Groups for Your
+// VPC (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html)
+// in the Amazon Virtual Private Cloud User Guide.
 //
 //  You can have up to 50 rules per security group (covering both ingress and
 // egress rules).
 //
-//  A security group is for use with instances either in the EC2-Classic platform
-// or in a specific VPC. This action doesn't apply to security groups for use
-// in EC2-Classic. For more information, see Security Groups for Your VPC (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html)
-// in the Amazon Virtual Private Cloud User Guide.
-//
-// Each rule consists of the protocol (for example, TCP), plus either a CIDR
+//  Each rule consists of the protocol (for example, TCP), plus either a CIDR
 // range or a source group. For the TCP and UDP protocols, you must also specify
 // the destination port or port range. For the ICMP protocol, you must also
 // specify the ICMP type and code. You can use -1 for the type or code to mean
@@ -488,6 +503,8 @@ func (c *EC2) AuthorizeSecurityGroupIngressRequest(input *AuthorizeSecurityGroup
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &AuthorizeSecurityGroupIngressOutput{}
 	req.Data = output
 	return
@@ -596,6 +613,8 @@ func (c *EC2) CancelConversionTaskRequest(input *CancelConversionTaskInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CancelConversionTaskOutput{}
 	req.Data = output
 	return
@@ -631,6 +650,8 @@ func (c *EC2) CancelExportTaskRequest(input *CancelExportTaskInput) (req *reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CancelExportTaskOutput{}
 	req.Data = output
 	return
@@ -693,7 +714,7 @@ func (c *EC2) CancelReservedInstancesListingRequest(input *CancelReservedInstanc
 	return
 }
 
-// Cancels the specified Reserved instance listing in the Reserved Instance
+// Cancels the specified Reserved Instance listing in the Reserved Instance
 // Marketplace.
 //
 // For more information, see Reserved Instance Marketplace (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-market-general.html)
@@ -825,8 +846,7 @@ func (c *EC2) CopyImageRequest(input *CopyImageInput) (req *request.Request, out
 
 // Initiates the copy of an AMI from the specified source region to the current
 // region. You specify the destination region by using its endpoint when making
-// the request. AMIs that use encrypted EBS snapshots cannot be copied with
-// this method.
+// the request.
 //
 // For more information, see Copying AMIs (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/CopyingAMIs.html)
 // in the Amazon Elastic Compute Cloud User Guide.
@@ -956,25 +976,33 @@ func (c *EC2) CreateDhcpOptionsRequest(input *CreateDhcpOptionsInput) (req *requ
 //  domain-name-servers - The IP addresses of up to four domain name servers,
 // or AmazonProvidedDNS. The default DHCP option set specifies AmazonProvidedDNS.
 // If specifying more than one domain name server, specify the IP addresses
-// in a single parameter, separated by commas. domain-name - If you're using
-// AmazonProvidedDNS in us-east-1, specify ec2.internal. If you're using AmazonProvidedDNS
-// in another region, specify region.compute.internal (for example, ap-northeast-1.compute.internal).
-// Otherwise, specify a domain name (for example, MyCompany.com). Important:
+// in a single parameter, separated by commas.
+//
+// domain-name - If you're using AmazonProvidedDNS in "us-east-1", specify
+// "ec2.internal". If you're using AmazonProvidedDNS in another region, specify
+// "region.compute.internal" (for example, "ap-northeast-1.compute.internal").
+// Otherwise, specify a domain name (for example, "MyCompany.com"). Important:
 // Some Linux operating systems accept multiple domain names separated by spaces.
 // However, Windows and other Linux operating systems treat the value as a single
 // domain, which results in unexpected behavior. If your DHCP options set is
 // associated with a VPC that has instances with multiple operating systems,
-// specify only one domain name. ntp-servers - The IP addresses of up to four
-// Network Time Protocol (NTP) servers. netbios-name-servers - The IP addresses
-// of up to four NetBIOS name servers. netbios-node-type - The NetBIOS node
-// type (1, 2, 4, or 8). We recommend that you specify 2 (broadcast and multicast
-// are not currently supported). For more information about these node types,
-// see RFC 2132 (http://www.ietf.org/rfc/rfc2132.txt).   Your VPC automatically
-// starts out with a set of DHCP options that includes only a DNS server that
-// we provide (AmazonProvidedDNS). If you create a set of options, and if your
-// VPC has an Internet gateway, make sure to set the domain-name-servers option
-// either to AmazonProvidedDNS or to a domain name server of your choice. For
-// more information about DHCP options, see DHCP Options Sets (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html)
+// specify only one domain name.
+//
+// ntp-servers - The IP addresses of up to four Network Time Protocol (NTP)
+// servers.
+//
+// netbios-name-servers - The IP addresses of up to four NetBIOS name servers.
+//
+// netbios-node-type - The NetBIOS node type (1, 2, 4, or 8). We recommend
+// that you specify 2 (broadcast and multicast are not currently supported).
+// For more information about these node types, see RFC 2132 (http://www.ietf.org/rfc/rfc2132.txt).
+//
+//  Your VPC automatically starts out with a set of DHCP options that includes
+// only a DNS server that we provide (AmazonProvidedDNS). If you create a set
+// of options, and if your VPC has an Internet gateway, make sure to set the
+// domain-name-servers option either to AmazonProvidedDNS or to a domain name
+// server of your choice. For more information about DHCP options, see DHCP
+// Options Sets (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html)
 // in the Amazon Virtual Private Cloud User Guide.
 func (c *EC2) CreateDhcpOptions(input *CreateDhcpOptionsInput) (*CreateDhcpOptionsOutput, error) {
 	req, out := c.CreateDhcpOptionsRequest(input)
@@ -1155,6 +1183,38 @@ func (c *EC2) CreateKeyPair(input *CreateKeyPairInput) (*CreateKeyPairOutput, er
 	return out, err
 }
 
+const opCreateNatGateway = "CreateNatGateway"
+
+// CreateNatGatewayRequest generates a request for the CreateNatGateway operation.
+func (c *EC2) CreateNatGatewayRequest(input *CreateNatGatewayInput) (req *request.Request, output *CreateNatGatewayOutput) {
+	op := &request.Operation{
+		Name:       opCreateNatGateway,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &CreateNatGatewayInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &CreateNatGatewayOutput{}
+	req.Data = output
+	return
+}
+
+// Creates a NAT gateway in the specified subnet. A NAT gateway can be used
+// to enable instances in a private subnet to connect to the Internet. This
+// action creates a network interface in the specified subnet with a private
+// IP address from the IP address range of the subnet. For more information,
+// see NAT Gateways (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html)
+// in the Amazon Virtual Private Cloud User Guide.
+func (c *EC2) CreateNatGateway(input *CreateNatGatewayInput) (*CreateNatGatewayOutput, error) {
+	req, out := c.CreateNatGatewayRequest(input)
+	err := req.Send()
+	return out, err
+}
+
 const opCreateNetworkAcl = "CreateNetworkAcl"
 
 // CreateNetworkAclRequest generates a request for the CreateNetworkAcl operation.
@@ -1201,6 +1261,8 @@ func (c *EC2) CreateNetworkAclEntryRequest(input *CreateNetworkAclEntryInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CreateNetworkAclEntryOutput{}
 	req.Data = output
 	return
@@ -1275,6 +1337,8 @@ func (c *EC2) CreatePlacementGroupRequest(input *CreatePlacementGroupInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CreatePlacementGroupOutput{}
 	req.Data = output
 	return
@@ -1312,22 +1376,22 @@ func (c *EC2) CreateReservedInstancesListingRequest(input *CreateReservedInstanc
 	return
 }
 
-// Creates a listing for Amazon EC2 Reserved instances to be sold in the Reserved
-// Instance Marketplace. You can submit one Reserved instance listing at a time.
-// To get a list of your Reserved instances, you can use the DescribeReservedInstances
+// Creates a listing for Amazon EC2 Reserved Instances to be sold in the Reserved
+// Instance Marketplace. You can submit one Reserved Instance listing at a time.
+// To get a list of your Reserved Instances, you can use the DescribeReservedInstances
 // operation.
 //
 // The Reserved Instance Marketplace matches sellers who want to resell Reserved
-// instance capacity that they no longer need with buyers who want to purchase
-// additional capacity. Reserved instances bought and sold through the Reserved
-// Instance Marketplace work like any other Reserved instances.
+// Instance capacity that they no longer need with buyers who want to purchase
+// additional capacity. Reserved Instances bought and sold through the Reserved
+// Instance Marketplace work like any other Reserved Instances.
 //
-// To sell your Reserved instances, you must first register as a seller in
+// To sell your Reserved Instances, you must first register as a seller in
 // the Reserved Instance Marketplace. After completing the registration process,
 // you can create a Reserved Instance Marketplace listing of some or all of
 // your Reserved Instances, and specify the upfront price to receive for them.
-// Your Reserved instance listings then become available for purchase. To view
-// the details of your Reserved instance listing, you can use the DescribeReservedInstancesListings
+// Your Reserved Instance listings then become available for purchase. To view
+// the details of your Reserved Instance listing, you can use the DescribeReservedInstancesListings
 // operation.
 //
 // For more information, see Reserved Instance Marketplace (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-market-general.html)
@@ -1361,7 +1425,8 @@ func (c *EC2) CreateRouteRequest(input *CreateRouteInput) (req *request.Request,
 // Creates a route in a route table within a VPC.
 //
 // You must specify one of the following targets: Internet gateway or virtual
-// private gateway, NAT instance, VPC peering connection, or network interface.
+// private gateway, NAT instance, NAT gateway, VPC peering connection, or network
+// interface.
 //
 // When determining how to route traffic, we use the route with the most specific
 // match. For example, let's say the traffic is destined for 192.0.2.3, and
@@ -1445,7 +1510,7 @@ func (c *EC2) CreateSecurityGroupRequest(input *CreateSecurityGroupInput) (req *
 //
 //  EC2-Classic: You can have up to 500 security groups.
 //
-// EC2-VPC: You can create up to 100 security groups per VPC.
+// EC2-VPC: You can create up to 500 security groups per VPC.
 //
 //  When you create a security group, you specify a friendly name of your choice.
 // You can have a security group for use in EC2-Classic with the same name as
@@ -1617,6 +1682,8 @@ func (c *EC2) CreateTagsRequest(input *CreateTagsInput) (req *request.Request, o
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CreateTagsOutput{}
 	req.Data = output
 	return
@@ -1709,6 +1776,11 @@ func (c *EC2) CreateVpcRequest(input *CreateVpcInput) (req *request.Request, out
 // By default, each instance you launch in the VPC has the default DHCP options,
 // which includes only a default DNS server that we provide (AmazonProvidedDNS).
 // For more information about DHCP options, see DHCP Options Sets (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html)
+// in the Amazon Virtual Private Cloud User Guide.
+//
+// You can specify the instance tenancy value for the VPC when you create it.
+// You can't change this value for the VPC after you create it. For more information,
+// see Dedicated Instances (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/dedicated-instance.html.html)
 // in the Amazon Virtual Private Cloud User Guide.
 func (c *EC2) CreateVpc(input *CreateVpcInput) (*CreateVpcOutput, error) {
 	req, out := c.CreateVpcRequest(input)
@@ -1820,6 +1892,9 @@ func (c *EC2) CreateVpnConnectionRequest(input *CreateVpnConnectionInput) (req *
 // create a new VPN connection, you must reconfigure your customer gateway with
 // the new information returned from this call.
 //
+// This is an idempotent operation. If you perform the operation more than
+// once, Amazon EC2 doesn't return an error.
+//
 // For more information about VPN connections, see Adding a Hardware Virtual
 // Private Gateway to Your VPC (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_VPN.html)
 // in the Amazon Virtual Private Cloud User Guide.
@@ -1844,6 +1919,8 @@ func (c *EC2) CreateVpnConnectionRouteRequest(input *CreateVpnConnectionRouteInp
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &CreateVpnConnectionRouteOutput{}
 	req.Data = output
 	return
@@ -1911,6 +1988,8 @@ func (c *EC2) DeleteCustomerGatewayRequest(input *DeleteCustomerGatewayInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteCustomerGatewayOutput{}
 	req.Data = output
 	return
@@ -1939,6 +2018,8 @@ func (c *EC2) DeleteDhcpOptionsRequest(input *DeleteDhcpOptionsInput) (req *requ
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteDhcpOptionsOutput{}
 	req.Data = output
 	return
@@ -1996,6 +2077,8 @@ func (c *EC2) DeleteInternetGatewayRequest(input *DeleteInternetGatewayInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteInternetGatewayOutput{}
 	req.Data = output
 	return
@@ -2024,6 +2107,8 @@ func (c *EC2) DeleteKeyPairRequest(input *DeleteKeyPairInput) (req *request.Requ
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteKeyPairOutput{}
 	req.Data = output
 	return
@@ -2032,6 +2117,35 @@ func (c *EC2) DeleteKeyPairRequest(input *DeleteKeyPairInput) (req *request.Requ
 // Deletes the specified key pair, by removing the public key from Amazon EC2.
 func (c *EC2) DeleteKeyPair(input *DeleteKeyPairInput) (*DeleteKeyPairOutput, error) {
 	req, out := c.DeleteKeyPairRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opDeleteNatGateway = "DeleteNatGateway"
+
+// DeleteNatGatewayRequest generates a request for the DeleteNatGateway operation.
+func (c *EC2) DeleteNatGatewayRequest(input *DeleteNatGatewayInput) (req *request.Request, output *DeleteNatGatewayOutput) {
+	op := &request.Operation{
+		Name:       opDeleteNatGateway,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DeleteNatGatewayInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DeleteNatGatewayOutput{}
+	req.Data = output
+	return
+}
+
+// Deletes the specified NAT gateway. Deleting a NAT gateway disassociates its
+// Elastic IP address, but does not release the address from your account. Deleting
+// a NAT gateway does not delete any NAT gateway routes in your route tables.
+func (c *EC2) DeleteNatGateway(input *DeleteNatGatewayInput) (*DeleteNatGatewayOutput, error) {
+	req, out := c.DeleteNatGatewayRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -2051,6 +2165,8 @@ func (c *EC2) DeleteNetworkAclRequest(input *DeleteNetworkAclInput) (req *reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteNetworkAclOutput{}
 	req.Data = output
 	return
@@ -2079,6 +2195,8 @@ func (c *EC2) DeleteNetworkAclEntryRequest(input *DeleteNetworkAclEntryInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteNetworkAclEntryOutput{}
 	req.Data = output
 	return
@@ -2107,6 +2225,8 @@ func (c *EC2) DeleteNetworkInterfaceRequest(input *DeleteNetworkInterfaceInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteNetworkInterfaceOutput{}
 	req.Data = output
 	return
@@ -2135,6 +2255,8 @@ func (c *EC2) DeletePlacementGroupRequest(input *DeletePlacementGroupInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeletePlacementGroupOutput{}
 	req.Data = output
 	return
@@ -2165,6 +2287,8 @@ func (c *EC2) DeleteRouteRequest(input *DeleteRouteInput) (req *request.Request,
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteRouteOutput{}
 	req.Data = output
 	return
@@ -2192,6 +2316,8 @@ func (c *EC2) DeleteRouteTableRequest(input *DeleteRouteTableInput) (req *reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteRouteTableOutput{}
 	req.Data = output
 	return
@@ -2221,6 +2347,8 @@ func (c *EC2) DeleteSecurityGroupRequest(input *DeleteSecurityGroupInput) (req *
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteSecurityGroupOutput{}
 	req.Data = output
 	return
@@ -2252,6 +2380,8 @@ func (c *EC2) DeleteSnapshotRequest(input *DeleteSnapshotInput) (req *request.Re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteSnapshotOutput{}
 	req.Data = output
 	return
@@ -2293,6 +2423,8 @@ func (c *EC2) DeleteSpotDatafeedSubscriptionRequest(input *DeleteSpotDatafeedSub
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteSpotDatafeedSubscriptionOutput{}
 	req.Data = output
 	return
@@ -2320,6 +2452,8 @@ func (c *EC2) DeleteSubnetRequest(input *DeleteSubnetInput) (req *request.Reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteSubnetOutput{}
 	req.Data = output
 	return
@@ -2348,6 +2482,8 @@ func (c *EC2) DeleteTagsRequest(input *DeleteTagsInput) (req *request.Request, o
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteTagsOutput{}
 	req.Data = output
 	return
@@ -2379,6 +2515,8 @@ func (c *EC2) DeleteVolumeRequest(input *DeleteVolumeInput) (req *request.Reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteVolumeOutput{}
 	req.Data = output
 	return
@@ -2412,6 +2550,8 @@ func (c *EC2) DeleteVpcRequest(input *DeleteVpcInput) (req *request.Request, out
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteVpcOutput{}
 	req.Data = output
 	return
@@ -2501,6 +2641,8 @@ func (c *EC2) DeleteVpnConnectionRequest(input *DeleteVpnConnectionInput) (req *
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteVpnConnectionOutput{}
 	req.Data = output
 	return
@@ -2537,6 +2679,8 @@ func (c *EC2) DeleteVpnConnectionRouteRequest(input *DeleteVpnConnectionRouteInp
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteVpnConnectionRouteOutput{}
 	req.Data = output
 	return
@@ -2567,6 +2711,8 @@ func (c *EC2) DeleteVpnGatewayRequest(input *DeleteVpnGatewayInput) (req *reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeleteVpnGatewayOutput{}
 	req.Data = output
 	return
@@ -2598,6 +2744,8 @@ func (c *EC2) DeregisterImageRequest(input *DeregisterImageInput) (req *request.
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DeregisterImageOutput{}
 	req.Data = output
 	return
@@ -2808,6 +2956,9 @@ func (c *EC2) DescribeConversionTasksRequest(input *DescribeConversionTasksInput
 // Using the Command Line Tools to Import Your Virtual Machine to Amazon EC2
 // (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UploadingYourInstancesandVolumes.html)
 // in the Amazon Elastic Compute Cloud User Guide.
+//
+// For information about the import manifest referenced by this API action,
+// see VM Import Manifest (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/manifest.html).
 func (c *EC2) DescribeConversionTasks(input *DescribeConversionTasksInput) (*DescribeConversionTasksOutput, error) {
 	req, out := c.DescribeConversionTasksRequest(input)
 	err := req.Send()
@@ -2955,7 +3106,7 @@ func (c *EC2) DescribeHostsRequest(input *DescribeHostsInput) (req *request.Requ
 //
 // The results describe only the Dedicated hosts in the region you're currently
 // using. All listed instances consume capacity on your Dedicated host. Dedicated
-// hosts that have recently been released will be listed with the status "released".
+// hosts that have recently been released will be listed with the state released.
 func (c *EC2) DescribeHosts(input *DescribeHostsInput) (*DescribeHostsOutput, error) {
 	req, out := c.DescribeHostsRequest(input)
 	err := req.Send()
@@ -2982,21 +3133,21 @@ func (c *EC2) DescribeIdFormatRequest(input *DescribeIdFormatInput) (req *reques
 	return
 }
 
-// Important: This command is reserved for future use, and is currently not
-// available for you to use.
+// Describes the ID format settings for your resources on a per-region basis,
+// for example, to view which resource types are enabled for longer IDs. This
+// request only returns information about resource types whose ID formats can
+// be modified; it does not return information about other resource types.
 //
-// Describes the ID format settings for your resources, for example, to view
-// which resource types are enabled for longer IDs. This request only returns
-// information about resource types whose ID formats can be modified; it does
-// not return information about other resource types.
-//
-// The following resource types support longer IDs: instance | reservation.
+// The following resource types support longer IDs: instance | reservation
+// | snapshot | volume.
 //
 // These settings apply to the IAM user who makes the request; they do not
 // apply to the entire AWS account. By default, an IAM user defaults to the
 // same settings as the root user, unless they explicitly override the settings
-// by running the ModifyIdFormat command. These settings are applied on a per-region
-// basis.
+// by running the ModifyIdFormat command. Resources created with longer IDs
+// are visible to all IAM users, regardless of these settings and provided that
+// they have permission to use the relevant Describe command for the resource
+// type.
 func (c *EC2) DescribeIdFormat(input *DescribeIdFormatInput) (*DescribeIdFormatOutput, error) {
 	req, out := c.DescribeIdFormatRequest(input)
 	err := req.Send()
@@ -3176,7 +3327,8 @@ func (c *EC2) DescribeInstanceStatusRequest(input *DescribeInstanceStatusInput) 
 	return
 }
 
-// Describes the status of one or more instances.
+// Describes the status of one or more instances. By default, only running instances
+// are described, unless specified otherwise.
 //
 // Instance status includes the following components:
 //
@@ -3342,6 +3494,33 @@ func (c *EC2) DescribeMovingAddressesRequest(input *DescribeMovingAddressesInput
 // not return information about any other Elastic IP addresses in your account.
 func (c *EC2) DescribeMovingAddresses(input *DescribeMovingAddressesInput) (*DescribeMovingAddressesOutput, error) {
 	req, out := c.DescribeMovingAddressesRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opDescribeNatGateways = "DescribeNatGateways"
+
+// DescribeNatGatewaysRequest generates a request for the DescribeNatGateways operation.
+func (c *EC2) DescribeNatGatewaysRequest(input *DescribeNatGatewaysInput) (req *request.Request, output *DescribeNatGatewaysOutput) {
+	op := &request.Operation{
+		Name:       opDescribeNatGateways,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeNatGatewaysInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeNatGatewaysOutput{}
+	req.Data = output
+	return
+}
+
+// Describes one or more of the your NAT gateways.
+func (c *EC2) DescribeNatGateways(input *DescribeNatGatewaysInput) (*DescribeNatGatewaysOutput, error) {
+	req, out := c.DescribeNatGatewaysRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -3541,9 +3720,9 @@ func (c *EC2) DescribeReservedInstancesRequest(input *DescribeReservedInstancesI
 	return
 }
 
-// Describes one or more of the Reserved instances that you purchased.
+// Describes one or more of the Reserved Instances that you purchased.
 //
-// For more information about Reserved instances, see Reserved Instances (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts-on-demand-reserved-instances.html)
+// For more information about Reserved Instances, see Reserved Instances (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts-on-demand-reserved-instances.html)
 // in the Amazon Elastic Compute Cloud User Guide.
 func (c *EC2) DescribeReservedInstances(input *DescribeReservedInstancesInput) (*DescribeReservedInstancesOutput, error) {
 	req, out := c.DescribeReservedInstancesRequest(input)
@@ -3571,22 +3750,22 @@ func (c *EC2) DescribeReservedInstancesListingsRequest(input *DescribeReservedIn
 	return
 }
 
-// Describes your account's Reserved instance listings in the Reserved Instance
+// Describes your account's Reserved Instance listings in the Reserved Instance
 // Marketplace.
 //
 // The Reserved Instance Marketplace matches sellers who want to resell Reserved
-// instance capacity that they no longer need with buyers who want to purchase
-// additional capacity. Reserved instances bought and sold through the Reserved
+// Instance capacity that they no longer need with buyers who want to purchase
+// additional capacity. Reserved Instances bought and sold through the Reserved
 // Instance Marketplace work like any other Reserved Instances.
 //
-// As a seller, you choose to list some or all of your Reserved instances,
-// and you specify the upfront price to receive for them. Your Reserved instances
+// As a seller, you choose to list some or all of your Reserved Instances,
+// and you specify the upfront price to receive for them. Your Reserved Instances
 // are then listed in the Reserved Instance Marketplace and are available for
 // purchase.
 //
-// As a buyer, you specify the configuration of the Reserved instance to purchase,
+// As a buyer, you specify the configuration of the Reserved Instance to purchase,
 // and the Marketplace matches what you're searching for with what's available.
-// The Marketplace first sells the lowest priced Reserved instances to you,
+// The Marketplace first sells the lowest priced Reserved Instances to you,
 // and continues to sell available Reserved Instance listings to you until your
 // demand is met. You are charged based on the total price of all of the listings
 // that you purchase.
@@ -3625,7 +3804,7 @@ func (c *EC2) DescribeReservedInstancesModificationsRequest(input *DescribeReser
 	return
 }
 
-// Describes the modifications made to your Reserved instances. If no parameter
+// Describes the modifications made to your Reserved Instances. If no parameter
 // is specified, information about all your Reserved Instances modification
 // requests is returned. If a modification ID is specified, only information
 // about the specific modification is returned.
@@ -3672,11 +3851,15 @@ func (c *EC2) DescribeReservedInstancesOfferingsRequest(input *DescribeReservedI
 	return
 }
 
-// Describes Reserved instance offerings that are available for purchase. With
-// Reserved instances, you purchase the right to launch instances for a period
+// Describes Reserved Instance offerings that are available for purchase. With
+// Reserved Instances, you purchase the right to launch instances for a period
 // of time. During that time period, you do not receive insufficient capacity
 // errors, and you pay a lower usage rate than the rate charged for On-Demand
 // instances for the actual time used.
+//
+// If you have listed your own Reserved Instances for sale in the Reserved
+// Instance Marketplace, they will be excluded from these results. This is to
+// ensure that you do not purchase your own Reserved Instances.
 //
 // For more information, see Reserved Instance Marketplace (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-market-general.html)
 // in the Amazon Elastic Compute Cloud User Guide.
@@ -3725,6 +3908,96 @@ func (c *EC2) DescribeRouteTablesRequest(input *DescribeRouteTablesInput) (req *
 // in the Amazon Virtual Private Cloud User Guide.
 func (c *EC2) DescribeRouteTables(input *DescribeRouteTablesInput) (*DescribeRouteTablesOutput, error) {
 	req, out := c.DescribeRouteTablesRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opDescribeScheduledInstanceAvailability = "DescribeScheduledInstanceAvailability"
+
+// DescribeScheduledInstanceAvailabilityRequest generates a request for the DescribeScheduledInstanceAvailability operation.
+func (c *EC2) DescribeScheduledInstanceAvailabilityRequest(input *DescribeScheduledInstanceAvailabilityInput) (req *request.Request, output *DescribeScheduledInstanceAvailabilityOutput) {
+	op := &request.Operation{
+		Name:       opDescribeScheduledInstanceAvailability,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeScheduledInstanceAvailabilityInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeScheduledInstanceAvailabilityOutput{}
+	req.Data = output
+	return
+}
+
+// Finds available schedules that meet the specified criteria.
+//
+// You can search for an available schedule no more than 3 months in advance.
+// You must meet the minimum required duration of 1,200 hours per year. For
+// example, the minimum daily schedule is 4 hours, the minimum weekly schedule
+// is 24 hours, and the minimum monthly schedule is 100 hours.
+//
+// After you find a schedule that meets your needs, call PurchaseScheduledInstances
+// to purchase Scheduled Instances with that schedule.
+func (c *EC2) DescribeScheduledInstanceAvailability(input *DescribeScheduledInstanceAvailabilityInput) (*DescribeScheduledInstanceAvailabilityOutput, error) {
+	req, out := c.DescribeScheduledInstanceAvailabilityRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opDescribeScheduledInstances = "DescribeScheduledInstances"
+
+// DescribeScheduledInstancesRequest generates a request for the DescribeScheduledInstances operation.
+func (c *EC2) DescribeScheduledInstancesRequest(input *DescribeScheduledInstancesInput) (req *request.Request, output *DescribeScheduledInstancesOutput) {
+	op := &request.Operation{
+		Name:       opDescribeScheduledInstances,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeScheduledInstancesInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeScheduledInstancesOutput{}
+	req.Data = output
+	return
+}
+
+// Describes one or more of your Scheduled Instances.
+func (c *EC2) DescribeScheduledInstances(input *DescribeScheduledInstancesInput) (*DescribeScheduledInstancesOutput, error) {
+	req, out := c.DescribeScheduledInstancesRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opDescribeSecurityGroupReferences = "DescribeSecurityGroupReferences"
+
+// DescribeSecurityGroupReferencesRequest generates a request for the DescribeSecurityGroupReferences operation.
+func (c *EC2) DescribeSecurityGroupReferencesRequest(input *DescribeSecurityGroupReferencesInput) (req *request.Request, output *DescribeSecurityGroupReferencesOutput) {
+	op := &request.Operation{
+		Name:       opDescribeSecurityGroupReferences,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeSecurityGroupReferencesInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeSecurityGroupReferencesOutput{}
+	req.Data = output
+	return
+}
+
+// [EC2-VPC only] Describes the VPCs on the other side of a VPC peering connection
+// that are referencing the security groups you've specified in this request.
+func (c *EC2) DescribeSecurityGroupReferences(input *DescribeSecurityGroupReferencesInput) (*DescribeSecurityGroupReferencesOutput, error) {
+	req, out := c.DescribeSecurityGroupReferencesRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -3827,14 +4100,20 @@ func (c *EC2) DescribeSnapshotsRequest(input *DescribeSnapshotsInput) (req *requ
 //
 // The create volume permissions fall into the following categories:
 //
-//  public: The owner of the snapshot granted create volume permissions for
+//   public: The owner of the snapshot granted create volume permissions for
 // the snapshot to the all group. All AWS accounts have create volume permissions
-// for these snapshots. explicit: The owner of the snapshot granted create volume
-// permissions to a specific AWS account. implicit: An AWS account has implicit
-// create volume permissions for all snapshots it owns.  The list of snapshots
-// returned can be modified by specifying snapshot IDs, snapshot owners, or
-// AWS accounts with create volume permissions. If no options are specified,
-// Amazon EC2 returns all snapshots for which you have create volume permissions.
+// for these snapshots.
+//
+//   explicit: The owner of the snapshot granted create volume permissions
+// to a specific AWS account.
+//
+//   implicit: An AWS account has implicit create volume permissions for all
+// snapshots it owns.
+//
+//   The list of snapshots returned can be modified by specifying snapshot
+// IDs, snapshot owners, or AWS accounts with create volume permissions. If
+// no options are specified, Amazon EC2 returns all snapshots for which you
+// have create volume permissions.
 //
 // If you specify one or more snapshot IDs, only snapshots that have the specified
 // IDs are returned. If you specify an invalid snapshot ID, an error is returned.
@@ -4074,6 +4353,36 @@ func (c *EC2) DescribeSpotPriceHistoryPages(input *DescribeSpotPriceHistoryInput
 	return page.EachPage(func(p interface{}, lastPage bool) bool {
 		return fn(p.(*DescribeSpotPriceHistoryOutput), lastPage)
 	})
+}
+
+const opDescribeStaleSecurityGroups = "DescribeStaleSecurityGroups"
+
+// DescribeStaleSecurityGroupsRequest generates a request for the DescribeStaleSecurityGroups operation.
+func (c *EC2) DescribeStaleSecurityGroupsRequest(input *DescribeStaleSecurityGroupsInput) (req *request.Request, output *DescribeStaleSecurityGroupsOutput) {
+	op := &request.Operation{
+		Name:       opDescribeStaleSecurityGroups,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeStaleSecurityGroupsInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeStaleSecurityGroupsOutput{}
+	req.Data = output
+	return
+}
+
+// [EC2-VPC only] Describes the stale security group rules for security groups
+// in a specified VPC. Rules are stale when they reference a deleted security
+// group in a peer VPC, or a security group in a peer VPC for which the VPC
+// peering connection has been deleted.
+func (c *EC2) DescribeStaleSecurityGroups(input *DescribeStaleSecurityGroupsInput) (*DescribeStaleSecurityGroupsOutput, error) {
+	req, out := c.DescribeStaleSecurityGroupsRequest(input)
+	err := req.Send()
+	return out, err
 }
 
 const opDescribeSubnets = "DescribeSubnets"
@@ -4362,6 +4671,39 @@ func (c *EC2) DescribeVpcClassicLink(input *DescribeVpcClassicLinkInput) (*Descr
 	return out, err
 }
 
+const opDescribeVpcClassicLinkDnsSupport = "DescribeVpcClassicLinkDnsSupport"
+
+// DescribeVpcClassicLinkDnsSupportRequest generates a request for the DescribeVpcClassicLinkDnsSupport operation.
+func (c *EC2) DescribeVpcClassicLinkDnsSupportRequest(input *DescribeVpcClassicLinkDnsSupportInput) (req *request.Request, output *DescribeVpcClassicLinkDnsSupportOutput) {
+	op := &request.Operation{
+		Name:       opDescribeVpcClassicLinkDnsSupport,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DescribeVpcClassicLinkDnsSupportInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DescribeVpcClassicLinkDnsSupportOutput{}
+	req.Data = output
+	return
+}
+
+// Describes the ClassicLink DNS support status of one or more VPCs. If enabled,
+// the DNS hostname of a linked EC2-Classic instance resolves to its private
+// IP address when addressed from an instance in the VPC to which it's linked.
+// Similarly, the DNS hostname of an instance in a VPC resolves to its private
+// IP address when addressed from a linked EC2-Classic instance. For more information
+// about ClassicLink, see ClassicLink (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/vpc-classiclink.html)
+// in the Amazon Elastic Compute Cloud User Guide.
+func (c *EC2) DescribeVpcClassicLinkDnsSupport(input *DescribeVpcClassicLinkDnsSupportInput) (*DescribeVpcClassicLinkDnsSupportOutput, error) {
+	req, out := c.DescribeVpcClassicLinkDnsSupportRequest(input)
+	err := req.Send()
+	return out, err
+}
+
 const opDescribeVpcEndpointServices = "DescribeVpcEndpointServices"
 
 // DescribeVpcEndpointServicesRequest generates a request for the DescribeVpcEndpointServices operation.
@@ -4577,6 +4919,8 @@ func (c *EC2) DetachInternetGatewayRequest(input *DetachInternetGatewayInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DetachInternetGatewayOutput{}
 	req.Data = output
 	return
@@ -4606,6 +4950,8 @@ func (c *EC2) DetachNetworkInterfaceRequest(input *DetachNetworkInterfaceInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DetachNetworkInterfaceOutput{}
 	req.Data = output
 	return
@@ -4672,6 +5018,8 @@ func (c *EC2) DetachVpnGatewayRequest(input *DetachVpnGatewayInput) (req *reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DetachVpnGatewayOutput{}
 	req.Data = output
 	return
@@ -4706,6 +5054,8 @@ func (c *EC2) DisableVgwRoutePropagationRequest(input *DisableVgwRoutePropagatio
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DisableVgwRoutePropagationOutput{}
 	req.Data = output
 	return
@@ -4747,6 +5097,37 @@ func (c *EC2) DisableVpcClassicLink(input *DisableVpcClassicLinkInput) (*Disable
 	return out, err
 }
 
+const opDisableVpcClassicLinkDnsSupport = "DisableVpcClassicLinkDnsSupport"
+
+// DisableVpcClassicLinkDnsSupportRequest generates a request for the DisableVpcClassicLinkDnsSupport operation.
+func (c *EC2) DisableVpcClassicLinkDnsSupportRequest(input *DisableVpcClassicLinkDnsSupportInput) (req *request.Request, output *DisableVpcClassicLinkDnsSupportOutput) {
+	op := &request.Operation{
+		Name:       opDisableVpcClassicLinkDnsSupport,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &DisableVpcClassicLinkDnsSupportInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &DisableVpcClassicLinkDnsSupportOutput{}
+	req.Data = output
+	return
+}
+
+// Disables ClassicLink DNS support for a VPC. If disabled, DNS hostnames resolve
+// to public IP addresses when addressed between a linked EC2-Classic instance
+// and instances in the VPC to which it's linked. For more information about
+// ClassicLink, see ClassicLink (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/vpc-classiclink.html)
+// in the Amazon Elastic Compute Cloud User Guide.
+func (c *EC2) DisableVpcClassicLinkDnsSupport(input *DisableVpcClassicLinkDnsSupportInput) (*DisableVpcClassicLinkDnsSupportOutput, error) {
+	req, out := c.DisableVpcClassicLinkDnsSupportRequest(input)
+	err := req.Send()
+	return out, err
+}
+
 const opDisassociateAddress = "DisassociateAddress"
 
 // DisassociateAddressRequest generates a request for the DisassociateAddress operation.
@@ -4762,6 +5143,8 @@ func (c *EC2) DisassociateAddressRequest(input *DisassociateAddressInput) (req *
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DisassociateAddressOutput{}
 	req.Data = output
 	return
@@ -4797,6 +5180,8 @@ func (c *EC2) DisassociateRouteTableRequest(input *DisassociateRouteTableInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &DisassociateRouteTableOutput{}
 	req.Data = output
 	return
@@ -4829,6 +5214,8 @@ func (c *EC2) EnableVgwRoutePropagationRequest(input *EnableVgwRoutePropagationI
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &EnableVgwRoutePropagationOutput{}
 	req.Data = output
 	return
@@ -4857,6 +5244,8 @@ func (c *EC2) EnableVolumeIORequest(input *EnableVolumeIOInput) (req *request.Re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &EnableVolumeIOOutput{}
 	req.Data = output
 	return
@@ -4903,6 +5292,39 @@ func (c *EC2) EnableVpcClassicLink(input *EnableVpcClassicLinkInput) (*EnableVpc
 	return out, err
 }
 
+const opEnableVpcClassicLinkDnsSupport = "EnableVpcClassicLinkDnsSupport"
+
+// EnableVpcClassicLinkDnsSupportRequest generates a request for the EnableVpcClassicLinkDnsSupport operation.
+func (c *EC2) EnableVpcClassicLinkDnsSupportRequest(input *EnableVpcClassicLinkDnsSupportInput) (req *request.Request, output *EnableVpcClassicLinkDnsSupportOutput) {
+	op := &request.Operation{
+		Name:       opEnableVpcClassicLinkDnsSupport,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &EnableVpcClassicLinkDnsSupportInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &EnableVpcClassicLinkDnsSupportOutput{}
+	req.Data = output
+	return
+}
+
+// Enables a VPC to support DNS hostname resolution for ClassicLink. If enabled,
+// the DNS hostname of a linked EC2-Classic instance resolves to its private
+// IP address when addressed from an instance in the VPC to which it's linked.
+// Similarly, the DNS hostname of an instance in a VPC resolves to its private
+// IP address when addressed from a linked EC2-Classic instance. For more information
+// about ClassicLink, see ClassicLink (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/vpc-classiclink.html)
+// in the Amazon Elastic Compute Cloud User Guide.
+func (c *EC2) EnableVpcClassicLinkDnsSupport(input *EnableVpcClassicLinkDnsSupportInput) (*EnableVpcClassicLinkDnsSupportOutput, error) {
+	req, out := c.EnableVpcClassicLinkDnsSupportRequest(input)
+	err := req.Send()
+	return out, err
+}
+
 const opGetConsoleOutput = "GetConsoleOutput"
 
 // GetConsoleOutputRequest generates a request for the GetConsoleOutput operation.
@@ -4943,6 +5365,36 @@ func (c *EC2) GetConsoleOutputRequest(input *GetConsoleOutputInput) (req *reques
 // the EC2Config service.
 func (c *EC2) GetConsoleOutput(input *GetConsoleOutputInput) (*GetConsoleOutputOutput, error) {
 	req, out := c.GetConsoleOutputRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opGetConsoleScreenshot = "GetConsoleScreenshot"
+
+// GetConsoleScreenshotRequest generates a request for the GetConsoleScreenshot operation.
+func (c *EC2) GetConsoleScreenshotRequest(input *GetConsoleScreenshotInput) (req *request.Request, output *GetConsoleScreenshotOutput) {
+	op := &request.Operation{
+		Name:       opGetConsoleScreenshot,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &GetConsoleScreenshotInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &GetConsoleScreenshotOutput{}
+	req.Data = output
+	return
+}
+
+// Retrieve a JPG-format screenshot of an instance to help with troubleshooting.
+//
+// For API calls, the returned content is base64-encoded. For command line
+// tools, the decoding is performed for you.
+func (c *EC2) GetConsoleScreenshot(input *GetConsoleScreenshotInput) (*GetConsoleScreenshotOutput, error) {
+	req, out := c.GetConsoleScreenshotRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -5042,6 +5494,9 @@ func (c *EC2) ImportInstanceRequest(input *ImportInstanceInput) (req *request.Re
 // see Using the Command Line Tools to Import Your Virtual Machine to Amazon
 // EC2 (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UploadingYourInstancesandVolumes.html)
 // in the Amazon Elastic Compute Cloud User Guide.
+//
+// For information about the import manifest referenced by this API action,
+// see VM Import Manifest (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/manifest.html).
 func (c *EC2) ImportInstance(input *ImportInstanceInput) (*ImportInstanceOutput, error) {
 	req, out := c.ImportInstanceRequest(input)
 	err := req.Send()
@@ -5135,6 +5590,9 @@ func (c *EC2) ImportVolumeRequest(input *ImportVolumeInput) (req *request.Reques
 // see Using the Command Line Tools to Import Your Virtual Machine to Amazon
 // EC2 (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UploadingYourInstancesandVolumes.html)
 // in the Amazon Elastic Compute Cloud User Guide.
+//
+// For information about the import manifest referenced by this API action,
+// see VM Import Manifest (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/manifest.html).
 func (c *EC2) ImportVolume(input *ImportVolumeInput) (*ImportVolumeOutput, error) {
 	req, out := c.ImportVolumeRequest(input)
 	err := req.Send()
@@ -5189,22 +5647,30 @@ func (c *EC2) ModifyIdFormatRequest(input *ModifyIdFormatInput) (req *request.Re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyIdFormatOutput{}
 	req.Data = output
 	return
 }
 
-// Important: This command is reserved for future use, and is currently not
-// available for you to use.
-//
-// Modifies the ID format for the specified resource. You can specify that
-// resources should receive longer IDs (17-character IDs) when they are created.
-// The following resource types support longer IDs: instance | reservation.
+// Modifies the ID format for the specified resource on a per-region basis.
+// You can specify that resources should receive longer IDs (17-character IDs)
+// when they are created. The following resource types support longer IDs: instance
+// | reservation | snapshot | volume.
 //
 // This setting applies to the IAM user who makes the request; it does not
 // apply to the entire AWS account. By default, an IAM user defaults to the
-// same settings as the root user, unless they explicitly override the settings
-// by running this request. These settings are applied on a per-region basis.
+// same settings as the root user. If you're using this action as the root user
+// or as an IAM role that has permission to use this action, then these settings
+// apply to the entire account, unless an IAM user explicitly overrides these
+// settings for themselves. For more information, see Controlling Access to
+// Longer ID Settings (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resource-ids.html#resource-ids-access)
+// in the Amazon Elastic Compute Cloud User Guide.
+//
+// Resources created with longer IDs are visible to all IAM users, regardless
+// of these settings and provided that they have permission to use the relevant
+// Describe command for the resource type.
 func (c *EC2) ModifyIdFormat(input *ModifyIdFormatInput) (*ModifyIdFormatOutput, error) {
 	req, out := c.ModifyIdFormatRequest(input)
 	err := req.Send()
@@ -5226,6 +5692,8 @@ func (c *EC2) ModifyImageAttributeRequest(input *ModifyImageAttributeInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyImageAttributeOutput{}
 	req.Data = output
 	return
@@ -5257,6 +5725,8 @@ func (c *EC2) ModifyInstanceAttributeRequest(input *ModifyInstanceAttributeInput
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyInstanceAttributeOutput{}
 	req.Data = output
 	return
@@ -5334,6 +5804,8 @@ func (c *EC2) ModifyNetworkInterfaceAttributeRequest(input *ModifyNetworkInterfa
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyNetworkInterfaceAttributeOutput{}
 	req.Data = output
 	return
@@ -5395,6 +5867,8 @@ func (c *EC2) ModifySnapshotAttributeRequest(input *ModifySnapshotAttributeInput
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifySnapshotAttributeOutput{}
 	req.Data = output
 	return
@@ -5478,6 +5952,8 @@ func (c *EC2) ModifySubnetAttributeRequest(input *ModifySubnetAttributeInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifySubnetAttributeOutput{}
 	req.Data = output
 	return
@@ -5505,6 +5981,8 @@ func (c *EC2) ModifyVolumeAttributeRequest(input *ModifyVolumeAttributeInput) (r
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyVolumeAttributeOutput{}
 	req.Data = output
 	return
@@ -5541,6 +6019,8 @@ func (c *EC2) ModifyVpcAttributeRequest(input *ModifyVpcAttributeInput) (req *re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ModifyVpcAttributeOutput{}
 	req.Data = output
 	return
@@ -5578,6 +6058,49 @@ func (c *EC2) ModifyVpcEndpointRequest(input *ModifyVpcEndpointInput) (req *requ
 // with the endpoint.
 func (c *EC2) ModifyVpcEndpoint(input *ModifyVpcEndpointInput) (*ModifyVpcEndpointOutput, error) {
 	req, out := c.ModifyVpcEndpointRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opModifyVpcPeeringConnectionOptions = "ModifyVpcPeeringConnectionOptions"
+
+// ModifyVpcPeeringConnectionOptionsRequest generates a request for the ModifyVpcPeeringConnectionOptions operation.
+func (c *EC2) ModifyVpcPeeringConnectionOptionsRequest(input *ModifyVpcPeeringConnectionOptionsInput) (req *request.Request, output *ModifyVpcPeeringConnectionOptionsOutput) {
+	op := &request.Operation{
+		Name:       opModifyVpcPeeringConnectionOptions,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &ModifyVpcPeeringConnectionOptionsInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &ModifyVpcPeeringConnectionOptionsOutput{}
+	req.Data = output
+	return
+}
+
+// Modifies the VPC peering connection options on one side of a VPC peering
+// connection. You can do the following:
+//
+//  Enable/disable communication over the peering connection between an EC2-Classic
+// instance that's linked to your VPC (using ClassicLink) and instances in the
+// peer VPC.
+//
+// Enable/disable communication over the peering connection between instances
+// in your VPC and an EC2-Classic instance that's linked to the peer VPC.
+//
+//  If the peered VPCs are in different accounts, each owner must initiate
+// a separate request to enable or disable communication in either direction,
+// depending on whether their VPC was the requester or accepter for the VPC
+// peering connection. If the peered VPCs are in the same account, you can modify
+// the requester and accepter options in the same request. To confirm which
+// VPC is the accepter and requester for a VPC peering connection, use the DescribeVpcPeeringConnections
+// command.
+func (c *EC2) ModifyVpcPeeringConnectionOptions(input *ModifyVpcPeeringConnectionOptionsInput) (*ModifyVpcPeeringConnectionOptionsOutput, error) {
+	req, out := c.ModifyVpcPeeringConnectionOptionsRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -5632,12 +6155,12 @@ func (c *EC2) MoveAddressToVpcRequest(input *MoveAddressToVpcInput) (req *reques
 }
 
 // Moves an Elastic IP address from the EC2-Classic platform to the EC2-VPC
-// platform. The Elastic IP address must be allocated to your account, and it
-// must not be associated with an instance. After the Elastic IP address is
-// moved, it is no longer available for use in the EC2-Classic platform, unless
-// you move it back using the RestoreAddressToClassic request. You cannot move
-// an Elastic IP address that's allocated for use in the EC2-VPC platform to
-// the EC2-Classic platform.
+// platform. The Elastic IP address must be allocated to your account for more
+// than 24 hours, and it must not be associated with an instance. After the
+// Elastic IP address is moved, it is no longer available for use in the EC2-Classic
+// platform, unless you move it back using the RestoreAddressToClassic request.
+// You cannot move an Elastic IP address that was originally allocated for use
+// in the EC2-VPC platform to the EC2-Classic platform.
 func (c *EC2) MoveAddressToVpc(input *MoveAddressToVpcInput) (*MoveAddressToVpcOutput, error) {
 	req, out := c.MoveAddressToVpcRequest(input)
 	err := req.Send()
@@ -5664,20 +6187,56 @@ func (c *EC2) PurchaseReservedInstancesOfferingRequest(input *PurchaseReservedIn
 	return
 }
 
-// Purchases a Reserved instance for use with your account. With Amazon EC2
-// Reserved instances, you obtain a capacity reservation for a certain instance
-// configuration over a specified period of time and pay a lower hourly rate
-// compared to On-Demand Instance pricing.
+// Purchases a Reserved Instance for use with your account. With Reserved Instances,
+// you obtain a capacity reservation for a certain instance configuration over
+// a specified period of time and pay a lower hourly rate compared to On-Demand
+// instance pricing.
 //
-// Use DescribeReservedInstancesOfferings to get a list of Reserved instance
+// Use DescribeReservedInstancesOfferings to get a list of Reserved Instance
 // offerings that match your specifications. After you've purchased a Reserved
-// instance, you can check for your new Reserved instance with DescribeReservedInstances.
+// Instance, you can check for your new Reserved Instance with DescribeReservedInstances.
 //
 // For more information, see Reserved Instances (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts-on-demand-reserved-instances.html)
 // and Reserved Instance Marketplace (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-market-general.html)
 // in the Amazon Elastic Compute Cloud User Guide.
 func (c *EC2) PurchaseReservedInstancesOffering(input *PurchaseReservedInstancesOfferingInput) (*PurchaseReservedInstancesOfferingOutput, error) {
 	req, out := c.PurchaseReservedInstancesOfferingRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opPurchaseScheduledInstances = "PurchaseScheduledInstances"
+
+// PurchaseScheduledInstancesRequest generates a request for the PurchaseScheduledInstances operation.
+func (c *EC2) PurchaseScheduledInstancesRequest(input *PurchaseScheduledInstancesInput) (req *request.Request, output *PurchaseScheduledInstancesOutput) {
+	op := &request.Operation{
+		Name:       opPurchaseScheduledInstances,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &PurchaseScheduledInstancesInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &PurchaseScheduledInstancesOutput{}
+	req.Data = output
+	return
+}
+
+// Purchases one or more Scheduled Instances with the specified schedule.
+//
+// Scheduled Instances enable you to purchase Amazon EC2 compute capacity by
+// the hour for a one-year term. Before you can purchase a Scheduled Instance,
+// you must call DescribeScheduledInstanceAvailability to check for available
+// schedules and obtain a purchase token. After you purchase a Scheduled Instance,
+// you must call RunScheduledInstances during each scheduled time period.
+//
+// After you purchase a Scheduled Instance, you can't cancel, modify, or resell
+// your purchase.
+func (c *EC2) PurchaseScheduledInstances(input *PurchaseScheduledInstancesInput) (*PurchaseScheduledInstancesOutput, error) {
+	req, out := c.PurchaseScheduledInstancesRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -5697,6 +6256,8 @@ func (c *EC2) RebootInstancesRequest(input *RebootInstancesInput) (req *request.
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &RebootInstancesOutput{}
 	req.Data = output
 	return
@@ -5707,8 +6268,8 @@ func (c *EC2) RebootInstancesRequest(input *RebootInstancesInput) (req *request.
 // succeeds if the instances are valid and belong to you. Requests to reboot
 // terminated instances are ignored.
 //
-// If a Linux/Unix instance does not cleanly shut down within four minutes,
-// Amazon EC2 performs a hard reboot.
+// If an instance does not cleanly shut down within four minutes, Amazon EC2
+// performs a hard reboot.
 //
 // For more information about troubleshooting, see Getting Console Output and
 // Rebooting Instances (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-console.html)
@@ -5824,6 +6385,8 @@ func (c *EC2) ReleaseAddressRequest(input *ReleaseAddressInput) (req *request.Re
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ReleaseAddressOutput{}
 	req.Data = output
 	return
@@ -5871,7 +6434,7 @@ func (c *EC2) ReleaseHostsRequest(input *ReleaseHostsInput) (req *request.Reques
 }
 
 // When you no longer want to use a Dedicated host it can be released. On-Demand
-// billing is stopped and the host goes into "released" state. The host ID of
+// billing is stopped and the host goes into released state. The host ID of
 // Dedicated hosts that have been released can no longer be specified in another
 // request, e.g., ModifyHosts. You must stop or terminate all instances on a
 // host before it can be released.
@@ -5933,6 +6496,8 @@ func (c *EC2) ReplaceNetworkAclEntryRequest(input *ReplaceNetworkAclEntryInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ReplaceNetworkAclEntryOutput{}
 	req.Data = output
 	return
@@ -5962,6 +6527,8 @@ func (c *EC2) ReplaceRouteRequest(input *ReplaceRouteInput) (req *request.Reques
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ReplaceRouteOutput{}
 	req.Data = output
 	return
@@ -5969,7 +6536,7 @@ func (c *EC2) ReplaceRouteRequest(input *ReplaceRouteInput) (req *request.Reques
 
 // Replaces an existing route within a route table in a VPC. You must provide
 // only one of the following: Internet gateway or virtual private gateway, NAT
-// instance, VPC peering connection, or network interface.
+// instance, NAT gateway, VPC peering connection, or network interface.
 //
 // For more information about route tables, see Route Tables (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html)
 // in the Amazon Virtual Private Cloud User Guide.
@@ -6029,6 +6596,8 @@ func (c *EC2) ReportInstanceStatusRequest(input *ReportInstanceStatusInput) (req
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ReportInstanceStatusOutput{}
 	req.Data = output
 	return
@@ -6137,6 +6706,8 @@ func (c *EC2) ResetImageAttributeRequest(input *ResetImageAttributeInput) (req *
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ResetImageAttributeOutput{}
 	req.Data = output
 	return
@@ -6166,16 +6737,18 @@ func (c *EC2) ResetInstanceAttributeRequest(input *ResetInstanceAttributeInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ResetInstanceAttributeOutput{}
 	req.Data = output
 	return
 }
 
 // Resets an attribute of an instance to its default value. To reset the kernel
-// or ramdisk, the instance must be in a stopped state. To reset the SourceDestCheck,
+// or ramdisk, the instance must be in a stopped state. To reset the sourceDestCheck,
 // the instance can be either running or stopped.
 //
-// The SourceDestCheck attribute controls whether source/destination checking
+// The sourceDestCheck attribute controls whether source/destination checking
 // is enabled. The default value is true, which means checking is enabled. This
 // value must be false for a NAT instance to perform NAT. For more information,
 // see NAT Instances (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_NAT_Instance.html)
@@ -6201,6 +6774,8 @@ func (c *EC2) ResetNetworkInterfaceAttributeRequest(input *ResetNetworkInterface
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ResetNetworkInterfaceAttributeOutput{}
 	req.Data = output
 	return
@@ -6229,6 +6804,8 @@ func (c *EC2) ResetSnapshotAttributeRequest(input *ResetSnapshotAttributeInput) 
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &ResetSnapshotAttributeOutput{}
 	req.Data = output
 	return
@@ -6290,14 +6867,17 @@ func (c *EC2) RevokeSecurityGroupEgressRequest(input *RevokeSecurityGroupEgressI
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &RevokeSecurityGroupEgressOutput{}
 	req.Data = output
 	return
 }
 
-// Removes one or more egress rules from a security group for EC2-VPC. The values
-// that you specify in the revoke request (for example, ports) must match the
-// existing rule's values for the rule to be revoked.
+// [EC2-VPC only] Removes one or more egress rules from a security group for
+// EC2-VPC. This action doesn't apply to security groups for use in EC2-Classic.
+// The values that you specify in the revoke request (for example, ports) must
+// match the existing rule's values for the rule to be revoked.
 //
 // Each rule consists of the protocol and the CIDR range or source security
 // group. For the TCP and UDP protocols, you must also specify the destination
@@ -6327,6 +6907,8 @@ func (c *EC2) RevokeSecurityGroupIngressRequest(input *RevokeSecurityGroupIngres
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &RevokeSecurityGroupIngressOutput{}
 	req.Data = output
 	return
@@ -6376,6 +6958,14 @@ func (c *EC2) RunInstancesRequest(input *RunInstancesInput) (req *request.Reques
 // is ready for you, it enters the running state. To check the state of your
 // instance, call DescribeInstances.
 //
+// To ensure faster instance launches, break up large requests into smaller
+// batches. For example, create five separate launch requests for 100 instances
+// each instead of one launch request for 500 instances.
+//
+// To tag your instance, ensure that it is running as CreateTags requires a
+// resource ID. For more information about tagging, see Tagging Your Amazon
+// EC2 Resources (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html).
+//
 // If you don't specify a security group when launching an instance, Amazon
 // EC2 uses the default security group. For more information, see Security Groups
 // (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html)
@@ -6400,9 +6990,9 @@ func (c *EC2) RunInstancesRequest(input *RunInstancesInput) (req *request.Reques
 // If any of the AMIs have a product code attached for which the user has not
 // subscribed, RunInstances fails.
 //
-// T2 instance types can only be launched into a VPC. If you do not have a
-// default VPC, or if you do not specify a subnet ID in the request, RunInstances
-// fails.
+// Some instance types can only be launched into a VPC. If you do not have
+// a default VPC, or if you do not specify a subnet ID in the request, RunInstances
+// fails. For more information, see Instance Types Available Only in a VPC (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-vpc.html#vpc-only-instance-types).
 //
 // For more information about troubleshooting, see What To Do If An Instance
 // Immediately Terminates (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_InstanceStraightToTerminated.html),
@@ -6410,6 +7000,43 @@ func (c *EC2) RunInstancesRequest(input *RunInstancesInput) (req *request.Reques
 // in the Amazon Elastic Compute Cloud User Guide.
 func (c *EC2) RunInstances(input *RunInstancesInput) (*Reservation, error) {
 	req, out := c.RunInstancesRequest(input)
+	err := req.Send()
+	return out, err
+}
+
+const opRunScheduledInstances = "RunScheduledInstances"
+
+// RunScheduledInstancesRequest generates a request for the RunScheduledInstances operation.
+func (c *EC2) RunScheduledInstancesRequest(input *RunScheduledInstancesInput) (req *request.Request, output *RunScheduledInstancesOutput) {
+	op := &request.Operation{
+		Name:       opRunScheduledInstances,
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+	}
+
+	if input == nil {
+		input = &RunScheduledInstancesInput{}
+	}
+
+	req = c.newRequest(op, input, output)
+	output = &RunScheduledInstancesOutput{}
+	req.Data = output
+	return
+}
+
+// Launches the specified Scheduled Instances.
+//
+// Before you can launch a Scheduled Instance, you must purchase it and obtain
+// an identifier using PurchaseScheduledInstances.
+//
+// You must launch a Scheduled Instance during its scheduled time period. You
+// can't stop or reboot a Scheduled Instance, but you can terminate it as needed.
+// If you terminate a Scheduled Instance before the current scheduled time period
+// ends, you can launch it again after a few minutes. For more information,
+// see Scheduled Instances (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-scheduled-instances.html)
+// in the Amazon Elastic Compute Cloud User Guide.
+func (c *EC2) RunScheduledInstances(input *RunScheduledInstancesInput) (*RunScheduledInstancesOutput, error) {
+	req, out := c.RunScheduledInstancesRequest(input)
 	err := req.Send()
 	return out, err
 }
@@ -6479,36 +7106,35 @@ func (c *EC2) StopInstancesRequest(input *StopInstancesInput) (req *request.Requ
 	return
 }
 
-// Stops an Amazon EBS-backed instance. Each time you transition an instance
-// from stopped to started, Amazon EC2 charges a full instance hour, even if
-// transitions happen multiple times within a single hour.
+// Stops an Amazon EBS-backed instance.
 //
-// You can't start or stop Spot instances.
+// We don't charge hourly usage for a stopped instance, or data transfer fees;
+// however, your root partition Amazon EBS volume remains, continues to persist
+// your data, and you are charged for Amazon EBS volume usage. Each time you
+// transition an instance from stopped to started, Amazon EC2 charges a full
+// instance hour, even if transitions happen multiple times within a single
+// hour.
 //
-// Instances that use Amazon EBS volumes as their root devices can be quickly
-// stopped and started. When an instance is stopped, the compute resources are
-// released and you are not billed for hourly instance usage. However, your
-// root partition Amazon EBS volume remains, continues to persist your data,
-// and you are charged for Amazon EBS volume usage. You can restart your instance
-// at any time.
+// You can't start or stop Spot instances, and you can't stop instance store-backed
+// instances.
 //
-// Before stopping an instance, make sure it is in a state from which it can
-// be restarted. Stopping an instance does not preserve data stored in RAM.
+// When you stop an instance, we shut it down. You can restart your instance
+// at any time. Before stopping an instance, make sure it is in a state from
+// which it can be restarted. Stopping an instance does not preserve data stored
+// in RAM.
 //
-// Performing this operation on an instance that uses an instance store as
-// its root device returns an error.
-//
-// You can stop, start, and terminate EBS-backed instances. You can only terminate
-// instance store-backed instances. What happens to an instance differs if you
-// stop it or terminate it. For example, when you stop an instance, the root
-// device and any other devices attached to the instance persist. When you terminate
-// an instance, the root device and any other devices attached during the instance
-// launch are automatically deleted. For more information about the differences
-// between stopping and terminating instances, see Instance Lifecycle (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html)
+// Stopping an instance is different to rebooting or terminating it. For example,
+// when you stop an instance, the root device and any other devices attached
+// to the instance persist. When you terminate an instance, the root device
+// and any other devices attached during the instance launch are automatically
+// deleted. For more information about the differences between rebooting, stopping,
+// and terminating instances, see Instance Lifecycle (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html)
 // in the Amazon Elastic Compute Cloud User Guide.
 //
-// For more information about troubleshooting, see Troubleshooting Stopping
-// Your Instance (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesStopping.html)
+// When you stop an instance, we attempt to shut it down forcibly after a short
+// while. If your instance appears stuck in the stopping state after a period
+// of time, there may be an issue with the underlying host computer. For more
+// information, see Troubleshooting Stopping Your Instance (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesStopping.html)
 // in the Amazon Elastic Compute Cloud User Guide.
 func (c *EC2) StopInstances(input *StopInstancesInput) (*StopInstancesOutput, error) {
 	req, out := c.StopInstancesRequest(input)
@@ -6579,6 +7205,8 @@ func (c *EC2) UnassignPrivateIpAddressesRequest(input *UnassignPrivateIpAddresse
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(ec2query.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &UnassignPrivateIpAddressesOutput{}
 	req.Data = output
 	return
@@ -6620,6 +7248,7 @@ func (c *EC2) UnmonitorInstances(input *UnmonitorInstancesInput) (*UnmonitorInst
 	return out, err
 }
 
+// Contains the parameters for AcceptVpcPeeringConnection.
 type AcceptVpcPeeringConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6643,6 +7272,7 @@ func (s AcceptVpcPeeringConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of AcceptVpcPeeringConnection.
 type AcceptVpcPeeringConnectionOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6764,6 +7394,7 @@ func (s Address) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AllocateAddress.
 type AllocateAddressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6789,6 +7420,7 @@ func (s AllocateAddressInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of AllocateAddress.
 type AllocateAddressOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6814,6 +7446,7 @@ func (s AllocateAddressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AllocateHosts.
 type AllocateHostsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6852,6 +7485,26 @@ func (s AllocateHostsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AllocateHostsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AllocateHostsInput"}
+	if s.AvailabilityZone == nil {
+		invalidParams.Add(request.NewErrParamRequired("AvailabilityZone"))
+	}
+	if s.InstanceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceType"))
+	}
+	if s.Quantity == nil {
+		invalidParams.Add(request.NewErrParamRequired("Quantity"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of AllocateHosts.
 type AllocateHostsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6870,6 +7523,7 @@ func (s AllocateHostsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AssignPrivateIpAddresses.
 type AssignPrivateIpAddressesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6903,6 +7557,19 @@ func (s AssignPrivateIpAddressesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AssignPrivateIpAddressesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssignPrivateIpAddressesInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type AssignPrivateIpAddressesOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -6917,6 +7584,7 @@ func (s AssignPrivateIpAddressesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AssociateAddress.
 type AssociateAddressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -6966,6 +7634,7 @@ func (s AssociateAddressInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of AssociateAddress.
 type AssociateAddressOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -6984,6 +7653,7 @@ func (s AssociateAddressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AssociateDhcpOptions.
 type AssociateDhcpOptionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7011,6 +7681,22 @@ func (s AssociateDhcpOptionsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AssociateDhcpOptionsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssociateDhcpOptionsInput"}
+	if s.DhcpOptionsId == nil {
+		invalidParams.Add(request.NewErrParamRequired("DhcpOptionsId"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type AssociateDhcpOptionsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -7025,6 +7711,7 @@ func (s AssociateDhcpOptionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AssociateRouteTable.
 type AssociateRouteTableInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7051,6 +7738,23 @@ func (s AssociateRouteTableInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AssociateRouteTableInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssociateRouteTableInput"}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+	if s.SubnetId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SubnetId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of AssociateRouteTable.
 type AssociateRouteTableOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7068,6 +7772,7 @@ func (s AssociateRouteTableOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AttachClassicLinkVpc.
 type AttachClassicLinkVpcInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7098,6 +7803,26 @@ func (s AttachClassicLinkVpcInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AttachClassicLinkVpcInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AttachClassicLinkVpcInput"}
+	if s.Groups == nil {
+		invalidParams.Add(request.NewErrParamRequired("Groups"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of AttachClassicLinkVpc.
 type AttachClassicLinkVpcOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7115,6 +7840,7 @@ func (s AttachClassicLinkVpcOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AttachInternetGateway.
 type AttachInternetGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7141,6 +7867,22 @@ func (s AttachInternetGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AttachInternetGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AttachInternetGatewayInput"}
+	if s.InternetGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InternetGatewayId"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type AttachInternetGatewayOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -7155,6 +7897,7 @@ func (s AttachInternetGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AttachNetworkInterface.
 type AttachNetworkInterfaceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7184,6 +7927,26 @@ func (s AttachNetworkInterfaceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AttachNetworkInterfaceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AttachNetworkInterfaceInput"}
+	if s.DeviceIndex == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeviceIndex"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of AttachNetworkInterface.
 type AttachNetworkInterfaceOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7201,6 +7964,7 @@ func (s AttachNetworkInterfaceOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AttachVolume.
 type AttachVolumeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7231,6 +7995,26 @@ func (s AttachVolumeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AttachVolumeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AttachVolumeInput"}
+	if s.Device == nil {
+		invalidParams.Add(request.NewErrParamRequired("Device"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the parameters for AttachVpnGateway.
 type AttachVpnGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7257,6 +8041,23 @@ func (s AttachVpnGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AttachVpnGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AttachVpnGatewayInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+	if s.VpnGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of AttachVpnGateway.
 type AttachVpnGatewayOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7310,11 +8111,12 @@ func (s AttributeValue) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AuthorizeSecurityGroupEgress.
 type AuthorizeSecurityGroupEgressInput struct {
 	_ struct{} `type:"structure"`
 
-	// The CIDR IP address range. You can't specify this parameter when specifying
-	// a source security group.
+	// The CIDR IP address range. We recommend that you specify the CIDR range in
+	// a set of IP permissions instead.
 	CidrIp *string `locationName:"cidrIp" type:"string"`
 
 	// Checks whether you have the required permissions for the action, without
@@ -7324,7 +8126,7 @@ type AuthorizeSecurityGroupEgressInput struct {
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
 
 	// The start of port range for the TCP and UDP protocols, or an ICMP type number.
-	// For the ICMP type number, use -1 to specify all ICMP types.
+	// We recommend that you specify the port range in a set of IP permissions instead.
 	FromPort *int64 `locationName:"fromPort" type:"integer"`
 
 	// The ID of the security group.
@@ -7334,8 +8136,8 @@ type AuthorizeSecurityGroupEgressInput struct {
 	// a CIDR IP address range.
 	IpPermissions []*IpPermission `locationName:"ipPermissions" locationNameList:"item" type:"list"`
 
-	// The IP protocol name (tcp, udp, icmp) or number (see Protocol Numbers (http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)).
-	// Use -1 to specify all.
+	// The IP protocol name or number. We recommend that you specify the protocol
+	// in a set of IP permissions instead.
 	IpProtocol *string `locationName:"ipProtocol" type:"string"`
 
 	// The name of a destination security group. To authorize outbound access to
@@ -7348,8 +8150,8 @@ type AuthorizeSecurityGroupEgressInput struct {
 	// IP permissions instead.
 	SourceSecurityGroupOwnerId *string `locationName:"sourceSecurityGroupOwnerId" type:"string"`
 
-	// The end of port range for the TCP and UDP protocols, or an ICMP code number.
-	// For the ICMP code number, use -1 to specify all ICMP codes for the ICMP type.
+	// The end of port range for the TCP and UDP protocols, or an ICMP type number.
+	// We recommend that you specify the port range in a set of IP permissions instead.
 	ToPort *int64 `locationName:"toPort" type:"integer"`
 }
 
@@ -7361,6 +8163,19 @@ func (s AuthorizeSecurityGroupEgressInput) String() string {
 // GoString returns the string representation
 func (s AuthorizeSecurityGroupEgressInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *AuthorizeSecurityGroupEgressInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AuthorizeSecurityGroupEgressInput"}
+	if s.GroupId == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type AuthorizeSecurityGroupEgressOutput struct {
@@ -7377,6 +8192,7 @@ func (s AuthorizeSecurityGroupEgressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for AuthorizeSecurityGroupIngress.
 type AuthorizeSecurityGroupIngressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7411,17 +8227,18 @@ type AuthorizeSecurityGroupIngressInput struct {
 	// [EC2-Classic, default VPC] The name of the source security group. You can't
 	// specify this parameter in combination with the following parameters: the
 	// CIDR IP address range, the start of the port range, the IP protocol, and
-	// the end of the port range. For EC2-VPC, the source security group must be
-	// in the same VPC.
+	// the end of the port range. Creates rules that grant full ICMP, UDP, and TCP
+	// access. To create a rule with a specific IP protocol and port range, use
+	// a set of IP permissions instead. For EC2-VPC, the source security group must
+	// be in the same VPC.
 	SourceSecurityGroupName *string `type:"string"`
 
-	// [EC2-Classic, default VPC] The AWS account number for the source security
-	// group. For EC2-VPC, the source security group must be in the same VPC. You
-	// can't specify this parameter in combination with the following parameters:
-	// the CIDR IP address range, the IP protocol, the start of the port range,
-	// and the end of the port range. Creates rules that grant full ICMP, UDP, and
-	// TCP access. To create a rule with a specific IP protocol and port range,
-	// use a set of IP permissions instead.
+	// [EC2-Classic] The AWS account number for the source security group, if the
+	// source security group is in a different account. You can't specify this parameter
+	// in combination with the following parameters: the CIDR IP address range,
+	// the IP protocol, the start of the port range, and the end of the port range.
+	// Creates rules that grant full ICMP, UDP, and TCP access. To create a rule
+	// with a specific IP protocol and port range, use a set of IP permissions instead.
 	SourceSecurityGroupOwnerId *string `type:"string"`
 
 	// The end of port range for the TCP and UDP protocols, or an ICMP code number.
@@ -7498,6 +8315,7 @@ func (s AvailabilityZoneMessage) GoString() string {
 	return s.String()
 }
 
+// The capacity information for instances launched onto the Dedicated host.
 type AvailableCapacity struct {
 	_ struct{} `type:"structure"`
 
@@ -7521,6 +8339,7 @@ func (s AvailableCapacity) GoString() string {
 type BlobAttributeValue struct {
 	_ struct{} `type:"structure"`
 
+	// Value is automatically base64 encoded/decoded by the SDK.
 	Value []byte `locationName:"value" type:"blob"`
 }
 
@@ -7572,6 +8391,7 @@ func (s BlockDeviceMapping) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for BundleInstance.
 type BundleInstanceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7606,6 +8426,23 @@ func (s BundleInstanceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *BundleInstanceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "BundleInstanceInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Storage == nil {
+		invalidParams.Add(request.NewErrParamRequired("Storage"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of BundleInstance.
 type BundleInstanceOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7683,6 +8520,7 @@ func (s BundleTaskError) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CancelBundleTask.
 type CancelBundleTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7706,6 +8544,20 @@ func (s CancelBundleTaskInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelBundleTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelBundleTaskInput"}
+	if s.BundleId == nil {
+		invalidParams.Add(request.NewErrParamRequired("BundleId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CancelBundleTask.
 type CancelBundleTaskOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7723,6 +8575,7 @@ func (s CancelBundleTaskOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CancelConversionTask.
 type CancelConversionTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7749,6 +8602,19 @@ func (s CancelConversionTaskInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelConversionTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelConversionTaskInput"}
+	if s.ConversionTaskId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ConversionTaskId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CancelConversionTaskOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -7763,6 +8629,7 @@ func (s CancelConversionTaskOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CancelExportTask.
 type CancelExportTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7780,6 +8647,19 @@ func (s CancelExportTaskInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelExportTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelExportTaskInput"}
+	if s.ExportTaskId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ExportTaskId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CancelExportTaskOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -7794,6 +8674,7 @@ func (s CancelExportTaskOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CancelImportTask.
 type CancelImportTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -7820,6 +8701,7 @@ func (s CancelImportTaskInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for CancelImportTask.
 type CancelImportTaskOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -7843,10 +8725,11 @@ func (s CancelImportTaskOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CancelReservedInstancesListing.
 type CancelReservedInstancesListingInput struct {
 	_ struct{} `type:"structure"`
 
-	// The ID of the Reserved instance listing.
+	// The ID of the Reserved Instance listing.
 	ReservedInstancesListingId *string `locationName:"reservedInstancesListingId" type:"string" required:"true"`
 }
 
@@ -7860,10 +8743,24 @@ func (s CancelReservedInstancesListingInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelReservedInstancesListingInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelReservedInstancesListingInput"}
+	if s.ReservedInstancesListingId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReservedInstancesListingId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CancelReservedInstancesListing.
 type CancelReservedInstancesListingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The Reserved instance listing.
+	// The Reserved Instance listing.
 	ReservedInstancesListings []*ReservedInstancesListing `locationName:"reservedInstancesListingsSet" locationNameList:"item" type:"list"`
 }
 
@@ -7947,6 +8844,22 @@ func (s CancelSpotFleetRequestsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelSpotFleetRequestsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelSpotFleetRequestsInput"}
+	if s.SpotFleetRequestIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotFleetRequestIds"))
+	}
+	if s.TerminateInstances == nil {
+		invalidParams.Add(request.NewErrParamRequired("TerminateInstances"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of CancelSpotFleetRequests.
 type CancelSpotFleetRequestsOutput struct {
 	_ struct{} `type:"structure"`
@@ -8016,6 +8929,19 @@ func (s CancelSpotInstanceRequestsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CancelSpotInstanceRequestsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelSpotInstanceRequestsInput"}
+	if s.SpotInstanceRequestIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotInstanceRequestIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of CancelSpotInstanceRequests.
 type CancelSpotInstanceRequestsOutput struct {
 	_ struct{} `type:"structure"`
@@ -8052,6 +8978,27 @@ func (s CancelledSpotInstanceRequest) String() string {
 
 // GoString returns the string representation
 func (s CancelledSpotInstanceRequest) GoString() string {
+	return s.String()
+}
+
+// Describes the ClassicLink DNS support status of a VPC.
+type ClassicLinkDnsSupport struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether ClassicLink DNS support is enabled for the VPC.
+	ClassicLinkDnsSupported *bool `locationName:"classicLinkDnsSupported" type:"boolean"`
+
+	// The ID of the VPC.
+	VpcId *string `locationName:"vpcId" type:"string"`
+}
+
+// String returns the string representation
+func (s ClassicLinkDnsSupport) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ClassicLinkDnsSupport) GoString() string {
 	return s.String()
 }
 
@@ -8109,6 +9056,7 @@ func (s ClientData) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ConfirmProductInstance.
 type ConfirmProductInstanceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8135,6 +9083,23 @@ func (s ConfirmProductInstanceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ConfirmProductInstanceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ConfirmProductInstanceInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.ProductCode == nil {
+		invalidParams.Add(request.NewErrParamRequired("ProductCode"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ConfirmProductInstance.
 type ConfirmProductInstanceOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8196,6 +9161,7 @@ func (s ConversionTask) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CopyImage.
 type CopyImageInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8212,6 +9178,23 @@ type CopyImageInput struct {
 	// the required permissions, the error response is DryRunOperation. Otherwise,
 	// it is UnauthorizedOperation.
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
+
+	// Specifies whether the destination snapshots of the copied image should be
+	// encrypted. The default CMK for EBS is used unless a non-default AWS Key Management
+	// Service (AWS KMS) CMK is specified with KmsKeyId. For more information, see
+	// Amazon EBS Encryption (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+	// in the Amazon Elastic Compute Cloud User Guide.
+	Encrypted *bool `locationName:"encrypted" type:"boolean"`
+
+	// The full ARN of the AWS Key Management Service (AWS KMS) CMK to use when
+	// encrypting the snapshots of an image during a copy operation. This parameter
+	// is only required if you want to use a non-default CMK; if this parameter
+	// is not specified, the default CMK for EBS is used. The ARN contains the arn:aws:kms
+	// namespace, followed by the region of the CMK, the AWS account ID of the CMK
+	// owner, the key namespace, and then the CMK ID. For example, arn:aws:kms:us-east-1:012345678910:key/abcd1234-a123-456a-a12b-a123b4cd56ef.
+	// The specified CMK must exist in the region that the snapshot is being copied
+	// to. If a KmsKeyId is specified, the Encrypted flag must also be set.
+	KmsKeyId *string `locationName:"kmsKeyId" type:"string"`
 
 	// The name of the new AMI in the destination region.
 	Name *string `type:"string" required:"true"`
@@ -8233,6 +9216,26 @@ func (s CopyImageInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CopyImageInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CopyImageInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+	if s.SourceImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SourceImageId"))
+	}
+	if s.SourceRegion == nil {
+		invalidParams.Add(request.NewErrParamRequired("SourceRegion"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CopyImage.
 type CopyImageOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8250,6 +9253,7 @@ func (s CopyImageOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CopySnapshot.
 type CopySnapshotInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8322,6 +9326,23 @@ func (s CopySnapshotInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CopySnapshotInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CopySnapshotInput"}
+	if s.SourceRegion == nil {
+		invalidParams.Add(request.NewErrParamRequired("SourceRegion"))
+	}
+	if s.SourceSnapshotId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SourceSnapshotId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CopySnapshot.
 type CopySnapshotOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8339,6 +9360,7 @@ func (s CopySnapshotOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateCustomerGateway.
 type CreateCustomerGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8371,6 +9393,26 @@ func (s CreateCustomerGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateCustomerGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateCustomerGatewayInput"}
+	if s.BgpAsn == nil {
+		invalidParams.Add(request.NewErrParamRequired("BgpAsn"))
+	}
+	if s.PublicIp == nil {
+		invalidParams.Add(request.NewErrParamRequired("PublicIp"))
+	}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateCustomerGateway.
 type CreateCustomerGatewayOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8388,6 +9430,7 @@ func (s CreateCustomerGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateDhcpOptions.
 type CreateDhcpOptionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8411,6 +9454,20 @@ func (s CreateDhcpOptionsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateDhcpOptionsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateDhcpOptionsInput"}
+	if s.DhcpConfigurations == nil {
+		invalidParams.Add(request.NewErrParamRequired("DhcpConfigurations"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateDhcpOptions.
 type CreateDhcpOptionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8428,6 +9485,7 @@ func (s CreateDhcpOptionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateFlowLogs.
 type CreateFlowLogsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8443,6 +9501,8 @@ type CreateFlowLogsInput struct {
 	LogGroupName *string `type:"string" required:"true"`
 
 	// One or more subnet, network interface, or VPC IDs.
+	//
+	// Constraints: Maximum of 1000 resources
 	ResourceIds []*string `locationName:"ResourceId" locationNameList:"item" type:"list" required:"true"`
 
 	// The type of resource on which to create the flow log.
@@ -8462,6 +9522,32 @@ func (s CreateFlowLogsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateFlowLogsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateFlowLogsInput"}
+	if s.DeliverLogsPermissionArn == nil {
+		invalidParams.Add(request.NewErrParamRequired("DeliverLogsPermissionArn"))
+	}
+	if s.LogGroupName == nil {
+		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
+	}
+	if s.ResourceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceIds"))
+	}
+	if s.ResourceType == nil {
+		invalidParams.Add(request.NewErrParamRequired("ResourceType"))
+	}
+	if s.TrafficType == nil {
+		invalidParams.Add(request.NewErrParamRequired("TrafficType"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateFlowLogs.
 type CreateFlowLogsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8486,6 +9572,7 @@ func (s CreateFlowLogsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateImage.
 type CreateImageInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8511,11 +9598,10 @@ type CreateImageInput struct {
 	// at-signs (@), or underscores(_)
 	Name *string `locationName:"name" type:"string" required:"true"`
 
-	// By default, this parameter is set to false, which means Amazon EC2 attempts
-	// to shut down the instance cleanly before image creation and then reboots
-	// the instance. When the parameter is set to true, Amazon EC2 doesn't shut
-	// down the instance before creating the image. When this option is used, file
-	// system integrity on the created image can't be guaranteed.
+	// By default, Amazon EC2 attempts to shut down and reboot the instance before
+	// creating the image. If the 'No Reboot' option is set, Amazon EC2 doesn't
+	// shut down the instance before creating the image. When this option is used,
+	// file system integrity on the created image can't be guaranteed.
 	NoReboot *bool `locationName:"noReboot" type:"boolean"`
 }
 
@@ -8529,6 +9615,23 @@ func (s CreateImageInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateImageInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateImageInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateImage.
 type CreateImageOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8546,6 +9649,7 @@ func (s CreateImageOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateInstanceExportTask.
 type CreateInstanceExportTaskInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8573,6 +9677,20 @@ func (s CreateInstanceExportTaskInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateInstanceExportTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateInstanceExportTaskInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output for CreateInstanceExportTask.
 type CreateInstanceExportTaskOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8590,6 +9708,7 @@ func (s CreateInstanceExportTaskOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateInternetGateway.
 type CreateInternetGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8610,6 +9729,7 @@ func (s CreateInternetGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of CreateInternetGateway.
 type CreateInternetGatewayOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8627,6 +9747,7 @@ func (s CreateInternetGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateKeyPair.
 type CreateKeyPairInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8650,6 +9771,19 @@ func (s CreateKeyPairInput) String() string {
 // GoString returns the string representation
 func (s CreateKeyPairInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateKeyPairInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateKeyPairInput"}
+	if s.KeyName == nil {
+		invalidParams.Add(request.NewErrParamRequired("KeyName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes a key pair.
@@ -8676,6 +9810,74 @@ func (s CreateKeyPairOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateNatGateway.
+type CreateNatGatewayInput struct {
+	_ struct{} `type:"structure"`
+
+	// The allocation ID of an Elastic IP address to associate with the NAT gateway.
+	// If the Elastic IP address is associated with another resource, you must first
+	// disassociate it.
+	AllocationId *string `type:"string" required:"true"`
+
+	// Unique, case-sensitive identifier you provide to ensure the idempotency of
+	// the request. For more information, see How to Ensure Idempotency (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
+	//
+	// Constraint: Maximum 64 ASCII characters.
+	ClientToken *string `type:"string"`
+
+	// The subnet in which to create the NAT gateway.
+	SubnetId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s CreateNatGatewayInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s CreateNatGatewayInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateNatGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateNatGatewayInput"}
+	if s.AllocationId == nil {
+		invalidParams.Add(request.NewErrParamRequired("AllocationId"))
+	}
+	if s.SubnetId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SubnetId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateNatGateway.
+type CreateNatGatewayOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Unique, case-sensitive identifier to ensure the idempotency of the request.
+	// Only returned if a client token was provided in the request.
+	ClientToken *string `locationName:"clientToken" type:"string"`
+
+	// Information about the NAT gateway.
+	NatGateway *NatGateway `locationName:"natGateway" type:"structure"`
+}
+
+// String returns the string representation
+func (s CreateNatGatewayOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s CreateNatGatewayOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for CreateNetworkAclEntry.
 type CreateNetworkAclEntryInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8711,7 +9913,8 @@ type CreateNetworkAclEntryInput struct {
 	// The rule number for the entry (for example, 100). ACL entries are processed
 	// in ascending order by rule number.
 	//
-	// Constraints: Positive integer from 1 to 32766
+	// Constraints: Positive integer from 1 to 32766. The range 32767 to 65535
+	// is reserved for internal use.
 	RuleNumber *int64 `locationName:"ruleNumber" type:"integer" required:"true"`
 }
 
@@ -8723,6 +9926,34 @@ func (s CreateNetworkAclEntryInput) String() string {
 // GoString returns the string representation
 func (s CreateNetworkAclEntryInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateNetworkAclEntryInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateNetworkAclEntryInput"}
+	if s.CidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("CidrBlock"))
+	}
+	if s.Egress == nil {
+		invalidParams.Add(request.NewErrParamRequired("Egress"))
+	}
+	if s.NetworkAclId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkAclId"))
+	}
+	if s.Protocol == nil {
+		invalidParams.Add(request.NewErrParamRequired("Protocol"))
+	}
+	if s.RuleAction == nil {
+		invalidParams.Add(request.NewErrParamRequired("RuleAction"))
+	}
+	if s.RuleNumber == nil {
+		invalidParams.Add(request.NewErrParamRequired("RuleNumber"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type CreateNetworkAclEntryOutput struct {
@@ -8739,6 +9970,7 @@ func (s CreateNetworkAclEntryOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateNetworkAcl.
 type CreateNetworkAclInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8762,6 +9994,20 @@ func (s CreateNetworkAclInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateNetworkAclInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateNetworkAclInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateNetworkAcl.
 type CreateNetworkAclOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8779,6 +10025,7 @@ func (s CreateNetworkAclOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateNetworkInterface.
 type CreateNetworkInterfaceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8828,6 +10075,30 @@ func (s CreateNetworkInterfaceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateNetworkInterfaceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateNetworkInterfaceInput"}
+	if s.SubnetId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SubnetId"))
+	}
+	if s.PrivateIpAddresses != nil {
+		for i, v := range s.PrivateIpAddresses {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "PrivateIpAddresses", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateNetworkInterface.
 type CreateNetworkInterfaceOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8845,6 +10116,7 @@ func (s CreateNetworkInterfaceOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreatePlacementGroup.
 type CreatePlacementGroupInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8873,6 +10145,22 @@ func (s CreatePlacementGroupInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreatePlacementGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreatePlacementGroupInput"}
+	if s.GroupName == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupName"))
+	}
+	if s.Strategy == nil {
+		invalidParams.Add(request.NewErrParamRequired("Strategy"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CreatePlacementGroupOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -8887,6 +10175,7 @@ func (s CreatePlacementGroupOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateReservedInstancesListing.
 type CreateReservedInstancesListingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8895,17 +10184,17 @@ type CreateReservedInstancesListingInput struct {
 	// Ensuring Idempotency (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
 	ClientToken *string `locationName:"clientToken" type:"string" required:"true"`
 
-	// The number of instances that are a part of a Reserved instance account to
+	// The number of instances that are a part of a Reserved Instance account to
 	// be listed in the Reserved Instance Marketplace. This number should be less
-	// than or equal to the instance count associated with the Reserved instance
+	// than or equal to the instance count associated with the Reserved Instance
 	// ID specified in this call.
 	InstanceCount *int64 `locationName:"instanceCount" type:"integer" required:"true"`
 
-	// A list specifying the price of the Reserved instance for each month remaining
-	// in the Reserved instance term.
+	// A list specifying the price of the Reserved Instance for each month remaining
+	// in the Reserved Instance term.
 	PriceSchedules []*PriceScheduleSpecification `locationName:"priceSchedules" locationNameList:"item" type:"list" required:"true"`
 
-	// The ID of the active Reserved instance.
+	// The ID of the active Reserved Instance.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string" required:"true"`
 }
 
@@ -8919,10 +10208,33 @@ func (s CreateReservedInstancesListingInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateReservedInstancesListingInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateReservedInstancesListingInput"}
+	if s.ClientToken == nil {
+		invalidParams.Add(request.NewErrParamRequired("ClientToken"))
+	}
+	if s.InstanceCount == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceCount"))
+	}
+	if s.PriceSchedules == nil {
+		invalidParams.Add(request.NewErrParamRequired("PriceSchedules"))
+	}
+	if s.ReservedInstancesId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReservedInstancesId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateReservedInstancesListing.
 type CreateReservedInstancesListingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Information about the Reserved instance listing.
+	// Information about the Reserved Instance listing.
 	ReservedInstancesListings []*ReservedInstancesListing `locationName:"reservedInstancesListingsSet" locationNameList:"item" type:"list"`
 }
 
@@ -8936,6 +10248,7 @@ func (s CreateReservedInstancesListingOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateRoute.
 type CreateRouteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -8957,6 +10270,9 @@ type CreateRouteInput struct {
 	// an instance ID unless exactly one network interface is attached.
 	InstanceId *string `locationName:"instanceId" type:"string"`
 
+	// The ID of a NAT gateway.
+	NatGatewayId *string `locationName:"natGatewayId" type:"string"`
+
 	// The ID of a network interface.
 	NetworkInterfaceId *string `locationName:"networkInterfaceId" type:"string"`
 
@@ -8977,6 +10293,23 @@ func (s CreateRouteInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateRouteInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateRouteInput"}
+	if s.DestinationCidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("DestinationCidrBlock"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateRoute.
 type CreateRouteOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -8994,6 +10327,7 @@ func (s CreateRouteOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateRouteTable.
 type CreateRouteTableInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9017,6 +10351,20 @@ func (s CreateRouteTableInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateRouteTableInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateRouteTableInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateRouteTable.
 type CreateRouteTableOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9034,6 +10382,7 @@ func (s CreateRouteTableOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateSecurityGroup.
 type CreateSecurityGroupInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9075,6 +10424,23 @@ func (s CreateSecurityGroupInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateSecurityGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateSecurityGroupInput"}
+	if s.Description == nil {
+		invalidParams.Add(request.NewErrParamRequired("Description"))
+	}
+	if s.GroupName == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateSecurityGroup.
 type CreateSecurityGroupOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9092,6 +10458,7 @@ func (s CreateSecurityGroupOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateSnapshot.
 type CreateSnapshotInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9116,6 +10483,19 @@ func (s CreateSnapshotInput) String() string {
 // GoString returns the string representation
 func (s CreateSnapshotInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateSnapshotInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateSnapshotInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Contains the parameters for CreateSpotDatafeedSubscription.
@@ -9145,6 +10525,19 @@ func (s CreateSpotDatafeedSubscriptionInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateSpotDatafeedSubscriptionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateSpotDatafeedSubscriptionInput"}
+	if s.Bucket == nil {
+		invalidParams.Add(request.NewErrParamRequired("Bucket"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of CreateSpotDatafeedSubscription.
 type CreateSpotDatafeedSubscriptionOutput struct {
 	_ struct{} `type:"structure"`
@@ -9163,6 +10556,7 @@ func (s CreateSpotDatafeedSubscriptionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateSubnet.
 type CreateSubnetInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9195,6 +10589,23 @@ func (s CreateSubnetInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateSubnetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateSubnetInput"}
+	if s.CidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("CidrBlock"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateSubnet.
 type CreateSubnetOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9212,6 +10623,7 @@ func (s CreateSubnetOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateTags.
 type CreateTagsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9240,6 +10652,22 @@ func (s CreateTagsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateTagsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateTagsInput"}
+	if s.Resources == nil {
+		invalidParams.Add(request.NewErrParamRequired("Resources"))
+	}
+	if s.Tags == nil {
+		invalidParams.Add(request.NewErrParamRequired("Tags"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CreateTagsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9254,6 +10682,7 @@ func (s CreateTagsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVolume.
 type CreateVolumeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9276,11 +10705,11 @@ type CreateVolumeInput struct {
 	// in the Amazon Elastic Compute Cloud User Guide.
 	Encrypted *bool `locationName:"encrypted" type:"boolean"`
 
-	// Only valid for Provisioned IOPS (SSD) volumes. The number of I/O operations
+	// Only valid for Provisioned IOPS SSD volumes. The number of I/O operations
 	// per second (IOPS) to provision for the volume, with a maximum ratio of 30
 	// IOPS/GiB.
 	//
-	// Constraint: Range is 100 to 20000 for Provisioned IOPS (SSD) volumes
+	// Constraint: Range is 100 to 20000 for Provisioned IOPS SSD volumes
 	Iops *int64 `type:"integer"`
 
 	// The full ARN of the AWS Key Management Service (AWS KMS) customer master
@@ -9294,9 +10723,9 @@ type CreateVolumeInput struct {
 
 	// The size of the volume, in GiBs.
 	//
-	// Constraints: 1-1024 for standard volumes, 1-16384 for gp2 volumes, and 4-16384
-	// for io1 volumes. If you specify a snapshot, the volume size must be equal
-	// to or larger than the snapshot size.
+	// Constraints: 1-16384 for gp2, 4-16384 for io1, 500-16384 for st1, 500-16384
+	// for sc1, and 1-1024 for standard. If you specify a snapshot, the volume size
+	// must be equal to or larger than the snapshot size.
 	//
 	// Default: If you're creating the volume from a snapshot and don't specify
 	// a volume size, the default is the snapshot size.
@@ -9305,8 +10734,9 @@ type CreateVolumeInput struct {
 	// The snapshot from which to create the volume.
 	SnapshotId *string `type:"string"`
 
-	// The volume type. This can be gp2 for General Purpose (SSD) volumes, io1 for
-	// Provisioned IOPS (SSD) volumes, or standard for Magnetic volumes.
+	// The volume type. This can be gp2 for General Purpose SSD, io1 for Provisioned
+	// IOPS SSD, st1 for Throughput Optimized HDD, sc1 for Cold HDD, or standard
+	// for Magnetic volumes.
 	//
 	// Default: standard
 	VolumeType *string `type:"string" enum:"VolumeType"`
@@ -9320,6 +10750,19 @@ func (s CreateVolumeInput) String() string {
 // GoString returns the string representation
 func (s CreateVolumeInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVolumeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVolumeInput"}
+	if s.AvailabilityZone == nil {
+		invalidParams.Add(request.NewErrParamRequired("AvailabilityZone"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes the user or group to be added or removed from the permissions for
@@ -9369,6 +10812,7 @@ func (s CreateVolumePermissionModifications) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpcEndpoint.
 type CreateVpcEndpointInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9408,6 +10852,23 @@ func (s CreateVpcEndpointInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVpcEndpointInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVpcEndpointInput"}
+	if s.ServiceName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ServiceName"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateVpcEndpoint.
 type CreateVpcEndpointOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9429,6 +10890,7 @@ func (s CreateVpcEndpointOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpc.
 type CreateVpcInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9441,11 +10903,11 @@ type CreateVpcInput struct {
 	// it is UnauthorizedOperation.
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
 
-	// The supported tenancy options for instances launched into the VPC. A value
-	// of default means that instances can be launched with any tenancy; a value
-	// of dedicated means all instances launched into the VPC are launched as dedicated
-	// tenancy instances regardless of the tenancy assigned to the instance at launch.
-	// Dedicated tenancy instances run on single-tenant hardware.
+	// The tenancy options for instances launched into the VPC. For default, instances
+	// are launched with shared tenancy by default. You can launch instances with
+	// any tenancy into a shared tenancy VPC. For dedicated, instances are launched
+	// as dedicated tenancy instances by default. You can only launch instances
+	// with a tenancy of dedicated or host into a dedicated tenancy VPC.
 	//
 	// Important: The host value cannot be used with this parameter. Use the default
 	// or dedicated values only.
@@ -9464,6 +10926,20 @@ func (s CreateVpcInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVpcInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVpcInput"}
+	if s.CidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("CidrBlock"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateVpc.
 type CreateVpcOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9481,6 +10957,7 @@ func (s CreateVpcOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpcPeeringConnection.
 type CreateVpcPeeringConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9512,6 +10989,7 @@ func (s CreateVpcPeeringConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of CreateVpcPeeringConnection.
 type CreateVpcPeeringConnectionOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9529,6 +11007,7 @@ func (s CreateVpcPeeringConnectionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpnConnection.
 type CreateVpnConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9565,6 +11044,26 @@ func (s CreateVpnConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVpnConnectionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVpnConnectionInput"}
+	if s.CustomerGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("CustomerGatewayId"))
+	}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+	if s.VpnGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateVpnConnection.
 type CreateVpnConnectionOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9582,6 +11081,7 @@ func (s CreateVpnConnectionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpnConnectionRoute.
 type CreateVpnConnectionRouteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9602,6 +11102,22 @@ func (s CreateVpnConnectionRouteInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVpnConnectionRouteInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVpnConnectionRouteInput"}
+	if s.DestinationCidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("DestinationCidrBlock"))
+	}
+	if s.VpnConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnConnectionId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type CreateVpnConnectionRouteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9616,6 +11132,7 @@ func (s CreateVpnConnectionRouteOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for CreateVpnGateway.
 type CreateVpnGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9642,6 +11159,20 @@ func (s CreateVpnGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *CreateVpnGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateVpnGatewayInput"}
+	if s.Type == nil {
+		invalidParams.Add(request.NewErrParamRequired("Type"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of CreateVpnGateway.
 type CreateVpnGatewayOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9694,6 +11225,7 @@ func (s CustomerGateway) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteCustomerGateway.
 type DeleteCustomerGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9717,6 +11249,19 @@ func (s DeleteCustomerGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteCustomerGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteCustomerGatewayInput"}
+	if s.CustomerGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("CustomerGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteCustomerGatewayOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9731,6 +11276,7 @@ func (s DeleteCustomerGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteDhcpOptions.
 type DeleteDhcpOptionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9754,6 +11300,19 @@ func (s DeleteDhcpOptionsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteDhcpOptionsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteDhcpOptionsInput"}
+	if s.DhcpOptionsId == nil {
+		invalidParams.Add(request.NewErrParamRequired("DhcpOptionsId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteDhcpOptionsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9768,6 +11327,7 @@ func (s DeleteDhcpOptionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteFlowLogs.
 type DeleteFlowLogsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9785,6 +11345,20 @@ func (s DeleteFlowLogsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteFlowLogsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteFlowLogsInput"}
+	if s.FlowLogIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("FlowLogIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DeleteFlowLogs.
 type DeleteFlowLogsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -9802,6 +11376,7 @@ func (s DeleteFlowLogsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteInternetGateway.
 type DeleteInternetGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9825,6 +11400,19 @@ func (s DeleteInternetGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteInternetGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteInternetGatewayInput"}
+	if s.InternetGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InternetGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteInternetGatewayOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9839,6 +11427,7 @@ func (s DeleteInternetGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteKeyPair.
 type DeleteKeyPairInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9862,6 +11451,19 @@ func (s DeleteKeyPairInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteKeyPairInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteKeyPairInput"}
+	if s.KeyName == nil {
+		invalidParams.Add(request.NewErrParamRequired("KeyName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteKeyPairOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9876,6 +11478,56 @@ func (s DeleteKeyPairOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteNatGateway.
+type DeleteNatGatewayInput struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of the NAT gateway.
+	NatGatewayId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s DeleteNatGatewayInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DeleteNatGatewayInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteNatGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteNatGatewayInput"}
+	if s.NatGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NatGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DeleteNatGateway.
+type DeleteNatGatewayOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of the NAT gateway.
+	NatGatewayId *string `locationName:"natGatewayId" type:"string"`
+}
+
+// String returns the string representation
+func (s DeleteNatGatewayOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DeleteNatGatewayOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DeleteNetworkAclEntry.
 type DeleteNetworkAclEntryInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9905,6 +11557,25 @@ func (s DeleteNetworkAclEntryInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteNetworkAclEntryInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteNetworkAclEntryInput"}
+	if s.Egress == nil {
+		invalidParams.Add(request.NewErrParamRequired("Egress"))
+	}
+	if s.NetworkAclId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkAclId"))
+	}
+	if s.RuleNumber == nil {
+		invalidParams.Add(request.NewErrParamRequired("RuleNumber"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteNetworkAclEntryOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9919,6 +11590,7 @@ func (s DeleteNetworkAclEntryOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteNetworkAcl.
 type DeleteNetworkAclInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9942,6 +11614,19 @@ func (s DeleteNetworkAclInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteNetworkAclInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteNetworkAclInput"}
+	if s.NetworkAclId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkAclId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteNetworkAclOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9956,6 +11641,7 @@ func (s DeleteNetworkAclOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteNetworkInterface.
 type DeleteNetworkInterfaceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -9979,6 +11665,19 @@ func (s DeleteNetworkInterfaceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteNetworkInterfaceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteNetworkInterfaceInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteNetworkInterfaceOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -9993,6 +11692,7 @@ func (s DeleteNetworkInterfaceOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeletePlacementGroup.
 type DeletePlacementGroupInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10016,6 +11716,19 @@ func (s DeletePlacementGroupInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeletePlacementGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeletePlacementGroupInput"}
+	if s.GroupName == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupName"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeletePlacementGroupOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10030,6 +11743,7 @@ func (s DeletePlacementGroupOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteRoute.
 type DeleteRouteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10057,6 +11771,22 @@ func (s DeleteRouteInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteRouteInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteRouteInput"}
+	if s.DestinationCidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("DestinationCidrBlock"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteRouteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10071,6 +11801,7 @@ func (s DeleteRouteOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteRouteTable.
 type DeleteRouteTableInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10094,6 +11825,19 @@ func (s DeleteRouteTableInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteRouteTableInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteRouteTableInput"}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteRouteTableOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10108,6 +11852,7 @@ func (s DeleteRouteTableOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteSecurityGroup.
 type DeleteSecurityGroupInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10149,6 +11894,7 @@ func (s DeleteSecurityGroupOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteSnapshot.
 type DeleteSnapshotInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10170,6 +11916,19 @@ func (s DeleteSnapshotInput) String() string {
 // GoString returns the string representation
 func (s DeleteSnapshotInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteSnapshotInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteSnapshotInput"}
+	if s.SnapshotId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SnapshotId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DeleteSnapshotOutput struct {
@@ -10221,6 +11980,7 @@ func (s DeleteSpotDatafeedSubscriptionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteSubnet.
 type DeleteSubnetInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10244,6 +12004,19 @@ func (s DeleteSubnetInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteSubnetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteSubnetInput"}
+	if s.SubnetId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SubnetId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteSubnetOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10258,6 +12031,7 @@ func (s DeleteSubnetOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteTags.
 type DeleteTagsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10287,6 +12061,19 @@ func (s DeleteTagsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteTagsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteTagsInput"}
+	if s.Resources == nil {
+		invalidParams.Add(request.NewErrParamRequired("Resources"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteTagsOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10301,6 +12088,7 @@ func (s DeleteTagsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVolume.
 type DeleteVolumeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10324,6 +12112,19 @@ func (s DeleteVolumeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVolumeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVolumeInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteVolumeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10338,6 +12139,7 @@ func (s DeleteVolumeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpcEndpoints.
 type DeleteVpcEndpointsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10361,6 +12163,20 @@ func (s DeleteVpcEndpointsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpcEndpointsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpcEndpointsInput"}
+	if s.VpcEndpointIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcEndpointIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DeleteVpcEndpoints.
 type DeleteVpcEndpointsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10378,6 +12194,7 @@ func (s DeleteVpcEndpointsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpc.
 type DeleteVpcInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10401,6 +12218,19 @@ func (s DeleteVpcInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpcInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpcInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteVpcOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10415,6 +12245,7 @@ func (s DeleteVpcOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpcPeeringConnection.
 type DeleteVpcPeeringConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10438,6 +12269,20 @@ func (s DeleteVpcPeeringConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpcPeeringConnectionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpcPeeringConnectionInput"}
+	if s.VpcPeeringConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcPeeringConnectionId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DeleteVpcPeeringConnection.
 type DeleteVpcPeeringConnectionOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10455,6 +12300,7 @@ func (s DeleteVpcPeeringConnectionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpnConnection.
 type DeleteVpnConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10478,6 +12324,19 @@ func (s DeleteVpnConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpnConnectionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpnConnectionInput"}
+	if s.VpnConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnConnectionId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteVpnConnectionOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10492,6 +12351,7 @@ func (s DeleteVpnConnectionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpnConnectionRoute.
 type DeleteVpnConnectionRouteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10512,6 +12372,22 @@ func (s DeleteVpnConnectionRouteInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpnConnectionRouteInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpnConnectionRouteInput"}
+	if s.DestinationCidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("DestinationCidrBlock"))
+	}
+	if s.VpnConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnConnectionId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteVpnConnectionRouteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10526,6 +12402,7 @@ func (s DeleteVpnConnectionRouteOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeleteVpnGateway.
 type DeleteVpnGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10549,6 +12426,19 @@ func (s DeleteVpnGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteVpnGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteVpnGatewayInput"}
+	if s.VpnGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeleteVpnGatewayOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10563,6 +12453,7 @@ func (s DeleteVpnGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DeregisterImage.
 type DeregisterImageInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10586,6 +12477,19 @@ func (s DeregisterImageInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeregisterImageInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeregisterImageInput"}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DeregisterImageOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -10600,6 +12504,7 @@ func (s DeregisterImageOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeAccountAttributes.
 type DescribeAccountAttributesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10623,6 +12528,7 @@ func (s DescribeAccountAttributesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeAccountAttributes.
 type DescribeAccountAttributesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10640,6 +12546,7 @@ func (s DescribeAccountAttributesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeAddresses.
 type DescribeAddressesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10693,6 +12600,7 @@ func (s DescribeAddressesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeAddresses.
 type DescribeAddressesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10710,6 +12618,7 @@ func (s DescribeAddressesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeAvailabilityZones.
 type DescribeAvailabilityZonesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10746,6 +12655,7 @@ func (s DescribeAvailabilityZonesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeAvailabiltyZones.
 type DescribeAvailabilityZonesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10763,6 +12673,7 @@ func (s DescribeAvailabilityZonesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeBundleTasks.
 type DescribeBundleTasksInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10813,6 +12724,7 @@ func (s DescribeBundleTasksInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeBundleTasks.
 type DescribeBundleTasksOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10830,6 +12742,7 @@ func (s DescribeBundleTasksOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeClassicLinkInstances.
 type DescribeClassicLinkInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10887,6 +12800,7 @@ func (s DescribeClassicLinkInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeClassicLinkInstances.
 type DescribeClassicLinkInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10908,6 +12822,7 @@ func (s DescribeClassicLinkInstancesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeConversionTasks.
 type DescribeConversionTasksInput struct {
 	_ struct{} `type:"structure"`
 
@@ -10934,6 +12849,7 @@ func (s DescribeConversionTasksInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for DescribeConversionTasks.
 type DescribeConversionTasksOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -10951,6 +12867,7 @@ func (s DescribeConversionTasksOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeCustomerGateways.
 type DescribeCustomerGatewaysInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11005,6 +12922,7 @@ func (s DescribeCustomerGatewaysInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeCustomerGateways.
 type DescribeCustomerGatewaysOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11022,6 +12940,7 @@ func (s DescribeCustomerGatewaysOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeDhcpOptions.
 type DescribeDhcpOptionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11068,6 +12987,7 @@ func (s DescribeDhcpOptionsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeDhcpOptions.
 type DescribeDhcpOptionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11085,6 +13005,7 @@ func (s DescribeDhcpOptionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeExportTasks.
 type DescribeExportTasksInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11102,6 +13023,7 @@ func (s DescribeExportTasksInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for DescribeExportTasks.
 type DescribeExportTasksOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11119,6 +13041,7 @@ func (s DescribeExportTasksOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeFlowLogs.
 type DescribeFlowLogsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11159,6 +13082,7 @@ func (s DescribeFlowLogsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeFlowLogs.
 type DescribeFlowLogsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11180,6 +13104,7 @@ func (s DescribeFlowLogsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeHosts.
 type DescribeHostsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11225,6 +13150,7 @@ func (s DescribeHostsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeHosts.
 type DescribeHostsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11246,6 +13172,7 @@ func (s DescribeHostsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeIdFormat.
 type DescribeIdFormatInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11263,6 +13190,7 @@ func (s DescribeIdFormatInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeIdFormat.
 type DescribeIdFormatOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11280,6 +13208,7 @@ func (s DescribeIdFormatOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeImageAttribute.
 type DescribeImageAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11308,6 +13237,22 @@ func (s DescribeImageAttributeInput) String() string {
 // GoString returns the string representation
 func (s DescribeImageAttributeInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeImageAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeImageAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes an image attribute.
@@ -11349,6 +13294,7 @@ func (s DescribeImageAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeImages.
 type DescribeImagesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11379,7 +13325,7 @@ type DescribeImagesInput struct {
 	// in GiB.
 	//
 	//   block-device-mapping.volume-type - The volume type of the EBS volume (gp2
-	// | standard | io1).
+	// | io1 | st1 | sc1 | standard).
 	//
 	//   description - The description of the image (provided during image creation).
 	//
@@ -11456,6 +13402,7 @@ func (s DescribeImagesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeImages.
 type DescribeImagesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11473,6 +13420,7 @@ func (s DescribeImagesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeImportImageTasks.
 type DescribeImportImageTasksInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11482,13 +13430,15 @@ type DescribeImportImageTasksInput struct {
 	// it is UnauthorizedOperation.
 	DryRun *bool `type:"boolean"`
 
-	// One or more filters.
+	// Filter tasks using the task-state filter and one of the following values:
+	// active, completed, deleting, deleted.
 	Filters []*Filter `locationNameList:"Filter" type:"list"`
 
 	// A list of import image task IDs.
 	ImportTaskIds []*string `locationName:"ImportTaskId" locationNameList:"ImportTaskId" type:"list"`
 
-	// The maximum number of results to return in a single request.
+	// The maximum number of results to return in a single call. To retrieve the
+	// remaining results, make another call with the returned NextToken value.
 	MaxResults *int64 `type:"integer"`
 
 	// A token that indicates the next page of results.
@@ -11505,6 +13455,7 @@ func (s DescribeImportImageTasksInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for DescribeImportImageTasks.
 type DescribeImportImageTasksOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11527,6 +13478,7 @@ func (s DescribeImportImageTasksOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeImportSnapshotTasks.
 type DescribeImportSnapshotTasksInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11542,7 +13494,8 @@ type DescribeImportSnapshotTasksInput struct {
 	// A list of import snapshot task IDs.
 	ImportTaskIds []*string `locationName:"ImportTaskId" locationNameList:"ImportTaskId" type:"list"`
 
-	// The maximum number of results to return in a single request.
+	// The maximum number of results to return in a single call. To retrieve the
+	// remaining results, make another call with the returned NextToken value.
 	MaxResults *int64 `type:"integer"`
 
 	// A token that indicates the next page of results.
@@ -11559,6 +13512,7 @@ func (s DescribeImportSnapshotTasksInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for DescribeImportSnapshotTasks.
 type DescribeImportSnapshotTasksOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11581,6 +13535,7 @@ func (s DescribeImportSnapshotTasksOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeInstanceAttribute.
 type DescribeInstanceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11605,6 +13560,22 @@ func (s DescribeInstanceAttributeInput) String() string {
 // GoString returns the string representation
 func (s DescribeInstanceAttributeInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeInstanceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeInstanceAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes an instance attribute.
@@ -11668,6 +13639,7 @@ func (s DescribeInstanceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeInstanceStatus.
 type DescribeInstanceStatusInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11727,12 +13699,10 @@ type DescribeInstanceStatusInput struct {
 	// Constraints: Maximum 100 explicitly specified instance IDs.
 	InstanceIds []*string `locationName:"InstanceId" locationNameList:"InstanceId" type:"list"`
 
-	// The maximum number of results to return for the request in a single page.
-	// The remaining results of the initial request can be seen by sending another
-	// request with the returned NextToken value. This value can be between 5 and
-	// 1000; if MaxResults is given a value larger than 1000, only 1000 results
-	// are returned. You cannot specify this parameter and the instance IDs parameter
-	// in the same request.
+	// The maximum number of results to return in a single call. To retrieve the
+	// remaining results, make another call with the returned NextToken value. This
+	// value can be between 5 and 1000. You cannot specify this parameter and the
+	// instance IDs parameter in the same call.
 	MaxResults *int64 `type:"integer"`
 
 	// The token to retrieve the next page of results.
@@ -11749,6 +13719,7 @@ func (s DescribeInstanceStatusInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeInstanceStatus.
 type DescribeInstanceStatusOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -11770,6 +13741,7 @@ func (s DescribeInstanceStatusOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeInstances.
 type DescribeInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -11780,6 +13752,9 @@ type DescribeInstancesInput struct {
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
 
 	// One or more filters.
+	//
+	//   affinity - The affinity setting for an instance running on a Dedicated
+	// host (default | host).
 	//
 	//   architecture - The instance architecture (i386 | x86_64).
 	//
@@ -11810,6 +13785,9 @@ type DescribeInstancesInput struct {
 	//   group-name - The name of the security group for the instance. EC2-Classic
 	// only.
 	//
+	//   host-Id - The ID of the Dedicated host on which the instance is running,
+	// if applicable.
+	//
 	//   hypervisor - The hypervisor type of the instance (ovm | xen).
 	//
 	//   iam-instance-profile.arn - The instance profile associated with the instance.
@@ -11819,7 +13797,8 @@ type DescribeInstancesInput struct {
 	//
 	//   instance-id - The ID of the instance.
 	//
-	//   instance-lifecycle - Indicates whether this is a Spot Instance (spot).
+	//   instance-lifecycle - Indicates whether this is a Spot Instance or a Scheduled
+	// Instance (spot | scheduled).
 	//
 	//   instance-state-code - The state of the instance, as a 16-bit unsigned
 	// integer. The high byte is an opaque internal value and should be ignored.
@@ -11915,7 +13894,7 @@ type DescribeInstancesInput struct {
 	//   tag-value - The value of a tag assigned to the resource. This filter is
 	// independent of the tag-key filter.
 	//
-	//   tenancy - The tenancy of an instance (dedicated | default).
+	//   tenancy - The tenancy of an instance (dedicated | default | host).
 	//
 	//   virtualization-type - The virtualization type of the instance (paravirtual
 	// | hvm).
@@ -11945,7 +13924,7 @@ type DescribeInstancesInput struct {
 	//
 	//   network-interface.mac-address - The MAC address of the network interface.
 	//
-	//   network-interface-private-dns-name - The private DNS name of the network
+	//   network-interface.private-dns-name - The private DNS name of the network
 	// interface.
 	//
 	//   network-interface.source-dest-check - Whether the network interface performs
@@ -12009,12 +13988,10 @@ type DescribeInstancesInput struct {
 	// Default: Describes all your instances.
 	InstanceIds []*string `locationName:"InstanceId" locationNameList:"InstanceId" type:"list"`
 
-	// The maximum number of results to return for the request in a single page.
-	// The remaining results of the initial request can be seen by sending another
-	// request with the returned NextToken value. This value can be between 5 and
-	// 1000; if MaxResults is given a value larger than 1000, only 1000 results
-	// are returned. You cannot specify this parameter and the instance IDs parameter
-	// in the same request.
+	// The maximum number of results to return in a single call. To retrieve the
+	// remaining results, make another call with the returned NextToken value. This
+	// value can be between 5 and 1000. You cannot specify this parameter and the
+	// instance IDs parameter or tag filters in the same call.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
 	// The token to request the next page of results.
@@ -12031,6 +14008,7 @@ func (s DescribeInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeInstances.
 type DescribeInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12052,6 +14030,7 @@ func (s DescribeInstancesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeInternetGateways.
 type DescribeInternetGatewaysInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12099,6 +14078,7 @@ func (s DescribeInternetGatewaysInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeInternetGateways.
 type DescribeInternetGatewaysOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12116,6 +14096,7 @@ func (s DescribeInternetGatewaysOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeKeyPairs.
 type DescribeKeyPairsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12148,6 +14129,7 @@ func (s DescribeKeyPairsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeKeyPairs.
 type DescribeKeyPairsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12165,6 +14147,7 @@ func (s DescribeKeyPairsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeMovingAddresses.
 type DescribeMovingAddressesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12204,6 +14187,7 @@ func (s DescribeMovingAddressesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeMovingAddresses.
 type DescribeMovingAddressesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12225,6 +14209,70 @@ func (s DescribeMovingAddressesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeNatGateways.
+type DescribeNatGatewaysInput struct {
+	_ struct{} `type:"structure"`
+
+	// One or more filters.
+	//
+	//   nat-gateway-id - The ID of the NAT gateway.
+	//
+	//   state - The state of the NAT gateway (pending | failed | available | deleting
+	// | deleted).
+	//
+	//   subnet-id - The ID of the subnet in which the NAT gateway resides.
+	//
+	//   vpc-id - The ID of the VPC in which the NAT gateway resides.
+	Filter []*Filter `locationNameList:"Filter" type:"list"`
+
+	// The maximum number of items to return for this request. The request returns
+	// a token that you can specify in a subsequent call to get the next set of
+	// results.
+	//
+	// Constraint: If the value specified is greater than 1000, we return only
+	// 1000 items.
+	MaxResults *int64 `type:"integer"`
+
+	// One or more NAT gateway IDs.
+	NatGatewayIds []*string `locationName:"NatGatewayId" locationNameList:"item" type:"list"`
+
+	// The token to retrieve the next page of results.
+	NextToken *string `type:"string"`
+}
+
+// String returns the string representation
+func (s DescribeNatGatewaysInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeNatGatewaysInput) GoString() string {
+	return s.String()
+}
+
+// Contains the output of DescribeNatGateways.
+type DescribeNatGatewaysOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Information about the NAT gateways.
+	NatGateways []*NatGateway `locationName:"natGatewaySet" locationNameList:"item" type:"list"`
+
+	// The token to use to retrieve the next page of results. This value is null
+	// when there are no more results to return.
+	NextToken *string `locationName:"nextToken" type:"string"`
+}
+
+// String returns the string representation
+func (s DescribeNatGatewaysOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeNatGatewaysOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DescribeNetworkAcls.
 type DescribeNetworkAclsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12299,6 +14347,7 @@ func (s DescribeNetworkAclsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeNetworkAcls.
 type DescribeNetworkAclsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12316,6 +14365,7 @@ func (s DescribeNetworkAclsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeNetworkInterfaceAttribute.
 type DescribeNetworkInterfaceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12342,6 +14392,20 @@ func (s DescribeNetworkInterfaceAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeNetworkInterfaceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeNetworkInterfaceAttributeInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeNetworkInterfaceAttribute.
 type DescribeNetworkInterfaceAttributeOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12371,6 +14435,7 @@ func (s DescribeNetworkInterfaceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeNetworkInterfaces.
 type DescribeNetworkInterfacesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12410,23 +14475,26 @@ type DescribeNetworkInterfacesInput struct {
 	//
 	//   attachment.attachment-id - The ID of the interface attachment.
 	//
+	//   attachment.attach.time - The time that the network interface was attached
+	// to an instance.
+	//
+	//   attachment.delete-on-termination - Indicates whether the attachment is
+	// deleted when an instance is terminated.
+	//
+	//   attachment.device-index - The device index to which the network interface
+	// is attached.
+	//
 	//   attachment.instance-id - The ID of the instance to which the network interface
 	// is attached.
 	//
 	//   attachment.instance-owner-id - The owner ID of the instance to which the
 	// network interface is attached.
 	//
-	//   attachment.device-index - The device index to which the network interface
-	// is attached.
+	//   attachment.nat-gateway-id - The ID of the NAT gateway to which the network
+	// interface is attached.
 	//
 	//   attachment.status - The status of the attachment (attaching | attached
 	// | detaching | detached).
-	//
-	//   attachment.attach.time - The time that the network interface was attached
-	// to an instance.
-	//
-	//   attachment.delete-on-termination - Indicates whether the attachment is
-	// deleted when an instance is terminated.
 	//
 	//   availability-zone - The Availability Zone of the network interface.
 	//
@@ -12458,7 +14526,7 @@ type DescribeNetworkInterfacesInput struct {
 	//   source-desk-check - Indicates whether the network interface performs source/destination
 	// checking. A value of true means checking is enabled, and false means checking
 	// is disabled. The value must be false for the network interface to perform
-	// Network Address Translation (NAT) in your VPC.
+	// network address translation (NAT) in your VPC.
 	//
 	//   status - The status of the network interface. If the network interface
 	// is not attached to an instance, the status is available; if a network interface
@@ -12497,6 +14565,7 @@ func (s DescribeNetworkInterfacesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeNetworkInterfaces.
 type DescribeNetworkInterfacesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12514,6 +14583,7 @@ func (s DescribeNetworkInterfacesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribePlacementGroups.
 type DescribePlacementGroupsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12549,6 +14619,7 @@ func (s DescribePlacementGroupsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribePlacementGroups.
 type DescribePlacementGroupsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12566,6 +14637,7 @@ func (s DescribePlacementGroupsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribePrefixLists.
 type DescribePrefixListsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12608,6 +14680,7 @@ func (s DescribePrefixListsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribePrefixLists.
 type DescribePrefixListsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12629,6 +14702,7 @@ func (s DescribePrefixListsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeRegions.
 type DescribeRegionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12659,6 +14733,7 @@ func (s DescribeRegionsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeRegions.
 type DescribeRegionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12676,6 +14751,7 @@ func (s DescribeRegionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeReservedInstances.
 type DescribeReservedInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12687,36 +14763,35 @@ type DescribeReservedInstancesInput struct {
 
 	// One or more filters.
 	//
-	//   availability-zone - The Availability Zone where the Reserved instance
+	//   availability-zone - The Availability Zone where the Reserved Instance
 	// can be used.
 	//
-	//   duration - The duration of the Reserved instance (one year or three years),
+	//   duration - The duration of the Reserved Instance (one year or three years),
 	// in seconds (31536000 | 94608000).
 	//
-	//   end - The time when the Reserved instance expires (for example, 2015-08-07T11:54:42.000Z).
+	//   end - The time when the Reserved Instance expires (for example, 2015-08-07T11:54:42.000Z).
 	//
-	//   fixed-price - The purchase price of the Reserved instance (for example,
+	//   fixed-price - The purchase price of the Reserved Instance (for example,
 	// 9800.0).
 	//
-	//   instance-type - The instance type on which the Reserved instance can be
-	// used.
+	//   instance-type - The instance type that is covered by the reservation.
 	//
-	//   product-description - The Reserved instance product platform description.
+	//   product-description - The Reserved Instance product platform description.
 	// Instances that include (Amazon VPC) in the product platform description will
 	// only be displayed to EC2-Classic account holders and are for use with Amazon
-	// VPC. (Linux/UNIX | Linux/UNIX (Amazon VPC) | SUSE Linux | SUSE Linux (Amazon
+	// VPC (Linux/UNIX | Linux/UNIX (Amazon VPC) | SUSE Linux | SUSE Linux (Amazon
 	// VPC) | Red Hat Enterprise Linux | Red Hat Enterprise Linux (Amazon VPC) |
 	// Windows | Windows (Amazon VPC) | Windows with SQL Server Standard | Windows
 	// with SQL Server Standard (Amazon VPC) | Windows with SQL Server Web | Windows
 	// with SQL Server Web (Amazon VPC) | Windows with SQL Server Enterprise | Windows
 	// with SQL Server Enterprise (Amazon VPC)).
 	//
-	//   reserved-instances-id - The ID of the Reserved instance.
+	//   reserved-instances-id - The ID of the Reserved Instance.
 	//
-	//   start - The time at which the Reserved instance purchase request was placed
+	//   start - The time at which the Reserved Instance purchase request was placed
 	// (for example, 2014-08-07T11:54:42.000Z).
 	//
-	//   state - The state of the Reserved instance (payment-pending | active |
+	//   state - The state of the Reserved Instance (payment-pending | active |
 	// payment-failed | retired).
 	//
 	//   tag:key=value - The key/value combination of a tag assigned to the resource.
@@ -12731,18 +14806,18 @@ type DescribeReservedInstancesInput struct {
 	//   tag-value - The value of a tag assigned to the resource. This filter is
 	// independent of the tag-key filter.
 	//
-	//   usage-price - The usage price of the Reserved instance, per hour (for
+	//   usage-price - The usage price of the Reserved Instance, per hour (for
 	// example, 0.84).
 	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
 
-	// The Reserved instance offering type. If you are using tools that predate
+	// The Reserved Instance offering type. If you are using tools that predate
 	// the 2011-11-01 API version, you only have access to the Medium Utilization
-	// Reserved instance offering type.
+	// Reserved Instance offering type.
 	OfferingType *string `locationName:"offeringType" type:"string" enum:"OfferingTypeValues"`
 
-	// One or more Reserved instance IDs.
+	// One or more Reserved Instance IDs.
 	//
-	// Default: Describes all your Reserved instances, or only those otherwise
+	// Default: Describes all your Reserved Instances, or only those otherwise
 	// specified.
 	ReservedInstancesIds []*string `locationName:"ReservedInstancesId" locationNameList:"ReservedInstancesId" type:"list"`
 }
@@ -12757,25 +14832,26 @@ func (s DescribeReservedInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeReservedInstancesListings.
 type DescribeReservedInstancesListingsInput struct {
 	_ struct{} `type:"structure"`
 
 	// One or more filters.
 	//
-	//   reserved-instances-id - The ID of the Reserved instances.
+	//   reserved-instances-id - The ID of the Reserved Instances.
 	//
-	//   reserved-instances-listing-id - The ID of the Reserved instances listing.
+	//   reserved-instances-listing-id - The ID of the Reserved Instances listing.
 	//
-	//   status - The status of the Reserved instance listing (pending | active
+	//   status - The status of the Reserved Instance listing (pending | active
 	// | cancelled | closed).
 	//
 	//   status-message - The reason for the status.
 	Filters []*Filter `locationName:"filters" locationNameList:"Filter" type:"list"`
 
-	// One or more Reserved instance IDs.
+	// One or more Reserved Instance IDs.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 
-	// One or more Reserved instance Listing IDs.
+	// One or more Reserved Instance listing IDs.
 	ReservedInstancesListingId *string `locationName:"reservedInstancesListingId" type:"string"`
 }
 
@@ -12789,10 +14865,11 @@ func (s DescribeReservedInstancesListingsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeReservedInstancesListings.
 type DescribeReservedInstancesListingsOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Information about the Reserved instance listing.
+	// Information about the Reserved Instance listing.
 	ReservedInstancesListings []*ReservedInstancesListing `locationName:"reservedInstancesListingsSet" locationNameList:"item" type:"list"`
 }
 
@@ -12806,6 +14883,7 @@ func (s DescribeReservedInstancesListingsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeReservedInstancesModifications.
 type DescribeReservedInstancesModificationsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -12817,27 +14895,27 @@ type DescribeReservedInstancesModificationsInput struct {
 	//
 	//   effective-date - The time when the modification becomes effective.
 	//
-	//   modification-result.reserved-instances-id - The ID for the Reserved instances
+	//   modification-result.reserved-instances-id - The ID for the Reserved Instances
 	// created as part of the modification request. This ID is only available when
 	// the status of the modification is fulfilled.
 	//
 	//   modification-result.target-configuration.availability-zone - The Availability
-	// Zone for the new Reserved instances.
+	// Zone for the new Reserved Instances.
 	//
 	//   modification-result.target-configuration.instance-count  - The number
-	// of new Reserved instances.
+	// of new Reserved Instances.
 	//
 	//   modification-result.target-configuration.instance-type - The instance
-	// type of the new Reserved instances.
+	// type of the new Reserved Instances.
 	//
 	//   modification-result.target-configuration.platform - The network platform
-	// of the new Reserved instances (EC2-Classic | EC2-VPC).
+	// of the new Reserved Instances (EC2-Classic | EC2-VPC).
 	//
-	//   reserved-instances-id - The ID of the Reserved instances modified.
+	//   reserved-instances-id - The ID of the Reserved Instances modified.
 	//
 	//   reserved-instances-modification-id - The ID of the modification request.
 	//
-	//   status - The status of the Reserved instances modification request (processing
+	//   status - The status of the Reserved Instances modification request (processing
 	// | fulfilled | failed).
 	//
 	//   status-message - The reason for the status.
@@ -12862,6 +14940,7 @@ func (s DescribeReservedInstancesModificationsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeReservedInstancesModifications.
 type DescribeReservedInstancesModificationsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12869,7 +14948,7 @@ type DescribeReservedInstancesModificationsOutput struct {
 	// when there are no more results to return.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
-	// The Reserved instance modification information.
+	// The Reserved Instance modification information.
 	ReservedInstancesModifications []*ReservedInstancesModification `locationName:"reservedInstancesModificationsSet" locationNameList:"item" type:"list"`
 }
 
@@ -12883,10 +14962,11 @@ func (s DescribeReservedInstancesModificationsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeReservedInstancesOfferings.
 type DescribeReservedInstancesOfferingsInput struct {
 	_ struct{} `type:"structure"`
 
-	// The Availability Zone in which the Reserved instance can be used.
+	// The Availability Zone in which the Reserved Instance can be used.
 	AvailabilityZone *string `type:"string"`
 
 	// Checks whether you have the required permissions for the action, without
@@ -12897,23 +14977,22 @@ type DescribeReservedInstancesOfferingsInput struct {
 
 	// One or more filters.
 	//
-	//   availability-zone - The Availability Zone where the Reserved instance
+	//   availability-zone - The Availability Zone where the Reserved Instance
 	// can be used.
 	//
-	//   duration - The duration of the Reserved instance (for example, one year
+	//   duration - The duration of the Reserved Instance (for example, one year
 	// or three years), in seconds (31536000 | 94608000).
 	//
-	//   fixed-price - The purchase price of the Reserved instance (for example,
+	//   fixed-price - The purchase price of the Reserved Instance (for example,
 	// 9800.0).
 	//
-	//   instance-type - The instance type on which the Reserved instance can be
-	// used.
+	//   instance-type - The instance type that is covered by the reservation.
 	//
 	//   marketplace - Set to true to show only Reserved Instance Marketplace offerings.
 	// When this filter is not used, which is the default behavior, all offerings
-	// from AWS and Reserved Instance Marketplace are listed.
+	// from both AWS and the Reserved Instance Marketplace are listed.
 	//
-	//   product-description - The Reserved instance product platform description.
+	//   product-description - The Reserved Instance product platform description.
 	// Instances that include (Amazon VPC) in the product platform description will
 	// only be displayed to EC2-Classic account holders and are for use with Amazon
 	// VPC. (Linux/UNIX | Linux/UNIX (Amazon VPC) | SUSE Linux | SUSE Linux (Amazon
@@ -12923,24 +15002,24 @@ type DescribeReservedInstancesOfferingsInput struct {
 	// with SQL Server Web (Amazon VPC) | Windows with SQL Server Enterprise | Windows
 	// with SQL Server Enterprise (Amazon VPC))
 	//
-	//   reserved-instances-offering-id - The Reserved instances offering ID.
+	//   reserved-instances-offering-id - The Reserved Instances offering ID.
 	//
-	//   usage-price - The usage price of the Reserved instance, per hour (for
+	//   usage-price - The usage price of the Reserved Instance, per hour (for
 	// example, 0.84).
 	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
 
 	// Include Reserved Instance Marketplace offerings in the response.
 	IncludeMarketplace *bool `type:"boolean"`
 
-	// The tenancy of the Reserved instance offering. A Reserved instance with dedicated
-	// tenancy is applied to instances that run on single-tenant hardware and can
-	// only be launched within a VPC.
+	// The tenancy of the instances covered by the reservation. A Reserved Instance
+	// with a tenancy of dedicated is applied to instances that run in a VPC on
+	// single-tenant hardware (i.e., Dedicated Instances).
 	//
 	// Default: default
 	InstanceTenancy *string `locationName:"instanceTenancy" type:"string" enum:"Tenancy"`
 
-	// The instance type on which the Reserved instance can be used. For more information,
-	// see Instance Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html)
+	// The instance type that the reservation will cover (for example, m1.small).
+	// For more information, see Instance Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html)
 	// in the Amazon Elastic Compute Cloud User Guide.
 	InstanceType *string `type:"string" enum:"InstanceType"`
 
@@ -12969,16 +15048,16 @@ type DescribeReservedInstancesOfferingsInput struct {
 	// The token to retrieve the next page of results.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
-	// The Reserved instance offering type. If you are using tools that predate
+	// The Reserved Instance offering type. If you are using tools that predate
 	// the 2011-11-01 API version, you only have access to the Medium Utilization
-	// Reserved instance offering type.
+	// Reserved Instance offering type.
 	OfferingType *string `locationName:"offeringType" type:"string" enum:"OfferingTypeValues"`
 
-	// The Reserved instance product platform description. Instances that include
+	// The Reserved Instance product platform description. Instances that include
 	// (Amazon VPC) in the description are for use with Amazon VPC.
 	ProductDescription *string `type:"string" enum:"RIProductDescription"`
 
-	// One or more Reserved instances offering IDs.
+	// One or more Reserved Instances offering IDs.
 	ReservedInstancesOfferingIds []*string `locationName:"ReservedInstancesOfferingId" type:"list"`
 }
 
@@ -12992,6 +15071,7 @@ func (s DescribeReservedInstancesOfferingsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeReservedInstancesOfferings.
 type DescribeReservedInstancesOfferingsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -12999,7 +15079,7 @@ type DescribeReservedInstancesOfferingsOutput struct {
 	// when there are no more results to return.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
-	// A list of Reserved instances offerings.
+	// A list of Reserved Instances offerings.
 	ReservedInstancesOfferings []*ReservedInstancesOffering `locationName:"reservedInstancesOfferingsSet" locationNameList:"item" type:"list"`
 }
 
@@ -13013,10 +15093,11 @@ func (s DescribeReservedInstancesOfferingsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for DescribeReservedInstances.
 type DescribeReservedInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
-	// A list of Reserved instances.
+	// A list of Reserved Instances.
 	ReservedInstances []*ReservedInstances `locationName:"reservedInstancesSet" locationNameList:"item" type:"list"`
 }
 
@@ -13030,6 +15111,7 @@ func (s DescribeReservedInstancesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeRouteTables.
 type DescribeRouteTablesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13064,6 +15146,8 @@ type DescribeRouteTablesInput struct {
 	//
 	//   route.instance-id - The ID of an instance specified in a route in the
 	// table.
+	//
+	//   route.nat-gateway-id - The ID of a NAT gateway.
 	//
 	//   route.origin - Describes how the route was created. CreateRouteTable indicates
 	// that the route was automatically created when the route table was created;
@@ -13110,6 +15194,7 @@ func (s DescribeRouteTablesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeRouteTables.
 type DescribeRouteTablesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13127,6 +15212,227 @@ func (s DescribeRouteTablesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeScheduledInstanceAvailability.
+type DescribeScheduledInstanceAvailabilityInput struct {
+	_ struct{} `type:"structure"`
+
+	// Checks whether you have the required permissions for the action, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// One or more filters.
+	//
+	//   availability-zone - The Availability Zone (for example, us-west-2a).
+	//
+	//   instance-type - The instance type (for example, c4.large).
+	//
+	//   network-platform - The network platform (EC2-Classic or EC2-VPC).
+	//
+	//   platform - The platform (Linux/UNIX or Windows).
+	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
+
+	// The time period for the first schedule to start.
+	FirstSlotStartTimeRange *SlotDateTimeRangeRequest `type:"structure" required:"true"`
+
+	// The maximum number of results to return in a single call. This value can
+	// be between 5 and 300. The default value is 300. To retrieve the remaining
+	// results, make another call with the returned NextToken value.
+	MaxResults *int64 `type:"integer"`
+
+	// The maximum available duration, in hours. This value must be greater than
+	// MinSlotDurationInHours and less than 1,720.
+	MaxSlotDurationInHours *int64 `type:"integer"`
+
+	// The minimum available duration, in hours. The minimum required duration is
+	// 1,200 hours per year. For example, the minimum daily schedule is 4 hours,
+	// the minimum weekly schedule is 24 hours, and the minimum monthly schedule
+	// is 100 hours.
+	MinSlotDurationInHours *int64 `type:"integer"`
+
+	// The token for the next set of results.
+	NextToken *string `type:"string"`
+
+	// The schedule recurrence.
+	Recurrence *ScheduledInstanceRecurrenceRequest `type:"structure" required:"true"`
+}
+
+// String returns the string representation
+func (s DescribeScheduledInstanceAvailabilityInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeScheduledInstanceAvailabilityInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeScheduledInstanceAvailabilityInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeScheduledInstanceAvailabilityInput"}
+	if s.FirstSlotStartTimeRange == nil {
+		invalidParams.Add(request.NewErrParamRequired("FirstSlotStartTimeRange"))
+	}
+	if s.Recurrence == nil {
+		invalidParams.Add(request.NewErrParamRequired("Recurrence"))
+	}
+	if s.FirstSlotStartTimeRange != nil {
+		if err := s.FirstSlotStartTimeRange.Validate(); err != nil {
+			invalidParams.AddNested("FirstSlotStartTimeRange", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeScheduledInstanceAvailability.
+type DescribeScheduledInstanceAvailabilityOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The token required to retrieve the next set of results. This value is null
+	// when there are no more results to return.
+	NextToken *string `locationName:"nextToken" type:"string"`
+
+	// Information about the available Scheduled Instances.
+	ScheduledInstanceAvailabilitySet []*ScheduledInstanceAvailability `locationName:"scheduledInstanceAvailabilitySet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeScheduledInstanceAvailabilityOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeScheduledInstanceAvailabilityOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DescribeScheduledInstances.
+type DescribeScheduledInstancesInput struct {
+	_ struct{} `type:"structure"`
+
+	// Checks whether you have the required permissions for the action, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// One or more filters.
+	//
+	//   availability-zone - The Availability Zone (for example, us-west-2a).
+	//
+	//   instance-type - The instance type (for example, c4.large).
+	//
+	//   network-platform - The network platform (EC2-Classic or EC2-VPC).
+	//
+	//   platform - The platform (Linux/UNIX or Windows).
+	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
+
+	// The maximum number of results to return in a single call. This value can
+	// be between 5 and 300. The default value is 100. To retrieve the remaining
+	// results, make another call with the returned NextToken value.
+	MaxResults *int64 `type:"integer"`
+
+	// The token for the next set of results.
+	NextToken *string `type:"string"`
+
+	// One or more Scheduled Instance IDs.
+	ScheduledInstanceIds []*string `locationName:"ScheduledInstanceId" locationNameList:"ScheduledInstanceId" type:"list"`
+
+	// The time period for the first schedule to start.
+	SlotStartTimeRange *SlotStartTimeRangeRequest `type:"structure"`
+}
+
+// String returns the string representation
+func (s DescribeScheduledInstancesInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeScheduledInstancesInput) GoString() string {
+	return s.String()
+}
+
+// Contains the output of DescribeScheduledInstances.
+type DescribeScheduledInstancesOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The token required to retrieve the next set of results. This value is null
+	// when there are no more results to return.
+	NextToken *string `locationName:"nextToken" type:"string"`
+
+	// Information about the Scheduled Instances.
+	ScheduledInstanceSet []*ScheduledInstance `locationName:"scheduledInstanceSet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeScheduledInstancesOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeScheduledInstancesOutput) GoString() string {
+	return s.String()
+}
+
+type DescribeSecurityGroupReferencesInput struct {
+	_ struct{} `type:"structure"`
+
+	// Checks whether you have the required permissions for the operation, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// One or more security group IDs in your account.
+	GroupId []*string `locationNameList:"item" type:"list" required:"true"`
+}
+
+// String returns the string representation
+func (s DescribeSecurityGroupReferencesInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeSecurityGroupReferencesInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeSecurityGroupReferencesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeSecurityGroupReferencesInput"}
+	if s.GroupId == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+type DescribeSecurityGroupReferencesOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Information about the VPCs with the referencing security groups.
+	SecurityGroupReferenceSet []*SecurityGroupReference `locationName:"securityGroupReferenceSet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeSecurityGroupReferencesOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeSecurityGroupReferencesOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DescribeSecurityGroups.
 type DescribeSecurityGroupsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13203,6 +15509,7 @@ func (s DescribeSecurityGroupsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeSecurityGroups.
 type DescribeSecurityGroupsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13220,6 +15527,7 @@ func (s DescribeSecurityGroupsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeSnapshotAttribute.
 type DescribeSnapshotAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13246,6 +15554,23 @@ func (s DescribeSnapshotAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeSnapshotAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeSnapshotAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.SnapshotId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SnapshotId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeSnapshotAttribute.
 type DescribeSnapshotAttributeOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13269,6 +15594,7 @@ func (s DescribeSnapshotAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeSnapshots.
 type DescribeSnapshotsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13354,6 +15680,7 @@ func (s DescribeSnapshotsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeSnapshots.
 type DescribeSnapshotsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13448,6 +15775,19 @@ func (s DescribeSpotFleetInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeSpotFleetInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeSpotFleetInstancesInput"}
+	if s.SpotFleetRequestId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotFleetRequestId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of DescribeSpotFleetInstances.
 type DescribeSpotFleetInstancesOutput struct {
 	_ struct{} `type:"structure"`
@@ -13510,6 +15850,22 @@ func (s DescribeSpotFleetRequestHistoryInput) String() string {
 // GoString returns the string representation
 func (s DescribeSpotFleetRequestHistoryInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeSpotFleetRequestHistoryInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeSpotFleetRequestHistoryInput"}
+	if s.SpotFleetRequestId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotFleetRequestId"))
+	}
+	if s.StartTime == nil {
+		invalidParams.Add(request.NewErrParamRequired("StartTime"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Contains the output of DescribeSpotFleetRequestHistory.
@@ -13636,8 +15992,9 @@ type DescribeSpotInstanceRequestsInput struct {
 	//   launch.block-device-mapping.volume-size - The size of the Amazon EBS volume,
 	// in GiB.
 	//
-	//   launch.block-device-mapping.volume-type - The type of the Amazon EBS volume
-	// (gp2 | standard | io1).
+	//   launch.block-device-mapping.volume-type - The type of the Amazon EBS volume:
+	// gp2 for General Purpose SSD, io1 for Provisioned IOPS SSD, st1 for Throughput
+	// Optimized HDD, sc1for Cold HDD, or standard for Magnetic.
 	//
 	//   launch.group-id - The security group for the instance.
 	//
@@ -13838,6 +16195,79 @@ func (s DescribeSpotPriceHistoryOutput) GoString() string {
 	return s.String()
 }
 
+type DescribeStaleSecurityGroupsInput struct {
+	_ struct{} `type:"structure"`
+
+	// Checks whether you have the required permissions for the operation, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// The maximum number of items to return for this request. The request returns
+	// a token that you can specify in a subsequent call to get the next set of
+	// results.
+	MaxResults *int64 `min:"5" type:"integer"`
+
+	// The token for the next set of items to return. (You received this token from
+	// a prior call.)
+	NextToken *string `min:"1" type:"string"`
+
+	// The ID of the VPC.
+	VpcId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s DescribeStaleSecurityGroupsInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeStaleSecurityGroupsInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeStaleSecurityGroupsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeStaleSecurityGroupsInput"}
+	if s.MaxResults != nil && *s.MaxResults < 5 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 5))
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+type DescribeStaleSecurityGroupsOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The token to use when requesting the next set of items. If there are no additional
+	// items to return, the string is empty.
+	NextToken *string `locationName:"nextToken" type:"string"`
+
+	// Information about the stale security groups.
+	StaleSecurityGroupSet []*StaleSecurityGroup `locationName:"staleSecurityGroupSet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeStaleSecurityGroupsOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeStaleSecurityGroupsOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DescribeSubnets.
 type DescribeSubnetsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13897,6 +16327,7 @@ func (s DescribeSubnetsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeSubnets.
 type DescribeSubnetsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13914,6 +16345,7 @@ func (s DescribeSubnetsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeTags.
 type DescribeTagsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -13937,11 +16369,9 @@ type DescribeTagsInput struct {
 	//   value - The tag value.
 	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
 
-	// The maximum number of results to return for the request in a single page.
-	// The remaining results of the initial request can be seen by sending another
-	// request with the returned NextToken value. This value can be between 5 and
-	// 1000; if MaxResults is given a value larger than 1000, only 1000 results
-	// are returned.
+	// The maximum number of results to return in a single call. This value can
+	// be between 5 and 1000. To retrieve the remaining results, make another call
+	// with the returned NextToken value.
 	MaxResults *int64 `locationName:"maxResults" type:"integer"`
 
 	// The token to retrieve the next page of results.
@@ -13958,6 +16388,7 @@ func (s DescribeTagsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeTags.
 type DescribeTagsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -13979,6 +16410,7 @@ func (s DescribeTagsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVolumeAttribute.
 type DescribeVolumeAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14005,6 +16437,20 @@ func (s DescribeVolumeAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeVolumeAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeVolumeAttributeInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeVolumeAttribute.
 type DescribeVolumeAttributeOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14028,6 +16474,7 @@ func (s DescribeVolumeAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVolumeStatus.
 type DescribeVolumeStatusInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14102,6 +16549,7 @@ func (s DescribeVolumeStatusInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVolumeStatus.
 type DescribeVolumeStatusOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14123,6 +16571,7 @@ func (s DescribeVolumeStatusOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVolumes.
 type DescribeVolumesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14176,8 +16625,8 @@ type DescribeVolumesInput struct {
 	//   volume-id - The volume ID.
 	//
 	//   volume-type - The Amazon EBS volume type. This can be gp2 for General
-	// Purpose (SSD) volumes, io1 for Provisioned IOPS (SSD) volumes, or standard
-	// for Magnetic volumes.
+	// Purpose SSD, io1 for Provisioned IOPS SSD, st1 for Throughput Optimized HDD,
+	// sc1 for Cold HDD, or standard for Magnetic volumes.
 	Filters []*Filter `locationName:"Filter" locationNameList:"Filter" type:"list"`
 
 	// The maximum number of volume results returned by DescribeVolumes in paginated
@@ -14211,6 +16660,7 @@ func (s DescribeVolumesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVolumes.
 type DescribeVolumesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14234,11 +16684,12 @@ func (s DescribeVolumesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcAttribute.
 type DescribeVpcAttributeInput struct {
 	_ struct{} `type:"structure"`
 
 	// The VPC attribute.
-	Attribute *string `type:"string" enum:"VpcAttributeName"`
+	Attribute *string `type:"string" required:"true" enum:"VpcAttributeName"`
 
 	// Checks whether you have the required permissions for the action, without
 	// actually making the request, and provides an error response. If you have
@@ -14260,6 +16711,23 @@ func (s DescribeVpcAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeVpcAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeVpcAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeVpcAttribute.
 type DescribeVpcAttributeOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14287,6 +16755,71 @@ func (s DescribeVpcAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcClassicLinkDnsSupport.
+type DescribeVpcClassicLinkDnsSupportInput struct {
+	_ struct{} `type:"structure"`
+
+	// The maximum number of items to return for this request. The request returns
+	// a token that you can specify in a subsequent call to get the next set of
+	// results.
+	MaxResults *int64 `locationName:"maxResults" min:"5" type:"integer"`
+
+	// The token for the next set of items to return. (You received this token from
+	// a prior call.)
+	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
+
+	// One or more VPC IDs.
+	VpcIds []*string `locationNameList:"VpcId" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeVpcClassicLinkDnsSupportInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeVpcClassicLinkDnsSupportInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DescribeVpcClassicLinkDnsSupportInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeVpcClassicLinkDnsSupportInput"}
+	if s.MaxResults != nil && *s.MaxResults < 5 {
+		invalidParams.Add(request.NewErrParamMinValue("MaxResults", 5))
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DescribeVpcClassicLinkDnsSupport.
+type DescribeVpcClassicLinkDnsSupportOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The token to use when requesting the next set of items.
+	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
+
+	// Information about the ClassicLink DNS support status of the VPCs.
+	Vpcs []*ClassicLinkDnsSupport `locationName:"vpcs" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s DescribeVpcClassicLinkDnsSupportOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DescribeVpcClassicLinkDnsSupportOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DescribeVpcClassicLink.
 type DescribeVpcClassicLinkInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14328,6 +16861,7 @@ func (s DescribeVpcClassicLinkInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpcClassicLink.
 type DescribeVpcClassicLinkOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14345,6 +16879,7 @@ func (s DescribeVpcClassicLinkOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcEndpointServices.
 type DescribeVpcEndpointServicesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14376,6 +16911,7 @@ func (s DescribeVpcEndpointServicesInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpcEndpointServices.
 type DescribeVpcEndpointServicesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14397,6 +16933,7 @@ func (s DescribeVpcEndpointServicesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcEndpoints.
 type DescribeVpcEndpointsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14443,6 +16980,7 @@ func (s DescribeVpcEndpointsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpcEndpoints.
 type DescribeVpcEndpointsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14464,6 +17002,7 @@ func (s DescribeVpcEndpointsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcPeeringConnections.
 type DescribeVpcPeeringConnectionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14528,6 +17067,7 @@ func (s DescribeVpcPeeringConnectionsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpcPeeringConnections.
 type DescribeVpcPeeringConnectionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14545,6 +17085,7 @@ func (s DescribeVpcPeeringConnectionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpcs.
 type DescribeVpcsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14597,6 +17138,7 @@ func (s DescribeVpcsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpcs.
 type DescribeVpcsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14614,6 +17156,7 @@ func (s DescribeVpcsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpnConnections.
 type DescribeVpnConnectionsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14681,6 +17224,7 @@ func (s DescribeVpnConnectionsInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpnConnections.
 type DescribeVpnConnectionsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14698,6 +17242,7 @@ func (s DescribeVpnConnectionsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DescribeVpnGateways.
 type DescribeVpnGatewaysInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14714,7 +17259,8 @@ type DescribeVpnGatewaysInput struct {
 	//
 	//   attachment.vpc-id - The ID of an attached VPC.
 	//
-	//   availability-zone - The Availability Zone for the virtual private gateway.
+	//   availability-zone - The Availability Zone for the virtual private gateway
+	// (if applicable).
 	//
 	//   state - The state of the virtual private gateway (pending | available
 	// | deleting | deleted).
@@ -14753,6 +17299,7 @@ func (s DescribeVpnGatewaysInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output of DescribeVpnGateways.
 type DescribeVpnGatewaysOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14770,6 +17317,7 @@ func (s DescribeVpnGatewaysOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DetachClassicLinkVpc.
 type DetachClassicLinkVpcInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14796,6 +17344,23 @@ func (s DetachClassicLinkVpcInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DetachClassicLinkVpcInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DetachClassicLinkVpcInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DetachClassicLinkVpc.
 type DetachClassicLinkVpcOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -14813,6 +17378,7 @@ func (s DetachClassicLinkVpcOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DetachInternetGateway.
 type DetachInternetGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14839,6 +17405,22 @@ func (s DetachInternetGatewayInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DetachInternetGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DetachInternetGatewayInput"}
+	if s.InternetGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InternetGatewayId"))
+	}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DetachInternetGatewayOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -14853,6 +17435,7 @@ func (s DetachInternetGatewayOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DetachNetworkInterface.
 type DetachNetworkInterfaceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14879,6 +17462,19 @@ func (s DetachNetworkInterfaceInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DetachNetworkInterfaceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DetachNetworkInterfaceInput"}
+	if s.AttachmentId == nil {
+		invalidParams.Add(request.NewErrParamRequired("AttachmentId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DetachNetworkInterfaceOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -14893,6 +17489,7 @@ func (s DetachNetworkInterfaceOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DetachVolume.
 type DetachVolumeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14931,6 +17528,20 @@ func (s DetachVolumeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DetachVolumeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DetachVolumeInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the parameters for DetachVpnGateway.
 type DetachVpnGatewayInput struct {
 	_ struct{} `type:"structure"`
 
@@ -14955,6 +17566,22 @@ func (s DetachVpnGatewayInput) String() string {
 // GoString returns the string representation
 func (s DetachVpnGatewayInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DetachVpnGatewayInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DetachVpnGatewayInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+	if s.VpnGatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpnGatewayId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DetachVpnGatewayOutput struct {
@@ -15016,6 +17643,7 @@ func (s DhcpOptions) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DisableVgwRoutePropagation.
 type DisableVgwRoutePropagationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15036,6 +17664,22 @@ func (s DisableVgwRoutePropagationInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DisableVgwRoutePropagationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DisableVgwRoutePropagationInput"}
+	if s.GatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("GatewayId"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type DisableVgwRoutePropagationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15050,6 +17694,43 @@ func (s DisableVgwRoutePropagationOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DisableVpcClassicLinkDnsSupport.
+type DisableVpcClassicLinkDnsSupportInput struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of the VPC.
+	VpcId *string `type:"string"`
+}
+
+// String returns the string representation
+func (s DisableVpcClassicLinkDnsSupportInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DisableVpcClassicLinkDnsSupportInput) GoString() string {
+	return s.String()
+}
+
+// Contains the output of DisableVpcClassicLinkDnsSupport.
+type DisableVpcClassicLinkDnsSupportOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Returns true if the request succeeds; otherwise, it returns an error.
+	Return *bool `locationName:"return" type:"boolean"`
+}
+
+// String returns the string representation
+func (s DisableVpcClassicLinkDnsSupportOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s DisableVpcClassicLinkDnsSupportOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for DisableVpcClassicLink.
 type DisableVpcClassicLinkInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15073,6 +17754,20 @@ func (s DisableVpcClassicLinkInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DisableVpcClassicLinkInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DisableVpcClassicLinkInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of DisableVpcClassicLink.
 type DisableVpcClassicLinkOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -15090,6 +17785,7 @@ func (s DisableVpcClassicLinkOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DisassociateAddress.
 type DisassociateAddressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15130,6 +17826,7 @@ func (s DisassociateAddressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for DisassociateRouteTable.
 type DisassociateRouteTableInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15152,6 +17849,19 @@ func (s DisassociateRouteTableInput) String() string {
 // GoString returns the string representation
 func (s DisassociateRouteTableInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DisassociateRouteTableInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DisassociateRouteTableInput"}
+	if s.AssociationId == nil {
+		invalidParams.Add(request.NewErrParamRequired("AssociationId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type DisassociateRouteTableOutput struct {
@@ -15192,6 +17902,26 @@ func (s DiskImage) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DiskImage) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DiskImage"}
+	if s.Image != nil {
+		if err := s.Image.Validate(); err != nil {
+			invalidParams.AddNested("Image", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Volume != nil {
+		if err := s.Volume.Validate(); err != nil {
+			invalidParams.AddNested("Volume", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes a disk image.
 type DiskImageDescription struct {
 	_ struct{} `type:"structure"`
@@ -15207,6 +17937,9 @@ type DiskImageDescription struct {
 	// Request Authentication Alternative" section of the Authenticating REST Requests
 	// (http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html)
 	// topic in the Amazon Simple Storage Service Developer Guide.
+	//
+	// For information about the import manifest referenced by this API action,
+	// see VM Import Manifest (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/manifest.html).
 	ImportManifestUrl *string `locationName:"importManifestUrl" type:"string" required:"true"`
 
 	// The size of the disk image, in GiB.
@@ -15238,6 +17971,9 @@ type DiskImageDetail struct {
 	// URL for an Amazon S3 object, read the "Query String Request Authentication
 	// Alternative" section of the Authenticating REST Requests (http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html)
 	// topic in the Amazon Simple Storage Service Developer Guide.
+	//
+	// For information about the import manifest referenced by this API action,
+	// see VM Import Manifest (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/manifest.html).
 	ImportManifestUrl *string `locationName:"importManifestUrl" type:"string" required:"true"`
 }
 
@@ -15249,6 +17985,25 @@ func (s DiskImageDetail) String() string {
 // GoString returns the string representation
 func (s DiskImageDetail) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DiskImageDetail) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DiskImageDetail"}
+	if s.Bytes == nil {
+		invalidParams.Add(request.NewErrParamRequired("Bytes"))
+	}
+	if s.Format == nil {
+		invalidParams.Add(request.NewErrParamRequired("Format"))
+	}
+	if s.ImportManifestUrl == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImportManifestUrl"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes a disk image volume.
@@ -15284,18 +18039,18 @@ type EbsBlockDevice struct {
 	Encrypted *bool `locationName:"encrypted" type:"boolean"`
 
 	// The number of I/O operations per second (IOPS) that the volume supports.
-	// For Provisioned IOPS (SSD) volumes, this represents the number of IOPS that
-	// are provisioned for the volume. For General Purpose (SSD) volumes, this represents
-	// the baseline performance of the volume and the rate at which the volume accumulates
-	// I/O credits for bursting. For more information on General Purpose (SSD) baseline
-	// performance, I/O credits, and bursting, see Amazon EBS Volume Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
+	// For io1, this represents the number of IOPS that are provisioned for the
+	// volume. For gp2, this represents the baseline performance of the volume and
+	// the rate at which the volume accumulates I/O credits for bursting. For more
+	// information on General Purpose SSD baseline performance, I/O credits, and
+	// bursting, see Amazon EBS Volume Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
 	// in the Amazon Elastic Compute Cloud User Guide.
 	//
-	// Constraint: Range is 100 to 20000 for Provisioned IOPS (SSD) volumes and
-	// 3 to 10000 for General Purpose (SSD) volumes.
+	// Constraint: Range is 100-20000 IOPS for io1 volumes and 100-10000 IOPS for
+	// gp2 volumes.
 	//
 	// Condition: This parameter is required for requests to create io1 volumes;
-	// it is not used in requests to create standard or gp2 volumes.
+	// it is not used in requests to create gp2, st1, sc1, or standard volumes.
 	Iops *int64 `locationName:"iops" type:"integer"`
 
 	// The ID of the snapshot.
@@ -15303,16 +18058,17 @@ type EbsBlockDevice struct {
 
 	// The size of the volume, in GiB.
 	//
-	// Constraints: 1-1024 for standard volumes, 1-16384 for gp2 volumes, and 4-16384
-	// for io1 volumes. If you specify a snapshot, the volume size must be equal
-	// to or larger than the snapshot size.
+	// Constraints: 1-16384 for General Purpose SSD (gp2), 4-16384 for Provisioned
+	// IOPS SSD (io1), 500-16384 for Throughput Optimized HDD (st1), 500-16384 for
+	// Cold HDD (sc1), and 1-1024 for Magnetic (standard) volumes. If you specify
+	// a snapshot, the volume size must be equal to or larger than the snapshot
+	// size.
 	//
 	// Default: If you're creating the volume from a snapshot and don't specify
 	// a volume size, the default is the snapshot size.
 	VolumeSize *int64 `locationName:"volumeSize" type:"integer"`
 
-	// The volume type. gp2 for General Purpose (SSD) volumes, io1 for Provisioned
-	// IOPS (SSD) volumes, and standard for Magnetic volumes.
+	// The volume type: gp2, io1, st1, sc1, or standard.
 	//
 	// Default: standard
 	VolumeType *string `locationName:"volumeType" type:"string" enum:"VolumeType"`
@@ -15355,6 +18111,8 @@ func (s EbsInstanceBlockDevice) GoString() string {
 	return s.String()
 }
 
+// Describes information used to set up an EBS volume specified in a block device
+// mapping.
 type EbsInstanceBlockDeviceSpecification struct {
 	_ struct{} `type:"structure"`
 
@@ -15375,6 +18133,7 @@ func (s EbsInstanceBlockDeviceSpecification) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for EnableVgwRoutePropagation.
 type EnableVgwRoutePropagationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15395,6 +18154,22 @@ func (s EnableVgwRoutePropagationInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EnableVgwRoutePropagationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EnableVgwRoutePropagationInput"}
+	if s.GatewayId == nil {
+		invalidParams.Add(request.NewErrParamRequired("GatewayId"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type EnableVgwRoutePropagationOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15409,6 +18184,7 @@ func (s EnableVgwRoutePropagationOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for EnableVolumeIO.
 type EnableVolumeIOInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15432,6 +18208,19 @@ func (s EnableVolumeIOInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EnableVolumeIOInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EnableVolumeIOInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type EnableVolumeIOOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -15446,6 +18235,43 @@ func (s EnableVolumeIOOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for EnableVpcClassicLinkDnsSupport.
+type EnableVpcClassicLinkDnsSupportInput struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of the VPC.
+	VpcId *string `type:"string"`
+}
+
+// String returns the string representation
+func (s EnableVpcClassicLinkDnsSupportInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s EnableVpcClassicLinkDnsSupportInput) GoString() string {
+	return s.String()
+}
+
+// Contains the output of EnableVpcClassicLinkDnsSupport.
+type EnableVpcClassicLinkDnsSupportOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Returns true if the request succeeds; otherwise, it returns an error.
+	Return *bool `locationName:"return" type:"boolean"`
+}
+
+// String returns the string representation
+func (s EnableVpcClassicLinkDnsSupportOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s EnableVpcClassicLinkDnsSupportOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for EnableVpcClassicLink.
 type EnableVpcClassicLinkInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15469,6 +18295,20 @@ func (s EnableVpcClassicLinkInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *EnableVpcClassicLinkInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "EnableVpcClassicLinkInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of EnableVpcClassicLink.
 type EnableVpcClassicLinkOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -15685,10 +18525,11 @@ type FlowLog struct {
 	CreationTime *time.Time `locationName:"creationTime" type:"timestamp" timestampFormat:"iso8601"`
 
 	// Information about the error that occurred. Rate limited indicates that CloudWatch
-	// logs throttling has been applied for one or more network interfaces. Access
-	// error indicates that the IAM role associated with the flow log does not have
-	// sufficient permissions to publish to CloudWatch Logs. Unknown error indicates
-	// an internal error.
+	// logs throttling has been applied for one or more network interfaces, or that
+	// you've reached the limit on the number of CloudWatch Logs log groups that
+	// you can create. Access error indicates that the IAM role associated with
+	// the flow log does not have sufficient permissions to publish to CloudWatch
+	// Logs. Unknown error indicates an internal error.
 	DeliverLogsErrorMessage *string `locationName:"deliverLogsErrorMessage" type:"string"`
 
 	// The ARN of the IAM role that posts logs to CloudWatch Logs.
@@ -15723,6 +18564,7 @@ func (s FlowLog) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for GetConsoleOutput.
 type GetConsoleOutputInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15746,13 +18588,28 @@ func (s GetConsoleOutputInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetConsoleOutputInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetConsoleOutputInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of GetConsoleOutput.
 type GetConsoleOutputOutput struct {
 	_ struct{} `type:"structure"`
 
 	// The ID of the instance.
 	InstanceId *string `locationName:"instanceId" type:"string"`
 
-	// The console output, Base64 encoded.
+	// The console output, Base64 encoded. If using a command line tool, the tools
+	// decode the output for you.
 	Output *string `locationName:"output" type:"string"`
 
 	// The time the output was last updated.
@@ -15769,6 +18626,69 @@ func (s GetConsoleOutputOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for the request.
+type GetConsoleScreenshotInput struct {
+	_ struct{} `type:"structure"`
+
+	// Checks whether you have the required permissions for the action, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// The ID of the instance.
+	InstanceId *string `type:"string" required:"true"`
+
+	// When set to true, acts as keystroke input and wakes up an instance that's
+	// in standby or "sleep" mode.
+	WakeUp *bool `type:"boolean"`
+}
+
+// String returns the string representation
+func (s GetConsoleScreenshotInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s GetConsoleScreenshotInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetConsoleScreenshotInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetConsoleScreenshotInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of the request.
+type GetConsoleScreenshotOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The data that comprises the image.
+	ImageData *string `locationName:"imageData" type:"string"`
+
+	// The ID of the instance.
+	InstanceId *string `locationName:"instanceId" type:"string"`
+}
+
+// String returns the string representation
+func (s GetConsoleScreenshotOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s GetConsoleScreenshotOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for GetPasswordData.
 type GetPasswordDataInput struct {
 	_ struct{} `type:"structure"`
 
@@ -15792,6 +18712,20 @@ func (s GetPasswordDataInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetPasswordDataInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetPasswordDataInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of GetPasswordData.
 type GetPasswordDataOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -15867,6 +18801,7 @@ func (s HistoryRecord) GoString() string {
 	return s.String()
 }
 
+// Describes the properties of the Dedicated host.
 type Host struct {
 	_ struct{} `type:"structure"`
 
@@ -15890,14 +18825,14 @@ type Host struct {
 	// The hardware specifications of the Dedicated host.
 	HostProperties *HostProperties `locationName:"hostProperties" type:"structure"`
 
-	// The reservation ID of the Dedicated host. This returns a "null" response
-	// if the Dedicated host doesn't have an associated reservation.
+	// The reservation ID of the Dedicated host. This returns a null response if
+	// the Dedicated host doesn't have an associated reservation.
 	HostReservationId *string `locationName:"hostReservationId" type:"string"`
 
 	// The IDs and instance type that are currently running on the Dedicated host.
 	Instances []*HostInstance `locationName:"instances" locationNameList:"item" type:"list"`
 
-	// The Dedicated host's state. Can be "available", "under assessment, or "released".
+	// The Dedicated host's state.
 	State *string `locationName:"state" type:"string" enum:"AllocationState"`
 }
 
@@ -15911,13 +18846,14 @@ func (s Host) GoString() string {
 	return s.String()
 }
 
+// Describes an instance running on a Dedicated host.
 type HostInstance struct {
 	_ struct{} `type:"structure"`
 
 	// the IDs of instances that are running on the Dedicated host.
 	InstanceId *string `locationName:"instanceId" type:"string"`
 
-	// The instance type size (e.g., m3.medium) of the running instance.
+	// The instance type size (for example, m3.medium) of the running instance.
 	InstanceType *string `locationName:"instanceType" type:"string"`
 }
 
@@ -15931,13 +18867,14 @@ func (s HostInstance) GoString() string {
 	return s.String()
 }
 
+// Describes properties of a Dedicated host.
 type HostProperties struct {
 	_ struct{} `type:"structure"`
 
 	// The number of cores on the Dedicated host.
 	Cores *int64 `locationName:"cores" type:"integer"`
 
-	// The instance type size that the Dedicated host supports (e.g., m3.medium).
+	// The instance type size that the Dedicated host supports (for example, m3.medium).
 	InstanceType *string `locationName:"instanceType" type:"string"`
 
 	// The number of sockets on the Dedicated host.
@@ -16025,7 +18962,8 @@ type IdFormat struct {
 	_ struct{} `type:"structure"`
 
 	// The date in UTC at which you are permanently switched over to using longer
-	// IDs.
+	// IDs. If a deadline is not yet available for this resource type, this field
+	// is not returned.
 	Deadline *time.Time `locationName:"deadline" type:"timestamp" timestampFormat:"iso8601"`
 
 	// The type of resource.
@@ -16172,6 +19110,7 @@ func (s ImageDiskContainer) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ImportImage.
 type ImportImageInput struct {
 	_ struct{} `type:"structure"`
 
@@ -16232,6 +19171,7 @@ func (s ImportImageInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for ImportImage.
 type ImportImageOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16331,6 +19271,7 @@ func (s ImportImageTask) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ImportInstance.
 type ImportInstanceInput struct {
 	_ struct{} `type:"structure"`
 
@@ -16361,6 +19302,29 @@ func (s ImportInstanceInput) String() string {
 // GoString returns the string representation
 func (s ImportInstanceInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ImportInstanceInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ImportInstanceInput"}
+	if s.Platform == nil {
+		invalidParams.Add(request.NewErrParamRequired("Platform"))
+	}
+	if s.DiskImages != nil {
+		for i, v := range s.DiskImages {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "DiskImages", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes the launch specification for VM import.
@@ -16414,6 +19378,7 @@ func (s ImportInstanceLaunchSpecification) GoString() string {
 	return s.String()
 }
 
+// Contains the output for ImportInstance.
 type ImportInstanceOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16494,6 +19459,7 @@ func (s ImportInstanceVolumeDetailItem) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ImportKeyPair.
 type ImportKeyPairInput struct {
 	_ struct{} `type:"structure"`
 
@@ -16506,8 +19472,10 @@ type ImportKeyPairInput struct {
 	// A unique name for the key pair.
 	KeyName *string `locationName:"keyName" type:"string" required:"true"`
 
-	// The public key. You must base64 encode the public key material before sending
-	// it to AWS.
+	// The public key. For API calls, the text must be base64-encoded. For command
+	// line tools, base64 encoding is performed for you.
+	//
+	// PublicKeyMaterial is automatically base64 encoded/decoded by the SDK.
 	PublicKeyMaterial []byte `locationName:"publicKeyMaterial" type:"blob" required:"true"`
 }
 
@@ -16521,6 +19489,23 @@ func (s ImportKeyPairInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ImportKeyPairInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ImportKeyPairInput"}
+	if s.KeyName == nil {
+		invalidParams.Add(request.NewErrParamRequired("KeyName"))
+	}
+	if s.PublicKeyMaterial == nil {
+		invalidParams.Add(request.NewErrParamRequired("PublicKeyMaterial"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ImportKeyPair.
 type ImportKeyPairOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16541,6 +19526,7 @@ func (s ImportKeyPairOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ImportSnapshot.
 type ImportSnapshotInput struct {
 	_ struct{} `type:"structure"`
 
@@ -16576,6 +19562,7 @@ func (s ImportSnapshotInput) GoString() string {
 	return s.String()
 }
 
+// Contains the output for ImportSnapshot.
 type ImportSnapshotOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16623,6 +19610,7 @@ func (s ImportSnapshotTask) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ImportVolume.
 type ImportVolumeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -16655,6 +19643,36 @@ func (s ImportVolumeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ImportVolumeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ImportVolumeInput"}
+	if s.AvailabilityZone == nil {
+		invalidParams.Add(request.NewErrParamRequired("AvailabilityZone"))
+	}
+	if s.Image == nil {
+		invalidParams.Add(request.NewErrParamRequired("Image"))
+	}
+	if s.Volume == nil {
+		invalidParams.Add(request.NewErrParamRequired("Volume"))
+	}
+	if s.Image != nil {
+		if err := s.Image.Validate(); err != nil {
+			invalidParams.AddNested("Image", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.Volume != nil {
+		if err := s.Volume.Validate(); err != nil {
+			invalidParams.AddNested("Volume", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output for ImportVolume.
 type ImportVolumeOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -16738,7 +19756,7 @@ type Instance struct {
 	// The ID of the instance.
 	InstanceId *string `locationName:"instanceId" type:"string"`
 
-	// Indicates whether this is a Spot instance.
+	// Indicates whether this is a Spot instance or a Scheduled Instance.
 	InstanceLifecycle *string `locationName:"instanceLifecycle" type:"string" enum:"InstanceLifecycleType"`
 
 	// The instance type.
@@ -16895,6 +19913,7 @@ func (s InstanceBlockDeviceMappingSpecification) GoString() string {
 	return s.String()
 }
 
+// Information about the instance type that the Dedicated host supports.
 type InstanceCapacity struct {
 	_ struct{} `type:"structure"`
 
@@ -16918,14 +19937,14 @@ func (s InstanceCapacity) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance listing state.
+// Describes a Reserved Instance listing state.
 type InstanceCount struct {
 	_ struct{} `type:"structure"`
 
-	// The number of listed Reserved instances in the state specified by the state.
+	// The number of listed Reserved Instances in the state specified by the state.
 	InstanceCount *int64 `locationName:"instanceCount" type:"integer"`
 
-	// The states of the listed Reserved instances.
+	// The states of the listed Reserved Instances.
 	State *string `locationName:"state" type:"string" enum:"ListingState"`
 }
 
@@ -17153,6 +20172,26 @@ func (s InstanceNetworkInterfaceSpecification) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *InstanceNetworkInterfaceSpecification) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InstanceNetworkInterfaceSpecification"}
+	if s.PrivateIpAddresses != nil {
+		for i, v := range s.PrivateIpAddresses {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "PrivateIpAddresses", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes a private IP address.
 type InstancePrivateIpAddress struct {
 	_ struct{} `type:"structure"`
@@ -17188,17 +20227,17 @@ type InstanceState struct {
 	// The low byte represents the state. The high byte is an opaque internal value
 	// and should be ignored.
 	//
-	//  0 : pending
+	//   0 : pending
 	//
-	// 16 : running
+	//   16 : running
 	//
-	// 32 : shutting-down
+	//   32 : shutting-down
 	//
-	// 48 : terminated
+	//   48 : terminated
 	//
-	// 64 : stopping
+	//   64 : stopping
 	//
-	// 80 : stopped
+	//   80 : stopped
 	Code *int64 `locationName:"code" type:"integer"`
 
 	// The current state of the instance.
@@ -17406,14 +20445,11 @@ type IpPermission struct {
 	// A value of -1 indicates all ICMP types.
 	FromPort *int64 `locationName:"fromPort" type:"integer"`
 
-	// The protocol.
+	// The IP protocol name (for tcp, udp, and icmp) or number (see Protocol Numbers
+	// (http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)).
 	//
-	// When you call DescribeSecurityGroups, the protocol value returned is the
-	// number. Exception: For TCP, UDP, and ICMP, the value returned is the name
-	// (for example, tcp, udp, or icmp). For a list of protocol numbers, see Protocol
-	// Numbers (http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
-	// (VPC only) When you call AuthorizeSecurityGroupIngress, you can use -1 to
-	// specify all.
+	// [EC2-VPC only] When you authorize or revoke security group rules, you can
+	// use -1 to specify all.
 	IpProtocol *string `locationName:"ipProtocol" type:"string"`
 
 	// One or more IP ranges.
@@ -17537,6 +20573,9 @@ type LaunchSpecification struct {
 	AddressingType *string `locationName:"addressingType" type:"string"`
 
 	// One or more block device mapping entries.
+	//
+	// Although you can specify encrypted EBS volumes in this block device mapping
+	// for your Spot Instances, these volumes are not encrypted.
 	BlockDeviceMappings []*BlockDeviceMapping `locationName:"blockDeviceMapping" locationNameList:"item" type:"list"`
 
 	// Indicates whether the instance is optimized for EBS I/O. This optimization
@@ -17597,6 +20636,7 @@ func (s LaunchSpecification) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyHosts.
 type ModifyHostsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17617,6 +20657,23 @@ func (s ModifyHostsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyHostsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyHostsInput"}
+	if s.AutoPlacement == nil {
+		invalidParams.Add(request.NewErrParamRequired("AutoPlacement"))
+	}
+	if s.HostIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("HostIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ModifyHosts.
 type ModifyHostsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -17638,6 +20695,7 @@ func (s ModifyHostsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters of ModifyIdFormat.
 type ModifyIdFormatInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17658,6 +20716,22 @@ func (s ModifyIdFormatInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyIdFormatInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyIdFormatInput"}
+	if s.Resource == nil {
+		invalidParams.Add(request.NewErrParamRequired("Resource"))
+	}
+	if s.UseLongIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("UseLongIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyIdFormatOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -17672,6 +20746,7 @@ func (s ModifyIdFormatOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyImageAttribute.
 type ModifyImageAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17723,6 +20798,19 @@ func (s ModifyImageAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyImageAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyImageAttributeInput"}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyImageAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -17737,6 +20825,7 @@ func (s ModifyImageAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyInstanceAttribute.
 type ModifyInstanceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17812,7 +20901,8 @@ type ModifyInstanceAttributeInput struct {
 	// with a PV instance can make it unreachable.
 	SriovNetSupport *AttributeValue `locationName:"sriovNetSupport" type:"structure"`
 
-	// Changes the instance's user data to the specified value.
+	// Changes the instance's user data to the specified base64-encoded value. For
+	// command line tools, base64 encoding is performed for you.
 	UserData *BlobAttributeValue `locationName:"userData" type:"structure"`
 
 	// A new value for the attribute. Use only with the kernel, ramdisk, userData,
@@ -17830,6 +20920,19 @@ func (s ModifyInstanceAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyInstanceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyInstanceAttributeInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyInstanceAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -17844,6 +20947,7 @@ func (s ModifyInstanceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyInstancePlacement.
 type ModifyInstancePlacementInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17870,6 +20974,20 @@ func (s ModifyInstancePlacementInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyInstancePlacementInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyInstancePlacementInput"}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ModifyInstancePlacement.
 type ModifyInstancePlacementOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -17887,6 +21005,7 @@ func (s ModifyInstancePlacementOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyNetworkInterfaceAttribute.
 type ModifyNetworkInterfaceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17930,6 +21049,19 @@ func (s ModifyNetworkInterfaceAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyNetworkInterfaceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyNetworkInterfaceAttributeInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyNetworkInterfaceAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -17944,6 +21076,7 @@ func (s ModifyNetworkInterfaceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyReservedInstances.
 type ModifyReservedInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -17951,10 +21084,10 @@ type ModifyReservedInstancesInput struct {
 	// modification request. For more information, see Ensuring Idempotency (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
 	ClientToken *string `locationName:"clientToken" type:"string"`
 
-	// The IDs of the Reserved instances to modify.
+	// The IDs of the Reserved Instances to modify.
 	ReservedInstancesIds []*string `locationName:"ReservedInstancesId" locationNameList:"ReservedInstancesId" type:"list" required:"true"`
 
-	// The configuration settings for the Reserved instances to modify.
+	// The configuration settings for the Reserved Instances to modify.
 	TargetConfigurations []*ReservedInstancesConfiguration `locationName:"ReservedInstancesConfigurationSetItemType" locationNameList:"item" type:"list" required:"true"`
 }
 
@@ -17968,6 +21101,23 @@ func (s ModifyReservedInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyReservedInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyReservedInstancesInput"}
+	if s.ReservedInstancesIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReservedInstancesIds"))
+	}
+	if s.TargetConfigurations == nil {
+		invalidParams.Add(request.NewErrParamRequired("TargetConfigurations"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ModifyReservedInstances.
 type ModifyReservedInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -17985,6 +21135,7 @@ func (s ModifyReservedInstancesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifySnapshotAttribute.
 type ModifySnapshotAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18023,6 +21174,19 @@ func (s ModifySnapshotAttributeInput) String() string {
 // GoString returns the string representation
 func (s ModifySnapshotAttributeInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifySnapshotAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifySnapshotAttributeInput"}
+	if s.SnapshotId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SnapshotId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type ModifySnapshotAttributeOutput struct {
@@ -18065,6 +21229,19 @@ func (s ModifySpotFleetRequestInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifySpotFleetRequestInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifySpotFleetRequestInput"}
+	if s.SpotFleetRequestId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotFleetRequestId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of ModifySpotFleetRequest.
 type ModifySpotFleetRequestOutput struct {
 	_ struct{} `type:"structure"`
@@ -18083,6 +21260,7 @@ func (s ModifySpotFleetRequestOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifySubnetAttribute.
 type ModifySubnetAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18104,6 +21282,19 @@ func (s ModifySubnetAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifySubnetAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifySubnetAttributeInput"}
+	if s.SubnetId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SubnetId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifySubnetAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -18118,6 +21309,7 @@ func (s ModifySubnetAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyVolumeAttribute.
 type ModifyVolumeAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18144,6 +21336,19 @@ func (s ModifyVolumeAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyVolumeAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyVolumeAttributeInput"}
+	if s.VolumeId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VolumeId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyVolumeAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -18158,6 +21363,7 @@ func (s ModifyVolumeAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyVpcAttribute.
 type ModifyVpcAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18193,6 +21399,19 @@ func (s ModifyVpcAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyVpcAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyVpcAttributeInput"}
+	if s.VpcId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ModifyVpcAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -18207,6 +21426,7 @@ func (s ModifyVpcAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ModifyVpcEndpoint.
 type ModifyVpcEndpointInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18244,6 +21464,20 @@ func (s ModifyVpcEndpointInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyVpcEndpointInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyVpcEndpointInput"}
+	if s.VpcEndpointId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcEndpointId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ModifyVpcEndpoint.
 type ModifyVpcEndpointOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -18261,6 +21495,79 @@ func (s ModifyVpcEndpointOutput) GoString() string {
 	return s.String()
 }
 
+type ModifyVpcPeeringConnectionOptionsInput struct {
+	_ struct{} `type:"structure"`
+
+	// The VPC peering connection options for the accepter VPC.
+	AccepterPeeringConnectionOptions *PeeringConnectionOptionsRequest `type:"structure"`
+
+	// Checks whether you have the required permissions for the operation, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// The VPC peering connection options for the requester VPC.
+	RequesterPeeringConnectionOptions *PeeringConnectionOptionsRequest `type:"structure"`
+
+	// The ID of the VPC peering connection.
+	VpcPeeringConnectionId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s ModifyVpcPeeringConnectionOptionsInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ModifyVpcPeeringConnectionOptionsInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ModifyVpcPeeringConnectionOptionsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ModifyVpcPeeringConnectionOptionsInput"}
+	if s.VpcPeeringConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcPeeringConnectionId"))
+	}
+	if s.AccepterPeeringConnectionOptions != nil {
+		if err := s.AccepterPeeringConnectionOptions.Validate(); err != nil {
+			invalidParams.AddNested("AccepterPeeringConnectionOptions", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.RequesterPeeringConnectionOptions != nil {
+		if err := s.RequesterPeeringConnectionOptions.Validate(); err != nil {
+			invalidParams.AddNested("RequesterPeeringConnectionOptions", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+type ModifyVpcPeeringConnectionOptionsOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Information about the VPC peering connection options for the accepter VPC.
+	AccepterPeeringConnectionOptions *PeeringConnectionOptions `locationName:"accepterPeeringConnectionOptions" type:"structure"`
+
+	// Information about the VPC peering connection options for the requester VPC.
+	RequesterPeeringConnectionOptions *PeeringConnectionOptions `locationName:"requesterPeeringConnectionOptions" type:"structure"`
+}
+
+// String returns the string representation
+func (s ModifyVpcPeeringConnectionOptionsOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ModifyVpcPeeringConnectionOptionsOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for MonitorInstances.
 type MonitorInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18284,6 +21591,20 @@ func (s MonitorInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *MonitorInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "MonitorInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of MonitorInstances.
 type MonitorInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -18319,6 +21640,7 @@ func (s Monitoring) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for MoveAddressToVpc.
 type MoveAddressToVpcInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18342,6 +21664,20 @@ func (s MoveAddressToVpcInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *MoveAddressToVpcInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "MoveAddressToVpcInput"}
+	if s.PublicIp == nil {
+		invalidParams.Add(request.NewErrParamRequired("PublicIp"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of MoveAddressToVpc.
 type MoveAddressToVpcOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -18381,6 +21717,118 @@ func (s MovingAddressStatus) String() string {
 
 // GoString returns the string representation
 func (s MovingAddressStatus) GoString() string {
+	return s.String()
+}
+
+// Describes a NAT gateway.
+type NatGateway struct {
+	_ struct{} `type:"structure"`
+
+	// The date and time the NAT gateway was created.
+	CreateTime *time.Time `locationName:"createTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The date and time the NAT gateway was deleted, if applicable.
+	DeleteTime *time.Time `locationName:"deleteTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// If the NAT gateway could not be created, specifies the error code for the
+	// failure. (InsufficientFreeAddressesInSubnet | Gateway.NotAttached | InvalidAllocationID.NotFound
+	// | Resource.AlreadyAssociated | InternalError | InvalidSubnetID.NotFound)
+	FailureCode *string `locationName:"failureCode" type:"string"`
+
+	// If the NAT gateway could not be created, specifies the error message for
+	// the failure, that corresponds to the error code.
+	//
+	//  For InsufficientFreeAddressesInSubnet: "Subnet has insufficient free addresses
+	// to create this NAT gateway"
+	//
+	// For Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway attached"
+	//
+	// For InvalidAllocationID.NotFound: "Elastic IP address eipalloc-xxxxxxxx
+	// could not be associated with this NAT gateway"
+	//
+	// For Resource.AlreadyAssociated: "Elastic IP address eipalloc-xxxxxxxx is
+	// already associated"
+	//
+	// For InternalError: "Network interface eni-xxxxxxxx, created and used internally
+	// by this NAT gateway is in an invalid state. Please try again."
+	//
+	// For InvalidSubnetID.NotFound: "The specified subnet subnet-xxxxxxxx does
+	// not exist or could not be found."
+	FailureMessage *string `locationName:"failureMessage" type:"string"`
+
+	// Information about the IP addresses and network interface associated with
+	// the NAT gateway.
+	NatGatewayAddresses []*NatGatewayAddress `locationName:"natGatewayAddressSet" locationNameList:"item" type:"list"`
+
+	// The ID of the NAT gateway.
+	NatGatewayId *string `locationName:"natGatewayId" type:"string"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	ProvisionedBandwidth *ProvisionedBandwidth `locationName:"provisionedBandwidth" type:"structure"`
+
+	// The state of the NAT gateway.
+	//
+	//   pending: The NAT gateway is being created and is not ready to process
+	// traffic.
+	//
+	//   failed: The NAT gateway could not be created. Check the failureCode and
+	// failureMessage fields for the reason.
+	//
+	//   available: The NAT gateway is able to process traffic. This status remains
+	// until you delete the NAT gateway, and does not indicate the health of the
+	// NAT gateway.
+	//
+	//   deleting: The NAT gateway is in the process of being terminated and may
+	// still be processing traffic.
+	//
+	//   deleted: The NAT gateway has been terminated and is no longer processing
+	// traffic.
+	State *string `locationName:"state" type:"string" enum:"NatGatewayState"`
+
+	// The ID of the subnet in which the NAT gateway is located.
+	SubnetId *string `locationName:"subnetId" type:"string"`
+
+	// The ID of the VPC in which the NAT gateway is located.
+	VpcId *string `locationName:"vpcId" type:"string"`
+}
+
+// String returns the string representation
+func (s NatGateway) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s NatGateway) GoString() string {
+	return s.String()
+}
+
+// Describes the IP addresses and network interface associated with a NAT gateway.
+type NatGatewayAddress struct {
+	_ struct{} `type:"structure"`
+
+	// The allocation ID of the Elastic IP address that's associated with the NAT
+	// gateway.
+	AllocationId *string `locationName:"allocationId" type:"string"`
+
+	// The ID of the network interface associated with the NAT gateway.
+	NetworkInterfaceId *string `locationName:"networkInterfaceId" type:"string"`
+
+	// The private IP address associated with the Elastic IP address.
+	PrivateIp *string `locationName:"privateIp" type:"string"`
+
+	// The Elastic IP address associated with the NAT gateway.
+	PublicIp *string `locationName:"publicIp" type:"string"`
+}
+
+// String returns the string representation
+func (s NatGatewayAddress) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s NatGatewayAddress) GoString() string {
 	return s.String()
 }
 
@@ -18498,6 +21946,9 @@ type NetworkInterface struct {
 
 	// Any security groups for the network interface.
 	Groups []*GroupIdentifier `locationName:"groupSet" locationNameList:"item" type:"list"`
+
+	// The type of interface.
+	InterfaceType *string `locationName:"interfaceType" type:"string" enum:"NetworkInterfaceType"`
 
 	// The MAC address.
 	MacAddress *string `locationName:"macAddress" type:"string"`
@@ -18684,6 +22135,68 @@ func (s NewDhcpConfiguration) GoString() string {
 	return s.String()
 }
 
+// Describes the VPC peering connection options.
+type PeeringConnectionOptions struct {
+	_ struct{} `type:"structure"`
+
+	// If true, enables outbound communication from an EC2-Classic instance that's
+	// linked to a local VPC via ClassicLink to instances in a peer VPC.
+	AllowEgressFromLocalClassicLinkToRemoteVpc *bool `locationName:"allowEgressFromLocalClassicLinkToRemoteVpc" type:"boolean"`
+
+	// If true, enables outbound communication from instances in a local VPC to
+	// an EC2-Classic instance that's linked to a peer VPC via ClassicLink.
+	AllowEgressFromLocalVpcToRemoteClassicLink *bool `locationName:"allowEgressFromLocalVpcToRemoteClassicLink" type:"boolean"`
+}
+
+// String returns the string representation
+func (s PeeringConnectionOptions) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PeeringConnectionOptions) GoString() string {
+	return s.String()
+}
+
+// The VPC peering connection options.
+type PeeringConnectionOptionsRequest struct {
+	_ struct{} `type:"structure"`
+
+	// If true, enables outbound communication from an EC2-Classic instance that's
+	// linked to a local VPC via ClassicLink to instances in a peer VPC.
+	AllowEgressFromLocalClassicLinkToRemoteVpc *bool `type:"boolean" required:"true"`
+
+	// If true, enables outbound communication from instances in a local VPC to
+	// an EC2-Classic instance that's linked to a peer VPC via ClassicLink.
+	AllowEgressFromLocalVpcToRemoteClassicLink *bool `type:"boolean" required:"true"`
+}
+
+// String returns the string representation
+func (s PeeringConnectionOptionsRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PeeringConnectionOptionsRequest) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PeeringConnectionOptionsRequest) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PeeringConnectionOptionsRequest"}
+	if s.AllowEgressFromLocalClassicLinkToRemoteVpc == nil {
+		invalidParams.Add(request.NewErrParamRequired("AllowEgressFromLocalClassicLinkToRemoteVpc"))
+	}
+	if s.AllowEgressFromLocalVpcToRemoteClassicLink == nil {
+		invalidParams.Add(request.NewErrParamRequired("AllowEgressFromLocalVpcToRemoteClassicLink"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes the placement for the instance.
 type Placement struct {
 	_ struct{} `type:"structure"`
@@ -18805,7 +22318,7 @@ func (s PrefixListId) GoString() string {
 	return s.String()
 }
 
-// Describes the price for a Reserved instance.
+// Describes the price for a Reserved Instance.
 type PriceSchedule struct {
 	_ struct{} `type:"structure"`
 
@@ -18821,7 +22334,7 @@ type PriceSchedule struct {
 	// be active for months 2 and 1.
 	Active *bool `locationName:"active" type:"boolean"`
 
-	// The currency for transacting the Reserved instance resale. At this time,
+	// The currency for transacting the Reserved Instance resale. At this time,
 	// the only supported currency is USD.
 	CurrencyCode *string `locationName:"currencyCode" type:"string" enum:"CurrencyCodeValues"`
 
@@ -18843,11 +22356,11 @@ func (s PriceSchedule) GoString() string {
 	return s.String()
 }
 
-// Describes the price for a Reserved instance.
+// Describes the price for a Reserved Instance.
 type PriceScheduleSpecification struct {
 	_ struct{} `type:"structure"`
 
-	// The currency for transacting the Reserved instance resale. At this time,
+	// The currency for transacting the Reserved Instance resale. At this time,
 	// the only supported currency is USD.
 	CurrencyCode *string `locationName:"currencyCode" type:"string" enum:"CurrencyCodeValues"`
 
@@ -18869,11 +22382,11 @@ func (s PriceScheduleSpecification) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance offering.
+// Describes a Reserved Instance offering.
 type PricingDetail struct {
 	_ struct{} `type:"structure"`
 
-	// The number of instances available for the price.
+	// The number of reservations available for the price.
 	Count *int64 `locationName:"count" type:"integer"`
 
 	// The price per instance.
@@ -18910,6 +22423,19 @@ func (s PrivateIpAddressSpecification) String() string {
 // GoString returns the string representation
 func (s PrivateIpAddressSpecification) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PrivateIpAddressSpecification) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PrivateIpAddressSpecification"}
+	if s.PrivateIpAddress == nil {
+		invalidParams.Add(request.NewErrParamRequired("PrivateIpAddress"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes a product code.
@@ -18951,6 +22477,86 @@ func (s PropagatingVgw) GoString() string {
 	return s.String()
 }
 
+// Reserved. If you need to sustain traffic greater than the documented limits
+// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+type ProvisionedBandwidth struct {
+	_ struct{} `type:"structure"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	ProvisionTime *time.Time `locationName:"provisionTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	Provisioned *string `locationName:"provisioned" type:"string"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	RequestTime *time.Time `locationName:"requestTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	Requested *string `locationName:"requested" type:"string"`
+
+	// Reserved. If you need to sustain traffic greater than the documented limits
+	// (http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html),
+	// contact us through the Support Center (https://console.aws.amazon.com/support/home?).
+	Status *string `locationName:"status" type:"string"`
+}
+
+// String returns the string representation
+func (s ProvisionedBandwidth) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ProvisionedBandwidth) GoString() string {
+	return s.String()
+}
+
+// Describes a request to purchase Scheduled Instances.
+type PurchaseRequest struct {
+	_ struct{} `type:"structure"`
+
+	// The number of instances.
+	InstanceCount *int64 `type:"integer" required:"true"`
+
+	// The purchase token.
+	PurchaseToken *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s PurchaseRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PurchaseRequest) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PurchaseRequest) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PurchaseRequest"}
+	if s.InstanceCount == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceCount"))
+	}
+	if s.PurchaseToken == nil {
+		invalidParams.Add(request.NewErrParamRequired("PurchaseToken"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the parameters for PurchaseReservedInstancesOffering.
 type PurchaseReservedInstancesOfferingInput struct {
 	_ struct{} `type:"structure"`
 
@@ -18960,15 +22566,15 @@ type PurchaseReservedInstancesOfferingInput struct {
 	// it is UnauthorizedOperation.
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
 
-	// The number of Reserved instances to purchase.
+	// The number of Reserved Instances to purchase.
 	InstanceCount *int64 `type:"integer" required:"true"`
 
 	// Specified for Reserved Instance Marketplace offerings to limit the total
-	// order and ensure that the Reserved instances are not purchased at unexpected
+	// order and ensure that the Reserved Instances are not purchased at unexpected
 	// prices.
 	LimitPrice *ReservedInstanceLimitPrice `locationName:"limitPrice" type:"structure"`
 
-	// The ID of the Reserved instance offering to purchase.
+	// The ID of the Reserved Instance offering to purchase.
 	ReservedInstancesOfferingId *string `type:"string" required:"true"`
 }
 
@@ -18982,10 +22588,27 @@ func (s PurchaseReservedInstancesOfferingInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PurchaseReservedInstancesOfferingInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PurchaseReservedInstancesOfferingInput"}
+	if s.InstanceCount == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceCount"))
+	}
+	if s.ReservedInstancesOfferingId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReservedInstancesOfferingId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of PurchaseReservedInstancesOffering.
 type PurchaseReservedInstancesOfferingOutput struct {
 	_ struct{} `type:"structure"`
 
-	// The IDs of the purchased Reserved instances.
+	// The IDs of the purchased Reserved Instances.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 }
 
@@ -18999,6 +22622,79 @@ func (s PurchaseReservedInstancesOfferingOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for PurchaseScheduledInstances.
+type PurchaseScheduledInstancesInput struct {
+	_ struct{} `type:"structure"`
+
+	// Unique, case-sensitive identifier that ensures the idempotency of the request.
+	// For more information, see Ensuring Idempotency (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
+	ClientToken *string `type:"string" idempotencyToken:"true"`
+
+	// Checks whether you have the required permissions for the action, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// One or more purchase requests.
+	PurchaseRequests []*PurchaseRequest `locationName:"PurchaseRequest" locationNameList:"PurchaseRequest" min:"1" type:"list" required:"true"`
+}
+
+// String returns the string representation
+func (s PurchaseScheduledInstancesInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PurchaseScheduledInstancesInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PurchaseScheduledInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PurchaseScheduledInstancesInput"}
+	if s.PurchaseRequests == nil {
+		invalidParams.Add(request.NewErrParamRequired("PurchaseRequests"))
+	}
+	if s.PurchaseRequests != nil && len(s.PurchaseRequests) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("PurchaseRequests", 1))
+	}
+	if s.PurchaseRequests != nil {
+		for i, v := range s.PurchaseRequests {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "PurchaseRequests", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of PurchaseScheduledInstances.
+type PurchaseScheduledInstancesOutput struct {
+	_ struct{} `type:"structure"`
+
+	// Information about the Scheduled Instances.
+	ScheduledInstanceSet []*ScheduledInstance `locationName:"scheduledInstanceSet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s PurchaseScheduledInstancesOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s PurchaseScheduledInstancesOutput) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for RebootInstances.
 type RebootInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19020,6 +22716,19 @@ func (s RebootInstancesInput) String() string {
 // GoString returns the string representation
 func (s RebootInstancesInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RebootInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RebootInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type RebootInstancesOutput struct {
@@ -19078,6 +22787,7 @@ func (s Region) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RegisterImage.
 type RegisterImageInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19143,6 +22853,20 @@ func (s RegisterImageInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RegisterImageInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RegisterImageInput"}
+	if s.Name == nil {
+		invalidParams.Add(request.NewErrParamRequired("Name"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of RegisterImage.
 type RegisterImageOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -19160,6 +22884,7 @@ func (s RegisterImageOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RejectVpcPeeringConnection.
 type RejectVpcPeeringConnectionInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19183,6 +22908,20 @@ func (s RejectVpcPeeringConnectionInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RejectVpcPeeringConnectionInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RejectVpcPeeringConnectionInput"}
+	if s.VpcPeeringConnectionId == nil {
+		invalidParams.Add(request.NewErrParamRequired("VpcPeeringConnectionId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of RejectVpcPeeringConnection.
 type RejectVpcPeeringConnectionOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -19200,6 +22939,7 @@ func (s RejectVpcPeeringConnectionOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReleaseAddress.
 type ReleaseAddressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19240,6 +22980,7 @@ func (s ReleaseAddressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReleaseHosts.
 type ReleaseHostsInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19257,6 +22998,20 @@ func (s ReleaseHostsInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReleaseHostsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReleaseHostsInput"}
+	if s.HostIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("HostIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ReleaseHosts.
 type ReleaseHostsOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -19278,6 +23033,7 @@ func (s ReleaseHostsOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReplaceNetworkAclAssociation.
 type ReplaceNetworkAclAssociationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19305,6 +23061,23 @@ func (s ReplaceNetworkAclAssociationInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceNetworkAclAssociationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceNetworkAclAssociationInput"}
+	if s.AssociationId == nil {
+		invalidParams.Add(request.NewErrParamRequired("AssociationId"))
+	}
+	if s.NetworkAclId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkAclId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ReplaceNetworkAclAssociation.
 type ReplaceNetworkAclAssociationOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -19322,6 +23095,7 @@ func (s ReplaceNetworkAclAssociationOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReplaceNetworkAclEntry.
 type ReplaceNetworkAclEntryInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19370,6 +23144,34 @@ func (s ReplaceNetworkAclEntryInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceNetworkAclEntryInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceNetworkAclEntryInput"}
+	if s.CidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("CidrBlock"))
+	}
+	if s.Egress == nil {
+		invalidParams.Add(request.NewErrParamRequired("Egress"))
+	}
+	if s.NetworkAclId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkAclId"))
+	}
+	if s.Protocol == nil {
+		invalidParams.Add(request.NewErrParamRequired("Protocol"))
+	}
+	if s.RuleAction == nil {
+		invalidParams.Add(request.NewErrParamRequired("RuleAction"))
+	}
+	if s.RuleNumber == nil {
+		invalidParams.Add(request.NewErrParamRequired("RuleNumber"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ReplaceNetworkAclEntryOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -19384,6 +23186,7 @@ func (s ReplaceNetworkAclEntryOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReplaceRoute.
 type ReplaceRouteInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19402,6 +23205,9 @@ type ReplaceRouteInput struct {
 
 	// The ID of a NAT instance in your VPC.
 	InstanceId *string `locationName:"instanceId" type:"string"`
+
+	// The ID of a NAT gateway.
+	NatGatewayId *string `locationName:"natGatewayId" type:"string"`
 
 	// The ID of a network interface.
 	NetworkInterfaceId *string `locationName:"networkInterfaceId" type:"string"`
@@ -19423,6 +23229,22 @@ func (s ReplaceRouteInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceRouteInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceRouteInput"}
+	if s.DestinationCidrBlock == nil {
+		invalidParams.Add(request.NewErrParamRequired("DestinationCidrBlock"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ReplaceRouteOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -19437,6 +23259,7 @@ func (s ReplaceRouteOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReplaceRouteTableAssociation.
 type ReplaceRouteTableAssociationInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19463,6 +23286,23 @@ func (s ReplaceRouteTableAssociationInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplaceRouteTableAssociationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplaceRouteTableAssociationInput"}
+	if s.AssociationId == nil {
+		invalidParams.Add(request.NewErrParamRequired("AssociationId"))
+	}
+	if s.RouteTableId == nil {
+		invalidParams.Add(request.NewErrParamRequired("RouteTableId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of ReplaceRouteTableAssociation.
 type ReplaceRouteTableAssociationOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -19480,6 +23320,7 @@ func (s ReplaceRouteTableAssociationOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ReportInstanceStatus.
 type ReportInstanceStatusInput struct {
 	_ struct{} `type:"structure"`
 
@@ -19500,26 +23341,26 @@ type ReportInstanceStatusInput struct {
 
 	// One or more reason codes that describes the health state of your instance.
 	//
-	//  instance-stuck-in-state: My instance is stuck in a state.
+	//   instance-stuck-in-state: My instance is stuck in a state.
 	//
-	// unresponsive: My instance is unresponsive.
+	//   unresponsive: My instance is unresponsive.
 	//
-	// not-accepting-credentials: My instance is not accepting my credentials.
+	//   not-accepting-credentials: My instance is not accepting my credentials.
 	//
-	// password-not-available: A password is not available for my instance.
+	//   password-not-available: A password is not available for my instance.
 	//
-	// performance-network: My instance is experiencing performance problems which
-	// I believe are network related.
+	//   performance-network: My instance is experiencing performance problems
+	// which I believe are network related.
 	//
-	// performance-instance-store: My instance is experiencing performance problems
+	//   performance-instance-store: My instance is experiencing performance problems
 	// which I believe are related to the instance stores.
 	//
-	// performance-ebs-volume: My instance is experiencing performance problems
+	//   performance-ebs-volume: My instance is experiencing performance problems
 	// which I believe are related to an EBS volume.
 	//
-	// performance-other: My instance is experiencing performance problems.
+	//   performance-other: My instance is experiencing performance problems.
 	//
-	// other: [explain using the description parameter]
+	//   other: [explain using the description parameter]
 	ReasonCodes []*string `locationName:"reasonCode" locationNameList:"item" type:"list" required:"true"`
 
 	// The time at which the reported instance health state began.
@@ -19537,6 +23378,25 @@ func (s ReportInstanceStatusInput) String() string {
 // GoString returns the string representation
 func (s ReportInstanceStatusInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReportInstanceStatusInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReportInstanceStatusInput"}
+	if s.Instances == nil {
+		invalidParams.Add(request.NewErrParamRequired("Instances"))
+	}
+	if s.ReasonCodes == nil {
+		invalidParams.Add(request.NewErrParamRequired("ReasonCodes"))
+	}
+	if s.Status == nil {
+		invalidParams.Add(request.NewErrParamRequired("Status"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type ReportInstanceStatusOutput struct {
@@ -19575,6 +23435,24 @@ func (s RequestSpotFleetInput) String() string {
 // GoString returns the string representation
 func (s RequestSpotFleetInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RequestSpotFleetInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RequestSpotFleetInput"}
+	if s.SpotFleetRequestConfig == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotFleetRequestConfig"))
+	}
+	if s.SpotFleetRequestConfig != nil {
+		if err := s.SpotFleetRequestConfig.Validate(); err != nil {
+			invalidParams.AddNested("SpotFleetRequestConfig", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Contains the output of RequestSpotFleet.
@@ -19620,8 +23498,9 @@ type RequestSpotInstancesInput struct {
 	// Default: Instances are launched in any available Availability Zone.
 	AvailabilityZoneGroup *string `locationName:"availabilityZoneGroup" type:"string"`
 
-	// The required duration for the Spot instances, in minutes. This value must
-	// be a multiple of 60 (60, 120, 180, 240, 300, or 360).
+	// The required duration for the Spot instances (also known as Spot blocks),
+	// in minutes. This value must be a multiple of 60 (60, 120, 180, 240, 300,
+	// or 360).
 	//
 	// The duration period starts as soon as your Spot instance receives its instance
 	// ID. At the end of the duration period, Amazon EC2 marks the Spot instance
@@ -19694,6 +23573,24 @@ func (s RequestSpotInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RequestSpotInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RequestSpotInstancesInput"}
+	if s.SpotPrice == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotPrice"))
+	}
+	if s.LaunchSpecification != nil {
+		if err := s.LaunchSpecification.Validate(); err != nil {
+			invalidParams.AddNested("LaunchSpecification", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Contains the output of RequestSpotInstances.
 type RequestSpotInstancesOutput struct {
 	_ struct{} `type:"structure"`
@@ -19720,6 +23617,9 @@ type RequestSpotLaunchSpecification struct {
 	AddressingType *string `locationName:"addressingType" type:"string"`
 
 	// One or more block device mapping entries.
+	//
+	// Although you can specify encrypted EBS volumes in this block device mapping
+	// for your Spot Instances, these volumes are not encrypted.
 	BlockDeviceMappings []*BlockDeviceMapping `locationName:"blockDeviceMapping" locationNameList:"item" type:"list"`
 
 	// Indicates whether the instance is optimized for EBS I/O. This optimization
@@ -19779,11 +23679,36 @@ func (s RequestSpotLaunchSpecification) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RequestSpotLaunchSpecification) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RequestSpotLaunchSpecification"}
+	if s.Monitoring != nil {
+		if err := s.Monitoring.Validate(); err != nil {
+			invalidParams.AddNested("Monitoring", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.NetworkInterfaces != nil {
+		for i, v := range s.NetworkInterfaces {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "NetworkInterfaces", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // Describes a reservation.
 type Reservation struct {
 	_ struct{} `type:"structure"`
 
-	// One or more security groups.
+	// [EC2-Classic only] One or more security groups.
 	Groups []*GroupIdentifier `locationName:"groupSet" locationNameList:"item" type:"list"`
 
 	// One or more instances.
@@ -19810,7 +23735,7 @@ func (s Reservation) GoString() string {
 	return s.String()
 }
 
-// Describes the limit price of a Reserved instance offering.
+// Describes the limit price of a Reserved Instance offering.
 type ReservedInstanceLimitPrice struct {
 	_ struct{} `type:"structure"`
 
@@ -19833,57 +23758,57 @@ func (s ReservedInstanceLimitPrice) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance.
+// Describes a Reserved Instance.
 type ReservedInstances struct {
 	_ struct{} `type:"structure"`
 
-	// The Availability Zone in which the Reserved instance can be used.
+	// The Availability Zone in which the Reserved Instance can be used.
 	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
 
-	// The currency of the Reserved instance. It's specified using ISO 4217 standard
+	// The currency of the Reserved Instance. It's specified using ISO 4217 standard
 	// currency codes. At this time, the only supported currency is USD.
 	CurrencyCode *string `locationName:"currencyCode" type:"string" enum:"CurrencyCodeValues"`
 
-	// The duration of the Reserved instance, in seconds.
+	// The duration of the Reserved Instance, in seconds.
 	Duration *int64 `locationName:"duration" type:"long"`
 
-	// The time when the Reserved instance expires.
+	// The time when the Reserved Instance expires.
 	End *time.Time `locationName:"end" type:"timestamp" timestampFormat:"iso8601"`
 
-	// The purchase price of the Reserved instance.
+	// The purchase price of the Reserved Instance.
 	FixedPrice *float64 `locationName:"fixedPrice" type:"float"`
 
-	// The number of Reserved instances purchased.
+	// The number of reservations purchased.
 	InstanceCount *int64 `locationName:"instanceCount" type:"integer"`
 
-	// The tenancy of the reserved instance.
+	// The tenancy of the instance.
 	InstanceTenancy *string `locationName:"instanceTenancy" type:"string" enum:"Tenancy"`
 
-	// The instance type on which the Reserved instance can be used.
+	// The instance type on which the Reserved Instance can be used.
 	InstanceType *string `locationName:"instanceType" type:"string" enum:"InstanceType"`
 
-	// The Reserved instance offering type.
+	// The Reserved Instance offering type.
 	OfferingType *string `locationName:"offeringType" type:"string" enum:"OfferingTypeValues"`
 
-	// The Reserved instance product platform description.
+	// The Reserved Instance product platform description.
 	ProductDescription *string `locationName:"productDescription" type:"string" enum:"RIProductDescription"`
 
 	// The recurring charge tag assigned to the resource.
 	RecurringCharges []*RecurringCharge `locationName:"recurringCharges" locationNameList:"item" type:"list"`
 
-	// The ID of the Reserved instance.
+	// The ID of the Reserved Instance.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 
-	// The date and time the Reserved instance started.
+	// The date and time the Reserved Instance started.
 	Start *time.Time `locationName:"start" type:"timestamp" timestampFormat:"iso8601"`
 
-	// The state of the Reserved instance purchase.
+	// The state of the Reserved Instance purchase.
 	State *string `locationName:"state" type:"string" enum:"ReservedInstanceState"`
 
 	// Any tags assigned to the resource.
 	Tags []*Tag `locationName:"tagSet" locationNameList:"item" type:"list"`
 
-	// The usage price of the Reserved instance, per hour.
+	// The usage price of the Reserved Instance, per hour.
 	UsagePrice *float64 `locationName:"usagePrice" type:"float"`
 }
 
@@ -19897,20 +23822,20 @@ func (s ReservedInstances) GoString() string {
 	return s.String()
 }
 
-// Describes the configuration settings for the modified Reserved instances.
+// Describes the configuration settings for the modified Reserved Instances.
 type ReservedInstancesConfiguration struct {
 	_ struct{} `type:"structure"`
 
-	// The Availability Zone for the modified Reserved instances.
+	// The Availability Zone for the modified Reserved Instances.
 	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
 
-	// The number of modified Reserved instances.
+	// The number of modified Reserved Instances.
 	InstanceCount *int64 `locationName:"instanceCount" type:"integer"`
 
-	// The instance type for the modified Reserved instances.
+	// The instance type for the modified Reserved Instances.
 	InstanceType *string `locationName:"instanceType" type:"string" enum:"InstanceType"`
 
-	// The network platform of the modified Reserved instances, which is either
+	// The network platform of the modified Reserved Instances, which is either
 	// EC2-Classic or EC2-VPC.
 	Platform *string `locationName:"platform" type:"string"`
 }
@@ -19925,11 +23850,11 @@ func (s ReservedInstancesConfiguration) GoString() string {
 	return s.String()
 }
 
-// Describes the ID of a Reserved instance.
+// Describes the ID of a Reserved Instance.
 type ReservedInstancesId struct {
 	_ struct{} `type:"structure"`
 
-	// The ID of the Reserved instance.
+	// The ID of the Reserved Instance.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 }
 
@@ -19943,7 +23868,7 @@ func (s ReservedInstancesId) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance listing.
+// Describes a Reserved Instance listing.
 type ReservedInstancesListing struct {
 	_ struct{} `type:"structure"`
 
@@ -19957,19 +23882,19 @@ type ReservedInstancesListing struct {
 	// The number of instances in this state.
 	InstanceCounts []*InstanceCount `locationName:"instanceCounts" locationNameList:"item" type:"list"`
 
-	// The price of the Reserved instance listing.
+	// The price of the Reserved Instance listing.
 	PriceSchedules []*PriceSchedule `locationName:"priceSchedules" locationNameList:"item" type:"list"`
 
-	// The ID of the Reserved instance.
+	// The ID of the Reserved Instance.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 
-	// The ID of the Reserved instance listing.
+	// The ID of the Reserved Instance listing.
 	ReservedInstancesListingId *string `locationName:"reservedInstancesListingId" type:"string"`
 
-	// The status of the Reserved instance listing.
+	// The status of the Reserved Instance listing.
 	Status *string `locationName:"status" type:"string" enum:"ListingStatus"`
 
-	// The reason for the current status of the Reserved instance listing. The response
+	// The reason for the current status of the Reserved Instance listing. The response
 	// can be blank.
 	StatusMessage *string `locationName:"statusMessage" type:"string"`
 
@@ -19990,7 +23915,7 @@ func (s ReservedInstancesListing) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance modification.
+// Describes a Reserved Instance modification.
 type ReservedInstancesModification struct {
 	_ struct{} `type:"structure"`
 
@@ -20005,16 +23930,16 @@ type ReservedInstancesModification struct {
 	EffectiveDate *time.Time `locationName:"effectiveDate" type:"timestamp" timestampFormat:"iso8601"`
 
 	// Contains target configurations along with their corresponding new Reserved
-	// instance IDs.
+	// Instance IDs.
 	ModificationResults []*ReservedInstancesModificationResult `locationName:"modificationResultSet" locationNameList:"item" type:"list"`
 
-	// The IDs of one or more Reserved instances.
+	// The IDs of one or more Reserved Instances.
 	ReservedInstancesIds []*ReservedInstancesId `locationName:"reservedInstancesSet" locationNameList:"item" type:"list"`
 
-	// A unique ID for the Reserved instance modification.
+	// A unique ID for the Reserved Instance modification.
 	ReservedInstancesModificationId *string `locationName:"reservedInstancesModificationId" type:"string"`
 
-	// The status of the Reserved instances modification request.
+	// The status of the Reserved Instances modification request.
 	Status *string `locationName:"status" type:"string"`
 
 	// The reason for the status.
@@ -20034,14 +23959,15 @@ func (s ReservedInstancesModification) GoString() string {
 	return s.String()
 }
 
+// Describes the modification request/s.
 type ReservedInstancesModificationResult struct {
 	_ struct{} `type:"structure"`
 
-	// The ID for the Reserved instances that were created as part of the modification
+	// The ID for the Reserved Instances that were created as part of the modification
 	// request. This field is only available when the modification is fulfilled.
 	ReservedInstancesId *string `locationName:"reservedInstancesId" type:"string"`
 
-	// The target Reserved instances configurations supplied as part of the modification
+	// The target Reserved Instances configurations supplied as part of the modification
 	// request.
 	TargetConfiguration *ReservedInstancesConfiguration `locationName:"targetConfiguration" type:"structure"`
 }
@@ -20056,28 +23982,28 @@ func (s ReservedInstancesModificationResult) GoString() string {
 	return s.String()
 }
 
-// Describes a Reserved instance offering.
+// Describes a Reserved Instance offering.
 type ReservedInstancesOffering struct {
 	_ struct{} `type:"structure"`
 
-	// The Availability Zone in which the Reserved instance can be used.
+	// The Availability Zone in which the Reserved Instance can be used.
 	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
 
-	// The currency of the Reserved instance offering you are purchasing. It's specified
+	// The currency of the Reserved Instance offering you are purchasing. It's specified
 	// using ISO 4217 standard currency codes. At this time, the only supported
 	// currency is USD.
 	CurrencyCode *string `locationName:"currencyCode" type:"string" enum:"CurrencyCodeValues"`
 
-	// The duration of the Reserved instance, in seconds.
+	// The duration of the Reserved Instance, in seconds.
 	Duration *int64 `locationName:"duration" type:"long"`
 
-	// The purchase price of the Reserved instance.
+	// The purchase price of the Reserved Instance.
 	FixedPrice *float64 `locationName:"fixedPrice" type:"float"`
 
-	// The tenancy of the reserved instance.
+	// The tenancy of the instance.
 	InstanceTenancy *string `locationName:"instanceTenancy" type:"string" enum:"Tenancy"`
 
-	// The instance type on which the Reserved instance can be used.
+	// The instance type on which the Reserved Instance can be used.
 	InstanceType *string `locationName:"instanceType" type:"string" enum:"InstanceType"`
 
 	// Indicates whether the offering is available through the Reserved Instance
@@ -20085,22 +24011,22 @@ type ReservedInstancesOffering struct {
 	// this is true.
 	Marketplace *bool `locationName:"marketplace" type:"boolean"`
 
-	// The Reserved instance offering type.
+	// The Reserved Instance offering type.
 	OfferingType *string `locationName:"offeringType" type:"string" enum:"OfferingTypeValues"`
 
-	// The pricing details of the Reserved instance offering.
+	// The pricing details of the Reserved Instance offering.
 	PricingDetails []*PricingDetail `locationName:"pricingDetailsSet" locationNameList:"item" type:"list"`
 
-	// The Reserved instance product platform description.
+	// The Reserved Instance product platform description.
 	ProductDescription *string `locationName:"productDescription" type:"string" enum:"RIProductDescription"`
 
 	// The recurring charge tag assigned to the resource.
 	RecurringCharges []*RecurringCharge `locationName:"recurringCharges" locationNameList:"item" type:"list"`
 
-	// The ID of the Reserved instance offering.
+	// The ID of the Reserved Instance offering.
 	ReservedInstancesOfferingId *string `locationName:"reservedInstancesOfferingId" type:"string"`
 
-	// The usage price of the Reserved instance, per hour.
+	// The usage price of the Reserved Instance, per hour.
 	UsagePrice *float64 `locationName:"usagePrice" type:"float"`
 }
 
@@ -20114,6 +24040,7 @@ func (s ReservedInstancesOffering) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ResetImageAttribute.
 type ResetImageAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20141,6 +24068,22 @@ func (s ResetImageAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ResetImageAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ResetImageAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ResetImageAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -20155,10 +24098,14 @@ func (s ResetImageAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ResetInstanceAttribute.
 type ResetInstanceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
 	// The attribute to reset.
+	//
+	// You can only reset the following attributes: kernel | ramdisk | sourceDestCheck.
+	// To change an instance attribute, use ModifyInstanceAttribute.
 	Attribute *string `locationName:"attribute" type:"string" required:"true" enum:"InstanceAttributeName"`
 
 	// Checks whether you have the required permissions for the action, without
@@ -20181,6 +24128,22 @@ func (s ResetInstanceAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ResetInstanceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ResetInstanceAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.InstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ResetInstanceAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -20195,6 +24158,7 @@ func (s ResetInstanceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ResetNetworkInterfaceAttribute.
 type ResetNetworkInterfaceAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20221,6 +24185,19 @@ func (s ResetNetworkInterfaceAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ResetNetworkInterfaceAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ResetNetworkInterfaceAttributeInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ResetNetworkInterfaceAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -20235,6 +24212,7 @@ func (s ResetNetworkInterfaceAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for ResetSnapshotAttribute.
 type ResetSnapshotAttributeInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20262,6 +24240,22 @@ func (s ResetSnapshotAttributeInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ResetSnapshotAttributeInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ResetSnapshotAttributeInput"}
+	if s.Attribute == nil {
+		invalidParams.Add(request.NewErrParamRequired("Attribute"))
+	}
+	if s.SnapshotId == nil {
+		invalidParams.Add(request.NewErrParamRequired("SnapshotId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type ResetSnapshotAttributeOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -20276,6 +24270,7 @@ func (s ResetSnapshotAttributeOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RestoreAddressToClassic.
 type RestoreAddressToClassicInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20299,6 +24294,20 @@ func (s RestoreAddressToClassicInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RestoreAddressToClassicInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RestoreAddressToClassicInput"}
+	if s.PublicIp == nil {
+		invalidParams.Add(request.NewErrParamRequired("PublicIp"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of RestoreAddressToClassic.
 type RestoreAddressToClassicOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -20319,11 +24328,12 @@ func (s RestoreAddressToClassicOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RevokeSecurityGroupEgress.
 type RevokeSecurityGroupEgressInput struct {
 	_ struct{} `type:"structure"`
 
-	// The CIDR IP address range. You can't specify this parameter when specifying
-	// a source security group.
+	// The CIDR IP address range. We recommend that you specify the CIDR range in
+	// a set of IP permissions instead.
 	CidrIp *string `locationName:"cidrIp" type:"string"`
 
 	// Checks whether you have the required permissions for the action, without
@@ -20333,7 +24343,7 @@ type RevokeSecurityGroupEgressInput struct {
 	DryRun *bool `locationName:"dryRun" type:"boolean"`
 
 	// The start of port range for the TCP and UDP protocols, or an ICMP type number.
-	// For the ICMP type number, use -1 to specify all ICMP types.
+	// We recommend that you specify the port range in a set of IP permissions instead.
 	FromPort *int64 `locationName:"fromPort" type:"integer"`
 
 	// The ID of the security group.
@@ -20343,8 +24353,8 @@ type RevokeSecurityGroupEgressInput struct {
 	// a CIDR IP address range.
 	IpPermissions []*IpPermission `locationName:"ipPermissions" locationNameList:"item" type:"list"`
 
-	// The IP protocol name (tcp, udp, icmp) or number (see Protocol Numbers (http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)).
-	// Use -1 to specify all.
+	// The IP protocol name or number. We recommend that you specify the protocol
+	// in a set of IP permissions instead.
 	IpProtocol *string `locationName:"ipProtocol" type:"string"`
 
 	// The name of a destination security group. To revoke outbound access to a
@@ -20357,8 +24367,8 @@ type RevokeSecurityGroupEgressInput struct {
 	// IP permissions instead.
 	SourceSecurityGroupOwnerId *string `locationName:"sourceSecurityGroupOwnerId" type:"string"`
 
-	// The end of port range for the TCP and UDP protocols, or an ICMP code number.
-	// For the ICMP code number, use -1 to specify all ICMP codes for the ICMP type.
+	// The end of port range for the TCP and UDP protocols, or an ICMP type number.
+	// We recommend that you specify the port range in a set of IP permissions instead.
 	ToPort *int64 `locationName:"toPort" type:"integer"`
 }
 
@@ -20370,6 +24380,19 @@ func (s RevokeSecurityGroupEgressInput) String() string {
 // GoString returns the string representation
 func (s RevokeSecurityGroupEgressInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RevokeSecurityGroupEgressInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RevokeSecurityGroupEgressInput"}
+	if s.GroupId == nil {
+		invalidParams.Add(request.NewErrParamRequired("GroupId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 type RevokeSecurityGroupEgressOutput struct {
@@ -20386,6 +24409,7 @@ func (s RevokeSecurityGroupEgressOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RevokeSecurityGroupIngress.
 type RevokeSecurityGroupIngressInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20422,15 +24446,16 @@ type RevokeSecurityGroupIngressInput struct {
 	// specify this parameter in combination with the following parameters: the
 	// CIDR IP address range, the start of the port range, the IP protocol, and
 	// the end of the port range. For EC2-VPC, the source security group must be
-	// in the same VPC.
+	// in the same VPC. To revoke a specific rule for an IP protocol and port range,
+	// use a set of IP permissions instead.
 	SourceSecurityGroupName *string `type:"string"`
 
-	// [EC2-Classic, default VPC] The AWS account ID of the source security group.
-	// For EC2-VPC, the source security group must be in the same VPC. You can't
-	// specify this parameter in combination with the following parameters: the
-	// CIDR IP address range, the IP protocol, the start of the port range, and
-	// the end of the port range. To revoke a specific rule for an IP protocol and
-	// port range, use a set of IP permissions instead.
+	// [EC2-Classic] The AWS account ID of the source security group, if the source
+	// security group is in a different account. You can't specify this parameter
+	// in combination with the following parameters: the CIDR IP address range,
+	// the IP protocol, the start of the port range, and the end of the port range.
+	// To revoke a specific rule for an IP protocol and port range, use a set of
+	// IP permissions instead.
 	SourceSecurityGroupOwnerId *string `type:"string"`
 
 	// The end of port range for the TCP and UDP protocols, or an ICMP code number.
@@ -20481,15 +24506,20 @@ type Route struct {
 	// The AWS account ID of the owner of the instance.
 	InstanceOwnerId *string `locationName:"instanceOwnerId" type:"string"`
 
+	// The ID of a NAT gateway.
+	NatGatewayId *string `locationName:"natGatewayId" type:"string"`
+
 	// The ID of the network interface.
 	NetworkInterfaceId *string `locationName:"networkInterfaceId" type:"string"`
 
 	// Describes how the route was created.
 	//
-	//  CreateRouteTable indicates that route was automatically created when the
-	// route table was created. CreateRoute indicates that the route was manually
-	// added to the route table. EnableVgwRoutePropagation indicates that the route
-	// was propagated by route propagation.
+	//  CreateRouteTable - The route was automatically created when the route table
+	// was created.
+	//
+	// CreateRoute - The route was manually added to the route table.
+	//
+	// EnableVgwRoutePropagation - The route was propagated by route propagation.
 	Origin *string `locationName:"origin" type:"string" enum:"RouteOrigin"`
 
 	// The state of the route. The blackhole state indicates that the route's target
@@ -20571,6 +24601,7 @@ func (s RouteTableAssociation) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for RunInstances.
 type RunInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -20651,7 +24682,7 @@ type RunInstancesInput struct {
 	// Constraints: Between 1 and the maximum number you're allowed for the specified
 	// instance type. For more information about the default limits, and how to
 	// request an increase, see How many instances can I run in Amazon EC2 (http://aws.amazon.com/ec2/faqs/#How_many_instances_can_I_run_in_Amazon_EC2)
-	// in the Amazon EC2 General FAQ.
+	// in the Amazon EC2 FAQ.
 	MaxCount *int64 `type:"integer" required:"true"`
 
 	// The minimum number of instances to launch. If you specify a minimum that
@@ -20704,7 +24735,13 @@ type RunInstancesInput struct {
 	// [EC2-VPC] The ID of the subnet to launch the instance into.
 	SubnetId *string `type:"string"`
 
-	// The Base64-encoded MIME user data for the instances.
+	// Data to configure the instance, or a script to run during instance launch.
+	// For more information, see Running Commands on Your Linux Instance at Launch
+	// (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html) (Linux)
+	// and Adding User Data (http://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-instance-metadata.html#instancedata-add-user-data)
+	// (Windows). For API calls, the text must be base64-encoded. For command line
+	// tools, the encoding is performed for you, and you can load the text from
+	// a file.
 	UserData *string `type:"string"`
 }
 
@@ -20716,6 +24753,40 @@ func (s RunInstancesInput) String() string {
 // GoString returns the string representation
 func (s RunInstancesInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RunInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RunInstancesInput"}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+	if s.MaxCount == nil {
+		invalidParams.Add(request.NewErrParamRequired("MaxCount"))
+	}
+	if s.MinCount == nil {
+		invalidParams.Add(request.NewErrParamRequired("MinCount"))
+	}
+	if s.Monitoring != nil {
+		if err := s.Monitoring.Validate(); err != nil {
+			invalidParams.AddNested("Monitoring", err.(request.ErrInvalidParams))
+		}
+	}
+	if s.NetworkInterfaces != nil {
+		for i, v := range s.NetworkInterfaces {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "NetworkInterfaces", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes the monitoring for the instance.
@@ -20733,6 +24804,94 @@ func (s RunInstancesMonitoringEnabled) String() string {
 
 // GoString returns the string representation
 func (s RunInstancesMonitoringEnabled) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RunInstancesMonitoringEnabled) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RunInstancesMonitoringEnabled"}
+	if s.Enabled == nil {
+		invalidParams.Add(request.NewErrParamRequired("Enabled"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the parameters for RunScheduledInstances.
+type RunScheduledInstancesInput struct {
+	_ struct{} `type:"structure"`
+
+	// Unique, case-sensitive identifier that ensures the idempotency of the request.
+	// For more information, see Ensuring Idempotency (http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html).
+	ClientToken *string `type:"string" idempotencyToken:"true"`
+
+	// Checks whether you have the required permissions for the action, without
+	// actually making the request, and provides an error response. If you have
+	// the required permissions, the error response is DryRunOperation. Otherwise,
+	// it is UnauthorizedOperation.
+	DryRun *bool `type:"boolean"`
+
+	// The number of instances.
+	//
+	// Default: 1
+	InstanceCount *int64 `type:"integer"`
+
+	// The launch specification.
+	LaunchSpecification *ScheduledInstancesLaunchSpecification `type:"structure" required:"true"`
+
+	// The Scheduled Instance ID.
+	ScheduledInstanceId *string `type:"string" required:"true"`
+}
+
+// String returns the string representation
+func (s RunScheduledInstancesInput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s RunScheduledInstancesInput) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *RunScheduledInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "RunScheduledInstancesInput"}
+	if s.LaunchSpecification == nil {
+		invalidParams.Add(request.NewErrParamRequired("LaunchSpecification"))
+	}
+	if s.ScheduledInstanceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ScheduledInstanceId"))
+	}
+	if s.LaunchSpecification != nil {
+		if err := s.LaunchSpecification.Validate(); err != nil {
+			invalidParams.AddNested("LaunchSpecification", err.(request.ErrInvalidParams))
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of RunScheduledInstances.
+type RunScheduledInstancesOutput struct {
+	_ struct{} `type:"structure"`
+
+	// The IDs of the newly launched instances.
+	InstanceIdSet []*string `locationName:"instanceIdSet" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s RunScheduledInstancesOutput) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s RunScheduledInstancesOutput) GoString() string {
 	return s.String()
 }
 
@@ -20754,8 +24913,11 @@ type S3Storage struct {
 	// The beginning of the file name of the AMI.
 	Prefix *string `locationName:"prefix" type:"string"`
 
-	// A Base64-encoded Amazon S3 upload policy that gives Amazon EC2 permission
-	// to upload items into Amazon S3 on your behalf.
+	// A base64-encoded Amazon S3 upload policy that gives Amazon EC2 permission
+	// to upload items into Amazon S3 on your behalf. For command line tools, base64
+	// encoding is performed for you.
+	//
+	// UploadPolicy is automatically base64 encoded/decoded by the SDK.
 	UploadPolicy []byte `locationName:"uploadPolicy" type:"blob"`
 
 	// The signature of the Base64 encoded JSON document.
@@ -20769,6 +24931,493 @@ func (s S3Storage) String() string {
 
 // GoString returns the string representation
 func (s S3Storage) GoString() string {
+	return s.String()
+}
+
+// Describes a Scheduled Instance.
+type ScheduledInstance struct {
+	_ struct{} `type:"structure"`
+
+	// The Availability Zone.
+	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
+
+	// The date when the Scheduled Instance was purchased.
+	CreateDate *time.Time `locationName:"createDate" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The hourly price for a single instance.
+	HourlyPrice *string `locationName:"hourlyPrice" type:"string"`
+
+	// The number of instances.
+	InstanceCount *int64 `locationName:"instanceCount" type:"integer"`
+
+	// The instance type.
+	InstanceType *string `locationName:"instanceType" type:"string"`
+
+	// The network platform (EC2-Classic or EC2-VPC).
+	NetworkPlatform *string `locationName:"networkPlatform" type:"string"`
+
+	// The time for the next schedule to start.
+	NextSlotStartTime *time.Time `locationName:"nextSlotStartTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The platform (Linux/UNIX or Windows).
+	Platform *string `locationName:"platform" type:"string"`
+
+	// The time that the previous schedule ended or will end.
+	PreviousSlotEndTime *time.Time `locationName:"previousSlotEndTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The schedule recurrence.
+	Recurrence *ScheduledInstanceRecurrence `locationName:"recurrence" type:"structure"`
+
+	// The Scheduled Instance ID.
+	ScheduledInstanceId *string `locationName:"scheduledInstanceId" type:"string"`
+
+	// The number of hours in the schedule.
+	SlotDurationInHours *int64 `locationName:"slotDurationInHours" type:"integer"`
+
+	// The end date for the Scheduled Instance.
+	TermEndDate *time.Time `locationName:"termEndDate" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The start date for the Scheduled Instance.
+	TermStartDate *time.Time `locationName:"termStartDate" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The total number of hours for a single instance for the entire term.
+	TotalScheduledInstanceHours *int64 `locationName:"totalScheduledInstanceHours" type:"integer"`
+}
+
+// String returns the string representation
+func (s ScheduledInstance) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstance) GoString() string {
+	return s.String()
+}
+
+// Describes a schedule that is available for your Scheduled Instances.
+type ScheduledInstanceAvailability struct {
+	_ struct{} `type:"structure"`
+
+	// The Availability Zone.
+	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
+
+	// The number of available instances.
+	AvailableInstanceCount *int64 `locationName:"availableInstanceCount" type:"integer"`
+
+	// The time period for the first schedule to start.
+	FirstSlotStartTime *time.Time `locationName:"firstSlotStartTime" type:"timestamp" timestampFormat:"iso8601"`
+
+	// The hourly price for a single instance.
+	HourlyPrice *string `locationName:"hourlyPrice" type:"string"`
+
+	// The instance type. You can specify one of the C3, C4, M4, or R3 instance
+	// types.
+	InstanceType *string `locationName:"instanceType" type:"string"`
+
+	// The maximum term. The only possible value is 365 days.
+	MaxTermDurationInDays *int64 `locationName:"maxTermDurationInDays" type:"integer"`
+
+	// The minimum term. The only possible value is 365 days.
+	MinTermDurationInDays *int64 `locationName:"minTermDurationInDays" type:"integer"`
+
+	// The network platform (EC2-Classic or EC2-VPC).
+	NetworkPlatform *string `locationName:"networkPlatform" type:"string"`
+
+	// The platform (Linux/UNIX or Windows).
+	Platform *string `locationName:"platform" type:"string"`
+
+	// The purchase token. This token expires in two hours.
+	PurchaseToken *string `locationName:"purchaseToken" type:"string"`
+
+	// The schedule recurrence.
+	Recurrence *ScheduledInstanceRecurrence `locationName:"recurrence" type:"structure"`
+
+	// The number of hours in the schedule.
+	SlotDurationInHours *int64 `locationName:"slotDurationInHours" type:"integer"`
+
+	// The total number of hours for a single instance for the entire term.
+	TotalScheduledInstanceHours *int64 `locationName:"totalScheduledInstanceHours" type:"integer"`
+}
+
+// String returns the string representation
+func (s ScheduledInstanceAvailability) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstanceAvailability) GoString() string {
+	return s.String()
+}
+
+// Describes the recurring schedule for a Scheduled Instance.
+type ScheduledInstanceRecurrence struct {
+	_ struct{} `type:"structure"`
+
+	// The frequency (Daily, Weekly, or Monthly).
+	Frequency *string `locationName:"frequency" type:"string"`
+
+	// The interval quantity. The interval unit depends on the value of frequency.
+	// For example, every 2 weeks or every 2 months.
+	Interval *int64 `locationName:"interval" type:"integer"`
+
+	// The days. For a monthly schedule, this is one or more days of the month (1-31).
+	// For a weekly schedule, this is one or more days of the week (1-7, where 1
+	// is Sunday).
+	OccurrenceDaySet []*int64 `locationName:"occurrenceDaySet" locationNameList:"item" type:"list"`
+
+	// Indicates whether the occurrence is relative to the end of the specified
+	// week or month.
+	OccurrenceRelativeToEnd *bool `locationName:"occurrenceRelativeToEnd" type:"boolean"`
+
+	// The unit for occurrenceDaySet (DayOfWeek or DayOfMonth).
+	OccurrenceUnit *string `locationName:"occurrenceUnit" type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstanceRecurrence) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstanceRecurrence) GoString() string {
+	return s.String()
+}
+
+// Describes the recurring schedule for a Scheduled Instance.
+type ScheduledInstanceRecurrenceRequest struct {
+	_ struct{} `type:"structure"`
+
+	// The frequency (Daily, Weekly, or Monthly).
+	Frequency *string `type:"string"`
+
+	// The interval quantity. The interval unit depends on the value of Frequency.
+	// For example, every 2 weeks or every 2 months.
+	Interval *int64 `type:"integer"`
+
+	// The days. For a monthly schedule, this is one or more days of the month (1-31).
+	// For a weekly schedule, this is one or more days of the week (1-7, where 1
+	// is Sunday). You can't specify this value with a daily schedule. If the occurrence
+	// is relative to the end of the month, you can specify only a single day.
+	OccurrenceDays []*int64 `locationName:"OccurrenceDay" locationNameList:"OccurenceDay" type:"list"`
+
+	// Indicates whether the occurrence is relative to the end of the specified
+	// week or month. You can't specify this value with a daily schedule.
+	OccurrenceRelativeToEnd *bool `type:"boolean"`
+
+	// The unit for OccurrenceDays (DayOfWeek or DayOfMonth). This value is required
+	// for a monthly schedule. You can't specify DayOfWeek with a weekly schedule.
+	// You can't specify this value with a daily schedule.
+	OccurrenceUnit *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstanceRecurrenceRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstanceRecurrenceRequest) GoString() string {
+	return s.String()
+}
+
+// Describes a block device mapping for a Scheduled Instance.
+type ScheduledInstancesBlockDeviceMapping struct {
+	_ struct{} `type:"structure"`
+
+	// The device name exposed to the instance (for example, /dev/sdh or xvdh).
+	DeviceName *string `type:"string"`
+
+	// Parameters used to set up EBS volumes automatically when the instance is
+	// launched.
+	Ebs *ScheduledInstancesEbs `type:"structure"`
+
+	// Suppresses the specified device included in the block device mapping of the
+	// AMI.
+	NoDevice *string `type:"string"`
+
+	// The virtual device name (ephemeralN). Instance store volumes are numbered
+	// starting from 0. An instance type with two available instance store volumes
+	// can specify mappings for ephemeral0 and ephemeral1.The number of available
+	// instance store volumes depends on the instance type. After you connect to
+	// the instance, you must mount the volume.
+	//
+	// Constraints: For M3 instances, you must specify instance store volumes in
+	// the block device mapping for the instance. When you launch an M3 instance,
+	// we ignore any instance store volumes specified in the block device mapping
+	// for the AMI.
+	VirtualName *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesBlockDeviceMapping) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesBlockDeviceMapping) GoString() string {
+	return s.String()
+}
+
+// Describes an EBS volume for a Scheduled Instance.
+type ScheduledInstancesEbs struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether the volume is deleted on instance termination.
+	DeleteOnTermination *bool `type:"boolean"`
+
+	// Indicates whether the volume is encrypted. You can attached encrypted volumes
+	// only to instances that support them.
+	Encrypted *bool `type:"boolean"`
+
+	// The number of I/O operations per second (IOPS) that the volume supports.
+	// For io1 volumes, this represents the number of IOPS that are provisioned
+	// for the volume. For gp2 volumes, this represents the baseline performance
+	// of the volume and the rate at which the volume accumulates I/O credits for
+	// bursting. For more information about gp2 baseline performance, I/O credits,
+	// and bursting, see Amazon EBS Volume Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
+	// in the Amazon Elastic Compute Cloud User Guide.
+	//
+	// Constraint: Range is 100-20000 IOPS for io1 volumes and 100-10000 IOPS for
+	// gp2 volumes.
+	//
+	// Condition: This parameter is required for requests to create io1volumes;
+	// it is not used in requests to create gp2, st1, sc1, or standard volumes.
+	Iops *int64 `type:"integer"`
+
+	// The ID of the snapshot.
+	SnapshotId *string `type:"string"`
+
+	// The size of the volume, in GiB.
+	//
+	// Default: If you're creating the volume from a snapshot and don't specify
+	// a volume size, the default is the snapshot size.
+	VolumeSize *int64 `type:"integer"`
+
+	// The volume type. gp2 for General Purpose SSD, io1 for Provisioned IOPS SSD,
+	// Throughput Optimized HDD for st1, Cold HDD for sc1, or standard for Magnetic.
+	//
+	// Default: standard
+	VolumeType *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesEbs) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesEbs) GoString() string {
+	return s.String()
+}
+
+// Describes an IAM instance profile for a Scheduled Instance.
+type ScheduledInstancesIamInstanceProfile struct {
+	_ struct{} `type:"structure"`
+
+	// The Amazon Resource Name (ARN).
+	Arn *string `type:"string"`
+
+	// The name.
+	Name *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesIamInstanceProfile) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesIamInstanceProfile) GoString() string {
+	return s.String()
+}
+
+// Describes the launch specification for a Scheduled Instance.
+//
+// If you are launching the Scheduled Instance in EC2-VPC, you must specify
+// the ID of the subnet. You can specify the subnet using either SubnetId or
+// NetworkInterface.
+type ScheduledInstancesLaunchSpecification struct {
+	_ struct{} `type:"structure"`
+
+	// One or more block device mapping entries.
+	BlockDeviceMappings []*ScheduledInstancesBlockDeviceMapping `locationName:"BlockDeviceMapping" locationNameList:"BlockDeviceMapping" type:"list"`
+
+	// Indicates whether the instances are optimized for EBS I/O. This optimization
+	// provides dedicated throughput to Amazon EBS and an optimized configuration
+	// stack to provide optimal EBS I/O performance. This optimization isn't available
+	// with all instance types. Additional usage charges apply when using an EBS-optimized
+	// instance.
+	//
+	// Default: false
+	EbsOptimized *bool `type:"boolean"`
+
+	// The IAM instance profile.
+	IamInstanceProfile *ScheduledInstancesIamInstanceProfile `type:"structure"`
+
+	// The ID of the Amazon Machine Image (AMI).
+	ImageId *string `type:"string" required:"true"`
+
+	// The instance type.
+	InstanceType *string `type:"string"`
+
+	// The ID of the kernel.
+	KernelId *string `type:"string"`
+
+	// The name of the key pair.
+	KeyName *string `type:"string"`
+
+	// Enable or disable monitoring for the instances.
+	Monitoring *ScheduledInstancesMonitoring `type:"structure"`
+
+	// One or more network interfaces.
+	NetworkInterfaces []*ScheduledInstancesNetworkInterface `locationName:"NetworkInterface" locationNameList:"NetworkInterface" type:"list"`
+
+	// The placement information.
+	Placement *ScheduledInstancesPlacement `type:"structure"`
+
+	// The ID of the RAM disk.
+	RamdiskId *string `type:"string"`
+
+	// The IDs of one or more security groups.
+	SecurityGroupIds []*string `locationName:"SecurityGroupId" locationNameList:"SecurityGroupId" type:"list"`
+
+	// The ID of the subnet in which to launch the instances.
+	SubnetId *string `type:"string"`
+
+	// The base64-encoded MIME user data.
+	UserData *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesLaunchSpecification) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesLaunchSpecification) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ScheduledInstancesLaunchSpecification) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ScheduledInstancesLaunchSpecification"}
+	if s.ImageId == nil {
+		invalidParams.Add(request.NewErrParamRequired("ImageId"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Describes whether monitoring is enabled for a Scheduled Instance.
+type ScheduledInstancesMonitoring struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether monitoring is enabled.
+	Enabled *bool `type:"boolean"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesMonitoring) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesMonitoring) GoString() string {
+	return s.String()
+}
+
+// Describes a network interface for a Scheduled Instance.
+type ScheduledInstancesNetworkInterface struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether to assign a public IP address to instances launched in
+	// a VPC. The public IP address can only be assigned to a network interface
+	// for eth0, and can only be assigned to a new network interface, not an existing
+	// one. You cannot specify more than one network interface in the request. If
+	// launching into a default subnet, the default value is true.
+	AssociatePublicIpAddress *bool `type:"boolean"`
+
+	// Indicates whether to delete the interface when the instance is terminated.
+	DeleteOnTermination *bool `type:"boolean"`
+
+	// The description.
+	Description *string `type:"string"`
+
+	// The index of the device for the network interface attachment.
+	DeviceIndex *int64 `type:"integer"`
+
+	// The IDs of one or more security groups.
+	Groups []*string `locationName:"Group" locationNameList:"SecurityGroupId" type:"list"`
+
+	// The ID of the network interface.
+	NetworkInterfaceId *string `type:"string"`
+
+	// The IP address of the network interface within the subnet.
+	PrivateIpAddress *string `type:"string"`
+
+	// The private IP addresses.
+	PrivateIpAddressConfigs []*ScheduledInstancesPrivateIpAddressConfig `locationName:"PrivateIpAddressConfig" locationNameList:"PrivateIpAddressConfigSet" type:"list"`
+
+	// The number of secondary private IP addresses.
+	SecondaryPrivateIpAddressCount *int64 `type:"integer"`
+
+	// The ID of the subnet.
+	SubnetId *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesNetworkInterface) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesNetworkInterface) GoString() string {
+	return s.String()
+}
+
+// Describes the placement for a Scheduled Instance.
+type ScheduledInstancesPlacement struct {
+	_ struct{} `type:"structure"`
+
+	// The Availability Zone.
+	AvailabilityZone *string `type:"string"`
+
+	// The name of the placement group.
+	GroupName *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesPlacement) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesPlacement) GoString() string {
+	return s.String()
+}
+
+// Describes a private IP address for a Scheduled Instance.
+type ScheduledInstancesPrivateIpAddressConfig struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether this is a primary IP address. Otherwise, this is a secondary
+	// IP address.
+	Primary *bool `type:"boolean"`
+
+	// The IP address.
+	PrivateIpAddress *string `type:"string"`
+}
+
+// String returns the string representation
+func (s ScheduledInstancesPrivateIpAddressConfig) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ScheduledInstancesPrivateIpAddressConfig) GoString() string {
 	return s.String()
 }
 
@@ -20808,6 +25457,91 @@ func (s SecurityGroup) String() string {
 
 // GoString returns the string representation
 func (s SecurityGroup) GoString() string {
+	return s.String()
+}
+
+// Describes a VPC with a security group that references your security group.
+type SecurityGroupReference struct {
+	_ struct{} `type:"structure"`
+
+	// The ID of your security group.
+	GroupId *string `locationName:"groupId" type:"string" required:"true"`
+
+	// The ID of the VPC with the referencing security group.
+	ReferencingVpcId *string `locationName:"referencingVpcId" type:"string" required:"true"`
+
+	// The ID of the VPC peering connection.
+	VpcPeeringConnectionId *string `locationName:"vpcPeeringConnectionId" type:"string"`
+}
+
+// String returns the string representation
+func (s SecurityGroupReference) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SecurityGroupReference) GoString() string {
+	return s.String()
+}
+
+// Describes the time period for a Scheduled Instance to start its first schedule.
+// The time period must span less than one day.
+type SlotDateTimeRangeRequest struct {
+	_ struct{} `type:"structure"`
+
+	// The earliest date and time, in UTC, for the Scheduled Instance to start.
+	EarliestTime *time.Time `type:"timestamp" timestampFormat:"iso8601" required:"true"`
+
+	// The latest date and time, in UTC, for the Scheduled Instance to start. This
+	// value must be later than or equal to the earliest date and at most three
+	// months in the future.
+	LatestTime *time.Time `type:"timestamp" timestampFormat:"iso8601" required:"true"`
+}
+
+// String returns the string representation
+func (s SlotDateTimeRangeRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SlotDateTimeRangeRequest) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SlotDateTimeRangeRequest) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SlotDateTimeRangeRequest"}
+	if s.EarliestTime == nil {
+		invalidParams.Add(request.NewErrParamRequired("EarliestTime"))
+	}
+	if s.LatestTime == nil {
+		invalidParams.Add(request.NewErrParamRequired("LatestTime"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Describes the time period for a Scheduled Instance to start its first schedule.
+type SlotStartTimeRangeRequest struct {
+	_ struct{} `type:"structure"`
+
+	// The earliest date and time, in UTC, for the Scheduled Instance to start.
+	EarliestTime *time.Time `type:"timestamp" timestampFormat:"iso8601"`
+
+	// The latest date and time, in UTC, for the Scheduled Instance to start.
+	LatestTime *time.Time `type:"timestamp" timestampFormat:"iso8601"`
+}
+
+// String returns the string representation
+func (s SlotStartTimeRangeRequest) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s SlotStartTimeRangeRequest) GoString() string {
 	return s.String()
 }
 
@@ -20912,7 +25646,7 @@ type SnapshotDetail struct {
 	// The URL used to access the disk image.
 	Url *string `locationName:"url" type:"string"`
 
-	// Describes the S3 bucket for the disk image.
+	// The S3 bucket for the disk image.
 	UserBucket *UserBucketDetails `locationName:"userBucket" type:"structure"`
 }
 
@@ -20942,7 +25676,7 @@ type SnapshotDiskContainer struct {
 	// a https URL (https://..) or an Amazon S3 URL (s3://..).
 	Url *string `type:"string"`
 
-	// Describes the S3 bucket for the disk image.
+	// The S3 bucket for the disk image.
 	UserBucket *UserBucket `type:"structure"`
 }
 
@@ -21085,7 +25819,8 @@ type SpotFleetLaunchSpecification struct {
 	// value of WeightedCapacity.
 	SpotPrice *string `locationName:"spotPrice" type:"string"`
 
-	// The ID of the subnet in which to launch the instances.
+	// The ID of the subnet in which to launch the instances. To specify multiple
+	// subnets, separate them using commas; for example, "subnet-a61dafcf, subnet-65ea5f08".
 	SubnetId *string `locationName:"subnetId" type:"string"`
 
 	// The Base64-encoded MIME user data to make available to the instances.
@@ -21109,6 +25844,26 @@ func (s SpotFleetLaunchSpecification) String() string {
 // GoString returns the string representation
 func (s SpotFleetLaunchSpecification) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SpotFleetLaunchSpecification) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SpotFleetLaunchSpecification"}
+	if s.NetworkInterfaces != nil {
+		for i, v := range s.NetworkInterfaces {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "NetworkInterfaces", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes whether monitoring is enabled.
@@ -21214,6 +25969,41 @@ func (s SpotFleetRequestConfigData) String() string {
 // GoString returns the string representation
 func (s SpotFleetRequestConfigData) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *SpotFleetRequestConfigData) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "SpotFleetRequestConfigData"}
+	if s.IamFleetRole == nil {
+		invalidParams.Add(request.NewErrParamRequired("IamFleetRole"))
+	}
+	if s.LaunchSpecifications == nil {
+		invalidParams.Add(request.NewErrParamRequired("LaunchSpecifications"))
+	}
+	if s.LaunchSpecifications != nil && len(s.LaunchSpecifications) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("LaunchSpecifications", 1))
+	}
+	if s.SpotPrice == nil {
+		invalidParams.Add(request.NewErrParamRequired("SpotPrice"))
+	}
+	if s.TargetCapacity == nil {
+		invalidParams.Add(request.NewErrParamRequired("TargetCapacity"))
+	}
+	if s.LaunchSpecifications != nil {
+		for i, v := range s.LaunchSpecifications {
+			if v == nil {
+				continue
+			}
+			if err := v.Validate(); err != nil {
+				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "LaunchSpecifications", i), err.(request.ErrInvalidParams))
+			}
+		}
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes a Spot instance request.
@@ -21351,6 +26141,9 @@ type SpotPlacement struct {
 	_ struct{} `type:"structure"`
 
 	// The Availability Zone.
+	//
+	// [Spot fleet only] To specify multiple Availability Zones, separate them
+	// using commas; for example, "us-west-2a, us-west-2b".
 	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
 
 	// The name of the placement group (for cluster instances).
@@ -21398,6 +26191,78 @@ func (s SpotPrice) GoString() string {
 	return s.String()
 }
 
+// Describes a stale rule in a security group.
+type StaleIpPermission struct {
+	_ struct{} `type:"structure"`
+
+	// The start of the port range for the TCP and UDP protocols, or an ICMP type
+	// number. A value of -1 indicates all ICMP types.
+	FromPort *int64 `locationName:"fromPort" type:"integer"`
+
+	// The IP protocol name (for tcp, udp, and icmp) or number (see Protocol Numbers)
+	// (http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
+	IpProtocol *string `locationName:"ipProtocol" type:"string"`
+
+	// One or more IP ranges. Not applicable for stale security group rules.
+	IpRanges []*string `locationName:"ipRanges" locationNameList:"item" type:"list"`
+
+	// One or more prefix list IDs for an AWS service. Not applicable for stale
+	// security group rules.
+	PrefixListIds []*string `locationName:"prefixListIds" locationNameList:"item" type:"list"`
+
+	// The end of the port range for the TCP and UDP protocols, or an ICMP type
+	// number. A value of -1 indicates all ICMP types.
+	ToPort *int64 `locationName:"toPort" type:"integer"`
+
+	// One or more security group pairs. Returns the ID of the referenced security
+	// group and VPC, and the ID and status of the VPC peering connection.
+	UserIdGroupPairs []*UserIdGroupPair `locationName:"groups" locationNameList:"item" type:"list"`
+}
+
+// String returns the string representation
+func (s StaleIpPermission) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s StaleIpPermission) GoString() string {
+	return s.String()
+}
+
+// Describes a stale security group (a security group that contains stale rules).
+type StaleSecurityGroup struct {
+	_ struct{} `type:"structure"`
+
+	// The description of the security group.
+	Description *string `locationName:"description" type:"string"`
+
+	// The ID of the security group.
+	GroupId *string `locationName:"groupId" type:"string" required:"true"`
+
+	// The name of the security group.
+	GroupName *string `locationName:"groupName" type:"string"`
+
+	// Information about the stale inbound rules in the security group.
+	StaleIpPermissions []*StaleIpPermission `locationName:"staleIpPermissions" locationNameList:"item" type:"list"`
+
+	// Information about the stale outbound rules in the security group.
+	StaleIpPermissionsEgress []*StaleIpPermission `locationName:"staleIpPermissionsEgress" locationNameList:"item" type:"list"`
+
+	// The ID of the VPC for the security group.
+	VpcId *string `locationName:"vpcId" type:"string"`
+}
+
+// String returns the string representation
+func (s StaleSecurityGroup) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s StaleSecurityGroup) GoString() string {
+	return s.String()
+}
+
+// Contains the parameters for StartInstances.
 type StartInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -21424,6 +26289,20 @@ func (s StartInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *StartInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "StartInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of StartInstances.
 type StartInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -21468,7 +26347,8 @@ type StateReason struct {
 	// Client.UserInitiatedShutdown: The instance was shut down using the Amazon
 	// EC2 API.
 	//
-	// Client.VolumeLimitExceeded: The volume limit was exceeded.
+	// Client.VolumeLimitExceeded: The limit on the number of EBS volumes or total
+	// storage was exceeded. Decrease usage or request an increase in your limits.
 	//
 	// Client.InvalidSnapshot.NotFound: The specified snapshot was not found.
 	Message *string `locationName:"message" type:"string"`
@@ -21484,6 +26364,7 @@ func (s StateReason) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for StopInstances.
 type StopInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -21515,6 +26396,20 @@ func (s StopInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *StopInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "StopInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of StopInstances.
 type StopInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -21647,6 +26542,7 @@ func (s TagDescription) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for TerminateInstances.
 type TerminateInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -21670,6 +26566,20 @@ func (s TerminateInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *TerminateInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TerminateInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of TerminateInstances.
 type TerminateInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -21687,6 +26597,7 @@ func (s TerminateInstancesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for UnassignPrivateIpAddresses.
 type UnassignPrivateIpAddressesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -21708,6 +26619,22 @@ func (s UnassignPrivateIpAddressesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UnassignPrivateIpAddressesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UnassignPrivateIpAddressesInput"}
+	if s.NetworkInterfaceId == nil {
+		invalidParams.Add(request.NewErrParamRequired("NetworkInterfaceId"))
+	}
+	if s.PrivateIpAddresses == nil {
+		invalidParams.Add(request.NewErrParamRequired("PrivateIpAddresses"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type UnassignPrivateIpAddressesOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -21722,6 +26649,7 @@ func (s UnassignPrivateIpAddressesOutput) GoString() string {
 	return s.String()
 }
 
+// Contains the parameters for UnmonitorInstances.
 type UnmonitorInstancesInput struct {
 	_ struct{} `type:"structure"`
 
@@ -21745,6 +26673,20 @@ func (s UnmonitorInstancesInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UnmonitorInstancesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UnmonitorInstancesInput"}
+	if s.InstanceIds == nil {
+		invalidParams.Add(request.NewErrParamRequired("InstanceIds"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// Contains the output of UnmonitorInstances.
 type UnmonitorInstancesOutput struct {
 	_ struct{} `type:"structure"`
 
@@ -21812,7 +26754,7 @@ type UserBucket struct {
 	// The name of the S3 bucket where the disk image is located.
 	S3Bucket *string `type:"string"`
 
-	// The key for the disk image.
+	// The file name of the disk image.
 	S3Key *string `type:"string"`
 }
 
@@ -21833,7 +26775,7 @@ type UserBucketDetails struct {
 	// The S3 bucket from which the disk image was created.
 	S3Bucket *string `locationName:"s3Bucket" type:"string"`
 
-	// The key from which the disk image was created.
+	// The file name of the disk image.
 	S3Key *string `locationName:"s3Key" type:"string"`
 }
 
@@ -21874,11 +26816,24 @@ type UserIdGroupPair struct {
 
 	// The name of the security group. In a request, use this parameter for a security
 	// group in EC2-Classic or a default VPC only. For a security group in a nondefault
-	// VPC, use GroupId.
+	// VPC, use the security group ID.
 	GroupName *string `locationName:"groupName" type:"string"`
 
-	// The ID of an AWS account. EC2-Classic only.
+	// The status of a VPC peering connection, if applicable.
+	PeeringStatus *string `locationName:"peeringStatus" type:"string"`
+
+	// The ID of an AWS account. For a referenced security group in another VPC,
+	// the account ID of the referenced security group is returned.
+	//
+	// [EC2-Classic] Required when adding or removing rules that reference a security
+	// group in another AWS account.
 	UserId *string `locationName:"userId" type:"string"`
+
+	// The ID of the VPC for the referenced security group, if applicable.
+	VpcId *string `locationName:"vpcId" type:"string"`
+
+	// The ID of the VPC peering connection, if applicable.
+	VpcPeeringConnectionId *string `locationName:"vpcPeeringConnectionId" type:"string"`
 }
 
 // String returns the string representation
@@ -21939,18 +26894,18 @@ type Volume struct {
 	Encrypted *bool `locationName:"encrypted" type:"boolean"`
 
 	// The number of I/O operations per second (IOPS) that the volume supports.
-	// For Provisioned IOPS (SSD) volumes, this represents the number of IOPS that
-	// are provisioned for the volume. For General Purpose (SSD) volumes, this represents
+	// For Provisioned IOPS SSD volumes, this represents the number of IOPS that
+	// are provisioned for the volume. For General Purpose SSD volumes, this represents
 	// the baseline performance of the volume and the rate at which the volume accumulates
-	// I/O credits for bursting. For more information on General Purpose (SSD) baseline
+	// I/O credits for bursting. For more information on General Purpose SSD baseline
 	// performance, I/O credits, and bursting, see Amazon EBS Volume Types (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)
 	// in the Amazon Elastic Compute Cloud User Guide.
 	//
-	// Constraint: Range is 100 to 20000 for Provisioned IOPS (SSD) volumes and
-	// 3 to 10000 for General Purpose (SSD) volumes.
+	// Constraint: Range is 100-20000 IOPS for io1 volumes and 100-10000 IOPS for
+	// gp2 volumes.
 	//
 	// Condition: This parameter is required for requests to create io1 volumes;
-	// it is not used in requests to create standard or gp2 volumes.
+	// it is not used in requests to create gp2, st1, sc1, or standard volumes.
 	Iops *int64 `locationName:"iops" type:"integer"`
 
 	// The full ARN of the AWS Key Management Service (AWS KMS) customer master
@@ -21972,8 +26927,9 @@ type Volume struct {
 	// The ID of the volume.
 	VolumeId *string `locationName:"volumeId" type:"string"`
 
-	// The volume type. This can be gp2 for General Purpose (SSD) volumes, io1 for
-	// Provisioned IOPS (SSD) volumes, or standard for Magnetic volumes.
+	// The volume type. This can be gp2 for General Purpose SSD, io1 for Provisioned
+	// IOPS SSD, st1 for Throughput Optimized HDD, sc1 for Cold HDD, or standard
+	// for Magnetic volumes.
 	VolumeType *string `locationName:"volumeType" type:"string" enum:"VolumeType"`
 }
 
@@ -22036,6 +26992,19 @@ func (s VolumeDetail) String() string {
 // GoString returns the string representation
 func (s VolumeDetail) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *VolumeDetail) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "VolumeDetail"}
+	if s.Size == nil {
+		invalidParams.Add(request.NewErrParamRequired("Size"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // Describes a volume status operation code.
@@ -22289,13 +27258,15 @@ func (s VpcEndpoint) GoString() string {
 type VpcPeeringConnection struct {
 	_ struct{} `type:"structure"`
 
-	// The information of the peer VPC.
+	// Information about the accepter VPC. CIDR block information is not returned
+	// when creating a VPC peering connection, or when describing a VPC peering
+	// connection that's in the initiating-request or pending-acceptance state.
 	AccepterVpcInfo *VpcPeeringConnectionVpcInfo `locationName:"accepterVpcInfo" type:"structure"`
 
 	// The time that an unaccepted VPC peering connection will expire.
 	ExpirationTime *time.Time `locationName:"expirationTime" type:"timestamp" timestampFormat:"iso8601"`
 
-	// The information of the requester VPC.
+	// Information about the requester VPC.
 	RequesterVpcInfo *VpcPeeringConnectionVpcInfo `locationName:"requesterVpcInfo" type:"structure"`
 
 	// The status of the VPC peering connection.
@@ -22315,6 +27286,29 @@ func (s VpcPeeringConnection) String() string {
 
 // GoString returns the string representation
 func (s VpcPeeringConnection) GoString() string {
+	return s.String()
+}
+
+// Describes the VPC peering connection options.
+type VpcPeeringConnectionOptionsDescription struct {
+	_ struct{} `type:"structure"`
+
+	// Indicates whether a local ClassicLink connection can communicate with the
+	// peer VPC over the VPC peering connection.
+	AllowEgressFromLocalClassicLinkToRemoteVpc *bool `locationName:"allowEgressFromLocalClassicLinkToRemoteVpc" type:"boolean"`
+
+	// Indicates whether a local VPC can communicate with a ClassicLink connection
+	// in the peer VPC over the VPC peering connection.
+	AllowEgressFromLocalVpcToRemoteClassicLink *bool `locationName:"allowEgressFromLocalVpcToRemoteClassicLink" type:"boolean"`
+}
+
+// String returns the string representation
+func (s VpcPeeringConnectionOptionsDescription) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s VpcPeeringConnectionOptionsDescription) GoString() string {
 	return s.String()
 }
 
@@ -22348,6 +27342,10 @@ type VpcPeeringConnectionVpcInfo struct {
 
 	// The AWS account ID of the VPC owner.
 	OwnerId *string `locationName:"ownerId" type:"string"`
+
+	// Information about the VPC peering connection options for the accepter or
+	// requester VPC.
+	PeeringOptions *VpcPeeringConnectionOptionsDescription `locationName:"peeringOptions" type:"structure"`
 
 	// The ID of the VPC.
 	VpcId *string `locationName:"vpcId" type:"string"`
@@ -22453,7 +27451,8 @@ func (s VpnConnectionOptionsSpecification) GoString() string {
 type VpnGateway struct {
 	_ struct{} `type:"structure"`
 
-	// The Availability Zone where the virtual private gateway was created.
+	// The Availability Zone where the virtual private gateway was created, if applicable.
+	// This field may be empty or not returned.
 	AvailabilityZone *string `locationName:"availabilityZone" type:"string"`
 
 	// The current state of the virtual private gateway.
@@ -22837,6 +27836,8 @@ const (
 const (
 	// @enum InstanceLifecycleType
 	InstanceLifecycleTypeSpot = "spot"
+	// @enum InstanceLifecycleType
+	InstanceLifecycleTypeScheduled = "scheduled"
 )
 
 const (
@@ -22884,6 +27885,8 @@ const (
 	// @enum InstanceType
 	InstanceTypeM410xlarge = "m4.10xlarge"
 	// @enum InstanceType
+	InstanceTypeT2Nano = "t2.nano"
+	// @enum InstanceType
 	InstanceTypeT2Micro = "t2.micro"
 	// @enum InstanceType
 	InstanceTypeT2Small = "t2.small"
@@ -22899,6 +27902,14 @@ const (
 	InstanceTypeM24xlarge = "m2.4xlarge"
 	// @enum InstanceType
 	InstanceTypeCr18xlarge = "cr1.8xlarge"
+	// @enum InstanceType
+	InstanceTypeX14xlarge = "x1.4xlarge"
+	// @enum InstanceType
+	InstanceTypeX18xlarge = "x1.8xlarge"
+	// @enum InstanceType
+	InstanceTypeX116xlarge = "x1.16xlarge"
+	// @enum InstanceType
+	InstanceTypeX132xlarge = "x1.32xlarge"
 	// @enum InstanceType
 	InstanceTypeI2Xlarge = "i2.xlarge"
 	// @enum InstanceType
@@ -22941,6 +27952,8 @@ const (
 	InstanceTypeCc28xlarge = "cc2.8xlarge"
 	// @enum InstanceType
 	InstanceTypeG22xlarge = "g2.2xlarge"
+	// @enum InstanceType
+	InstanceTypeG28xlarge = "g2.8xlarge"
 	// @enum InstanceType
 	InstanceTypeCg14xlarge = "cg1.4xlarge"
 	// @enum InstanceType
@@ -23004,6 +28017,19 @@ const (
 )
 
 const (
+	// @enum NatGatewayState
+	NatGatewayStatePending = "pending"
+	// @enum NatGatewayState
+	NatGatewayStateFailed = "failed"
+	// @enum NatGatewayState
+	NatGatewayStateAvailable = "available"
+	// @enum NatGatewayState
+	NatGatewayStateDeleting = "deleting"
+	// @enum NatGatewayState
+	NatGatewayStateDeleted = "deleted"
+)
+
+const (
 	// @enum NetworkInterfaceAttribute
 	NetworkInterfaceAttributeDescription = "description"
 	// @enum NetworkInterfaceAttribute
@@ -23023,6 +28049,13 @@ const (
 	NetworkInterfaceStatusInUse = "in-use"
 	// @enum NetworkInterfaceStatus
 	NetworkInterfaceStatusDetaching = "detaching"
+)
+
+const (
+	// @enum NetworkInterfaceType
+	NetworkInterfaceTypeInterface = "interface"
+	// @enum NetworkInterfaceType
+	NetworkInterfaceTypeNatGateway = "natGateway"
 )
 
 const (
@@ -23387,6 +28420,10 @@ const (
 	VolumeTypeIo1 = "io1"
 	// @enum VolumeType
 	VolumeTypeGp2 = "gp2"
+	// @enum VolumeType
+	VolumeTypeSc1 = "sc1"
+	// @enum VolumeType
+	VolumeTypeSt1 = "st1"
 )
 
 const (

@@ -6,6 +6,8 @@ package iotdataplane
 import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/private/protocol"
+	"github.com/aws/aws-sdk-go/private/protocol/restjson"
 )
 
 const opDeleteThingShadow = "DeleteThingShadow"
@@ -83,6 +85,8 @@ func (c *IoTDataPlane) PublishRequest(input *PublishInput) (req *request.Request
 	}
 
 	req = c.newRequest(op, input, output)
+	req.Handlers.Unmarshal.Remove(restjson.UnmarshalHandler)
+	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	output = &PublishOutput{}
 	req.Data = output
 	return
@@ -146,6 +150,22 @@ func (s DeleteThingShadowInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *DeleteThingShadowInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteThingShadowInput"}
+	if s.ThingName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ThingName"))
+	}
+	if s.ThingName != nil && len(*s.ThingName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ThingName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 // The output from the DeleteThingShadow operation.
 type DeleteThingShadowOutput struct {
 	_ struct{} `type:"structure" payload:"Payload"`
@@ -180,6 +200,22 @@ func (s GetThingShadowInput) String() string {
 // GoString returns the string representation
 func (s GetThingShadowInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *GetThingShadowInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetThingShadowInput"}
+	if s.ThingName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ThingName"))
+	}
+	if s.ThingName != nil && len(*s.ThingName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ThingName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // The output from the GetThingShadow operation.
@@ -224,6 +260,19 @@ func (s PublishInput) GoString() string {
 	return s.String()
 }
 
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *PublishInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PublishInput"}
+	if s.Topic == nil {
+		invalidParams.Add(request.NewErrParamRequired("Topic"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
 type PublishOutput struct {
 	_ struct{} `type:"structure"`
 }
@@ -257,6 +306,25 @@ func (s UpdateThingShadowInput) String() string {
 // GoString returns the string representation
 func (s UpdateThingShadowInput) GoString() string {
 	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *UpdateThingShadowInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UpdateThingShadowInput"}
+	if s.Payload == nil {
+		invalidParams.Add(request.NewErrParamRequired("Payload"))
+	}
+	if s.ThingName == nil {
+		invalidParams.Add(request.NewErrParamRequired("ThingName"))
+	}
+	if s.ThingName != nil && len(*s.ThingName) < 1 {
+		invalidParams.Add(request.NewErrParamMinLen("ThingName", 1))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
 }
 
 // The output from the UpdateThingShadow operation.

@@ -4,11 +4,11 @@
     "apiVersion":"2014-11-06",
     "endpointPrefix":"ssm",
     "jsonVersion":"1.1",
+    "protocol":"json",
     "serviceAbbreviation":"Amazon SSM",
     "serviceFullName":"Amazon Simple Systems Management Service",
     "signatureVersion":"v4",
-    "targetPrefix":"AmazonSSM",
-    "protocol":"json"
+    "targetPrefix":"AmazonSSM"
   },
   "operations":{
     "CancelCommand":{
@@ -20,33 +20,10 @@
       "input":{"shape":"CancelCommandRequest"},
       "output":{"shape":"CancelCommandResult"},
       "errors":[
-        {
-          "shape":"InvalidCommandId",
-          "error":{
-            "code":"InvalidCommandId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"DuplicateInstanceId",
-          "error":{
-            "code":"DuplicateInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidCommandId"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"DuplicateInstanceId"}
       ]
     },
     "CreateAssociation":{
@@ -58,68 +35,13 @@
       "input":{"shape":"CreateAssociationRequest"},
       "output":{"shape":"CreateAssociationResult"},
       "errors":[
-        {
-          "shape":"AssociationAlreadyExists",
-          "error":{
-            "code":"AssociationAlreadyExists",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"AssociationLimitExceeded",
-          "error":{
-            "code":"AssociationLimitExceeded",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"UnsupportedPlatformType",
-          "error":{
-            "code":"UnsupportedPlatformType",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidParameters",
-          "error":{
-            "code":"InvalidParameters",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"AssociationAlreadyExists"},
+        {"shape":"AssociationLimitExceeded"},
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"UnsupportedPlatformType"},
+        {"shape":"InvalidParameters"}
       ]
     },
     "CreateAssociationBatch":{
@@ -131,68 +53,13 @@
       "input":{"shape":"CreateAssociationBatchRequest"},
       "output":{"shape":"CreateAssociationBatchResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidParameters",
-          "error":{
-            "code":"InvalidParameters",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"DuplicateInstanceId",
-          "error":{
-            "code":"DuplicateInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"AssociationLimitExceeded",
-          "error":{
-            "code":"AssociationLimitExceeded",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"UnsupportedPlatformType",
-          "error":{
-            "code":"UnsupportedPlatformType",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidParameters"},
+        {"shape":"DuplicateInstanceId"},
+        {"shape":"AssociationLimitExceeded"},
+        {"shape":"UnsupportedPlatformType"}
       ]
     },
     "CreateDocument":{
@@ -204,50 +71,11 @@
       "input":{"shape":"CreateDocumentRequest"},
       "output":{"shape":"CreateDocumentResult"},
       "errors":[
-        {
-          "shape":"DocumentAlreadyExists",
-          "error":{
-            "code":"DocumentAlreadyExists",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"MaxDocumentSizeExceeded",
-          "error":{
-            "code":"MaxDocumentSizeExceeded",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocumentContent",
-          "error":{
-            "code":"InvalidDocumentContent",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"DocumentLimitExceeded",
-          "error":{
-            "code":"DocumentLimitExceeded",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"DocumentAlreadyExists"},
+        {"shape":"MaxDocumentSizeExceeded"},
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocumentContent"},
+        {"shape":"DocumentLimitExceeded"}
       ]
     },
     "DeleteAssociation":{
@@ -259,50 +87,11 @@
       "input":{"shape":"DeleteAssociationRequest"},
       "output":{"shape":"DeleteAssociationResult"},
       "errors":[
-        {
-          "shape":"AssociationDoesNotExist",
-          "error":{
-            "code":"AssociationDoesNotExist",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"TooManyUpdates",
-          "error":{
-            "code":"TooManyUpdates",
-            "httpStatusCode":429,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"AssociationDoesNotExist"},
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"TooManyUpdates"}
       ]
     },
     "DeleteDocument":{
@@ -314,32 +103,10 @@
       "input":{"shape":"DeleteDocumentRequest"},
       "output":{"shape":"DeleteDocumentResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"AssociatedInstances",
-          "error":{
-            "code":"AssociatedInstances",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidDocumentOperation"},
+        {"shape":"AssociatedInstances"}
       ]
     },
     "DescribeAssociation":{
@@ -351,41 +118,10 @@
       "input":{"shape":"DescribeAssociationRequest"},
       "output":{"shape":"DescribeAssociationResult"},
       "errors":[
-        {
-          "shape":"AssociationDoesNotExist",
-          "error":{
-            "code":"AssociationDoesNotExist",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"AssociationDoesNotExist"},
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidInstanceId"}
       ]
     },
     "DescribeDocument":{
@@ -397,23 +133,22 @@
       "input":{"shape":"DescribeDocumentRequest"},
       "output":{"shape":"DescribeDocumentResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"}
+      ]
+    },
+    "DescribeDocumentPermission":{
+      "name":"DescribeDocumentPermission",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"DescribeDocumentPermissionRequest"},
+      "output":{"shape":"DescribeDocumentPermissionResponse"},
+      "errors":[
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidPermissionType"}
       ]
     },
     "DescribeInstanceInformation":{
@@ -425,50 +160,11 @@
       "input":{"shape":"DescribeInstanceInformationRequest"},
       "output":{"shape":"DescribeInstanceInformationResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidNextToken",
-          "error":{
-            "code":"InvalidNextToken",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceInformationFilterValue",
-          "error":{
-            "code":"InvalidInstanceInformationFilterValue",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidFilterKey",
-          "error":{
-            "code":"InvalidFilterKey",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidNextToken"},
+        {"shape":"InvalidInstanceInformationFilterValue"},
+        {"shape":"InvalidFilterKey"}
       ]
     },
     "GetDocument":{
@@ -480,23 +176,8 @@
       "input":{"shape":"GetDocumentRequest"},
       "output":{"shape":"GetDocumentResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"}
       ]
     },
     "ListAssociations":{
@@ -508,23 +189,8 @@
       "input":{"shape":"ListAssociationsRequest"},
       "output":{"shape":"ListAssociationsResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidNextToken",
-          "error":{
-            "code":"InvalidNextToken",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidNextToken"}
       ]
     },
     "ListCommandInvocations":{
@@ -536,42 +202,11 @@
       "input":{"shape":"ListCommandInvocationsRequest"},
       "output":{"shape":"ListCommandInvocationsResult"},
       "errors":[
-        {
-          "shape":"InvalidCommandId",
-          "error":{
-            "code":"InvalidCommandId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidFilterKey",
-          "error":{
-            "code":"InvalidFilterKey",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidNextToken",
-          "error":{
-            "code":"InvalidNextToken",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidCommandId"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidFilterKey"},
+        {"shape":"InvalidNextToken"}
       ]
     },
     "ListCommands":{
@@ -583,42 +218,11 @@
       "input":{"shape":"ListCommandsRequest"},
       "output":{"shape":"ListCommandsResult"},
       "errors":[
-        {
-          "shape":"InvalidCommandId",
-          "error":{
-            "code":"InvalidCommandId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidFilterKey",
-          "error":{
-            "code":"InvalidFilterKey",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidNextToken",
-          "error":{
-            "code":"InvalidNextToken",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidCommandId"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidFilterKey"},
+        {"shape":"InvalidNextToken"}
       ]
     },
     "ListDocuments":{
@@ -630,32 +234,25 @@
       "input":{"shape":"ListDocumentsRequest"},
       "output":{"shape":"ListDocumentsResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidNextToken",
-          "error":{
-            "code":"InvalidNextToken",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidFilterKey",
-          "error":{
-            "code":"InvalidFilterKey",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidNextToken"},
+        {"shape":"InvalidFilterKey"}
+      ]
+    },
+    "ModifyDocumentPermission":{
+      "name":"ModifyDocumentPermission",
+      "http":{
+        "method":"POST",
+        "requestUri":"/"
+      },
+      "input":{"shape":"ModifyDocumentPermissionRequest"},
+      "output":{"shape":"ModifyDocumentPermissionResponse"},
+      "errors":[
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidPermissionType"},
+        {"shape":"DocumentPermissionLimit"},
+        {"shape":"DocumentLimitExceeded"}
       ]
     },
     "SendCommand":{
@@ -667,60 +264,14 @@
       "input":{"shape":"SendCommandRequest"},
       "output":{"shape":"SendCommandResult"},
       "errors":[
-        {
-          "shape":"DuplicateInstanceId",
-          "error":{
-            "code":"DuplicateInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidOutputFolder",
-          "error":{
-            "code":"InvalidOutputFolder",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidParameters",
-          "error":{
-            "code":"InvalidParameters",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"UnsupportedPlatformType",
-          "error":{
-            "code":"UnsupportedPlatformType",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"DuplicateInstanceId"},
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidDocument"},
+        {"shape":"InvalidOutputFolder"},
+        {"shape":"InvalidParameters"},
+        {"shape":"UnsupportedPlatformType"},
+        {"shape":"MaxDocumentSizeExceeded"}
       ]
     },
     "UpdateAssociationStatus":{
@@ -732,71 +283,31 @@
       "input":{"shape":"UpdateAssociationStatusRequest"},
       "output":{"shape":"UpdateAssociationStatusResult"},
       "errors":[
-        {
-          "shape":"InternalServerError",
-          "error":{
-            "code":"InternalServerError",
-            "httpStatusCode":500
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidInstanceId",
-          "error":{
-            "code":"InvalidInstanceId",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"InvalidDocument",
-          "error":{
-            "code":"InvalidDocument",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"AssociationDoesNotExist",
-          "error":{
-            "code":"AssociationDoesNotExist",
-            "httpStatusCode":404,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"StatusUnchanged",
-          "error":{
-            "code":"StatusUnchanged",
-            "httpStatusCode":400,
-            "senderFault":true
-          },
-          "exception":true
-        },
-        {
-          "shape":"TooManyUpdates",
-          "error":{
-            "code":"TooManyUpdates",
-            "httpStatusCode":429,
-            "senderFault":true
-          },
-          "exception":true
-        }
+        {"shape":"InternalServerError"},
+        {"shape":"InvalidInstanceId"},
+        {"shape":"InvalidDocument"},
+        {"shape":"AssociationDoesNotExist"},
+        {"shape":"StatusUnchanged"},
+        {"shape":"TooManyUpdates"}
       ]
     }
   },
   "shapes":{
+    "AccountId":{
+      "type":"string",
+      "pattern":"(?i)all|[0-9]{12}"
+    },
+    "AccountIdList":{
+      "type":"list",
+      "member":{
+        "shape":"AccountId",
+        "locationName":"AccountId"
+      },
+      "max":20
+    },
     "AssociatedInstances":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"AssociatedInstances",
-        "httpStatusCode":400,
-        "senderFault":true
       },
       "exception":true
     },
@@ -810,11 +321,6 @@
     "AssociationAlreadyExists":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"AssociationAlreadyExists",
-        "httpStatusCode":400,
-        "senderFault":true
       },
       "exception":true
     },
@@ -838,11 +344,6 @@
     "AssociationDoesNotExist":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"AssociationDoesNotExist",
-        "httpStatusCode":404,
-        "senderFault":true
       },
       "exception":true
     },
@@ -879,11 +380,6 @@
     "AssociationLimitExceeded":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"AssociationLimitExceeded",
-        "httpStatusCode":400,
-        "senderFault":true
       },
       "exception":true
     },
@@ -968,8 +464,8 @@
     "CommandFilterList":{
       "type":"list",
       "member":{"shape":"CommandFilter"},
-      "min":1,
-      "max":3
+      "max":3,
+      "min":1
     },
     "CommandFilterValue":{
       "type":"string",
@@ -977,8 +473,8 @@
     },
     "CommandId":{
       "type":"string",
-      "min":36,
-      "max":36
+      "max":36,
+      "min":36
     },
     "CommandInvocation":{
       "type":"structure",
@@ -1015,8 +511,8 @@
     },
     "CommandMaxResults":{
       "type":"integer",
-      "min":1,
-      "max":50
+      "max":50,
+      "min":1
     },
     "CommandPlugin":{
       "type":"structure",
@@ -1180,11 +676,28 @@
         "AssociationDescription":{"shape":"AssociationDescription"}
       }
     },
+    "DescribeDocumentPermissionRequest":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "PermissionType"
+      ],
+      "members":{
+        "Name":{"shape":"DocumentName"},
+        "PermissionType":{"shape":"DocumentPermissionType"}
+      }
+    },
+    "DescribeDocumentPermissionResponse":{
+      "type":"structure",
+      "members":{
+        "AccountIds":{"shape":"AccountIdList"}
+      }
+    },
     "DescribeDocumentRequest":{
       "type":"structure",
       "required":["Name"],
       "members":{
-        "Name":{"shape":"DocumentName"}
+        "Name":{"shape":"DocumentARN"}
       }
     },
     "DescribeDocumentResult":{
@@ -1212,14 +725,14 @@
       }
     },
     "DescriptionInDocument":{"type":"string"},
+    "DocumentARN":{
+      "type":"string",
+      "pattern":"^[a-zA-Z0-9_\\-.:/]{3,128}$"
+    },
     "DocumentAlreadyExists":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"DocumentAlreadyExists",
-        "httpStatusCode":400,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1231,7 +744,10 @@
       "type":"structure",
       "members":{
         "Sha1":{"shape":"DocumentSha1"},
-        "Name":{"shape":"DocumentName"},
+        "Hash":{"shape":"DocumentHash"},
+        "HashType":{"shape":"DocumentHashType"},
+        "Name":{"shape":"DocumentARN"},
+        "Owner":{"shape":"DocumentOwner"},
         "CreatedDate":{"shape":"DateTime"},
         "Status":{"shape":"DocumentStatus"},
         "Description":{"shape":"DescriptionInDocument"},
@@ -1270,10 +786,22 @@
       "type":"string",
       "min":1
     },
+    "DocumentHash":{
+      "type":"string",
+      "max":256
+    },
+    "DocumentHashType":{
+      "type":"string",
+      "enum":[
+        "Sha256",
+        "Sha1"
+      ]
+    },
     "DocumentIdentifier":{
       "type":"structure",
       "members":{
-        "Name":{"shape":"DocumentName"},
+        "Name":{"shape":"DocumentARN"},
+        "Owner":{"shape":"DocumentOwner"},
         "PlatformTypes":{"shape":"PlatformTypeList"}
       }
     },
@@ -1287,11 +815,7 @@
     "DocumentLimitExceeded":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"DocumentLimitExceeded",
-        "httpStatusCode":400,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1299,6 +823,7 @@
       "type":"string",
       "pattern":"^[a-zA-Z0-9_\\-.]{3,128}$"
     },
+    "DocumentOwner":{"type":"string"},
     "DocumentParameter":{
       "type":"structure",
       "members":{
@@ -1325,6 +850,17 @@
         "StringList"
       ]
     },
+    "DocumentPermissionLimit":{
+      "type":"structure",
+      "members":{
+        "Message":{"shape":"String"}
+      },
+      "exception":true
+    },
+    "DocumentPermissionType":{
+      "type":"string",
+      "enum":["Share"]
+    },
     "DocumentSha1":{"type":"string"},
     "DocumentStatus":{
       "type":"string",
@@ -1337,11 +873,6 @@
     "DuplicateInstanceId":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"DuplicateInstanceId",
-        "httpStatusCode":404,
-        "senderFault":true
       },
       "exception":true
     },
@@ -1372,27 +903,25 @@
       "type":"structure",
       "required":["Name"],
       "members":{
-        "Name":{"shape":"DocumentName"}
+        "Name":{"shape":"DocumentARN"}
       }
     },
     "GetDocumentResult":{
       "type":"structure",
       "members":{
-        "Name":{"shape":"DocumentName"},
+        "Name":{"shape":"DocumentARN"},
         "Content":{"shape":"DocumentContent"}
       }
     },
     "InstanceId":{
       "type":"string",
-      "min":10,
-      "max":10,
-      "pattern":"^(?=.{10}$)(i-(\\w){8})"
+      "pattern":"(^i-(\\w{8}|\\w{17})$)|(^op-\\w{17}$)"
     },
     "InstanceIdList":{
       "type":"list",
       "member":{"shape":"InstanceId"},
-      "min":1,
-      "max":50
+      "max":50,
+      "min":1
     },
     "InstanceInformation":{
       "type":"structure",
@@ -1451,8 +980,8 @@
         "shape":"InstanceInformationFilterValue",
         "locationName":"InstanceInformationFilterValue"
       },
-      "min":1,
-      "max":100
+      "max":100,
+      "min":1
     },
     "InstanceInformationList":{
       "type":"list",
@@ -1464,11 +993,7 @@
     "InternalServerError":{
       "type":"structure",
       "members":{
-        "message":{"shape":"String"}
-      },
-      "error":{
-        "code":"InternalServerError",
-        "httpStatusCode":500
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1476,34 +1001,26 @@
       "type":"structure",
       "members":{
       },
-      "error":{
-        "code":"InvalidCommandId",
-        "httpStatusCode":404,
-        "senderFault":true
-      },
       "exception":true
     },
     "InvalidDocument":{
       "type":"structure",
       "members":{
-        "message":{"shape":"String"}
-      },
-      "error":{
-        "code":"InvalidDocument",
-        "httpStatusCode":404,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
     "InvalidDocumentContent":{
       "type":"structure",
       "members":{
-        "message":{"shape":"String"}
+        "Message":{"shape":"String"}
       },
-      "error":{
-        "code":"InvalidDocumentContent",
-        "httpStatusCode":400,
-        "senderFault":true
+      "exception":true
+    },
+    "InvalidDocumentOperation":{
+      "type":"structure",
+      "members":{
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1511,21 +1028,12 @@
       "type":"structure",
       "members":{
       },
-      "error":{
-        "code":"InvalidFilterKey",
-        "httpStatusCode":400,
-        "senderFault":true
-      },
       "exception":true
     },
     "InvalidInstanceId":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"InvalidInstanceId",
-        "httpStatusCode":404,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1534,21 +1042,11 @@
       "members":{
         "message":{"shape":"String"}
       },
-      "error":{
-        "code":"InvalidInstanceInformationFilterValue",
-        "httpStatusCode":400,
-        "senderFault":true
-      },
       "exception":true
     },
     "InvalidNextToken":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"InvalidNextToken",
-        "httpStatusCode":400,
-        "senderFault":true
       },
       "exception":true
     },
@@ -1556,22 +1054,19 @@
       "type":"structure",
       "members":{
       },
-      "error":{
-        "code":"InvalidOutputFolder",
-        "httpStatusCode":400,
-        "senderFault":true
-      },
       "exception":true
     },
     "InvalidParameters":{
       "type":"structure",
       "members":{
-        "message":{"shape":"String"}
+        "Message":{"shape":"String"}
       },
-      "error":{
-        "code":"InvalidParameters",
-        "httpStatusCode":400,
-        "senderFault":true
+      "exception":true
+    },
+    "InvalidPermissionType":{
+      "type":"structure",
+      "members":{
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
@@ -1639,12 +1134,17 @@
         "NextToken":{"shape":"NextToken"}
       }
     },
+    "ListDocumentsMaxResults":{
+      "type":"integer",
+      "max":50,
+      "min":1
+    },
     "ListDocumentsRequest":{
       "type":"structure",
       "members":{
         "DocumentFilterList":{"shape":"DocumentFilterList"},
         "MaxResults":{
-          "shape":"MaxResults",
+          "shape":"ListDocumentsMaxResults",
           "box":true
         },
         "NextToken":{"shape":"NextToken"}
@@ -1660,23 +1160,37 @@
     "MaxDocumentSizeExceeded":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"MaxDocumentSizeExceeded",
-        "httpStatusCode":400,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
     "MaxResults":{
       "type":"integer",
-      "min":1,
-      "max":25
+      "max":25,
+      "min":1
     },
     "MaxResultsEC2Compatible":{
       "type":"integer",
-      "min":5,
-      "max":50
+      "max":50,
+      "min":5
+    },
+    "ModifyDocumentPermissionRequest":{
+      "type":"structure",
+      "required":[
+        "Name",
+        "PermissionType"
+      ],
+      "members":{
+        "Name":{"shape":"DocumentName"},
+        "PermissionType":{"shape":"DocumentPermissionType"},
+        "AccountIdsToAdd":{"shape":"AccountIdList"},
+        "AccountIdsToRemove":{"shape":"AccountIdList"}
+      }
+    },
+    "ModifyDocumentPermissionResponse":{
+      "type":"structure",
+      "members":{
+      }
     },
     "NextToken":{"type":"string"},
     "ParameterName":{"type":"string"},
@@ -1715,8 +1229,8 @@
     "ResponseCode":{"type":"integer"},
     "S3BucketName":{
       "type":"string",
-      "min":3,
-      "max":63
+      "max":63,
+      "min":3
     },
     "S3KeyPrefix":{
       "type":"string",
@@ -1730,7 +1244,9 @@
       ],
       "members":{
         "InstanceIds":{"shape":"InstanceIdList"},
-        "DocumentName":{"shape":"DocumentName"},
+        "DocumentName":{"shape":"DocumentARN"},
+        "DocumentHash":{"shape":"DocumentHash"},
+        "DocumentHashType":{"shape":"DocumentHashType"},
         "TimeoutSeconds":{
           "shape":"TimeoutSeconds",
           "box":true
@@ -1759,39 +1275,24 @@
       "type":"structure",
       "members":{
       },
-      "error":{
-        "code":"StatusUnchanged",
-        "httpStatusCode":400,
-        "senderFault":true
-      },
       "exception":true
     },
     "String":{"type":"string"},
     "TimeoutSeconds":{
       "type":"integer",
-      "min":30,
-      "max":2592000
+      "max":2592000,
+      "min":30
     },
     "TooManyUpdates":{
       "type":"structure",
       "members":{
-      },
-      "error":{
-        "code":"TooManyUpdates",
-        "httpStatusCode":429,
-        "senderFault":true
       },
       "exception":true
     },
     "UnsupportedPlatformType":{
       "type":"structure",
       "members":{
-        "message":{"shape":"String"}
-      },
-      "error":{
-        "code":"UnsupportedPlatformType",
-        "httpStatusCode":400,
-        "senderFault":true
+        "Message":{"shape":"String"}
       },
       "exception":true
     },
