@@ -3,8 +3,11 @@ package integration
 import (
 	"io/ioutil"
 	"os"
+	"s3cli/client"
 	"s3cli/config"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/onsi/gomega"
 )
 
@@ -51,6 +54,31 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	gomega.Expect(s3CLISession.ExitCode()).To(gomega.Equal(3))
 	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.MatchRegexp("File '.*' does not exist in bucket '.*'"))
+}
+
+// AssertPutOptionsApplied asserts that `s3cli put` uploads files with
+// the requested encryption options
+func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
+	expectedString := GenerateRandomString()
+	s3Filename := GenerateRandomString()
+
+	configPath := MakeConfigFile(cfg)
+	defer func() { _ = os.Remove(configPath) }()
+
+	contentFile := MakeContentFile(expectedString)
+	defer func() { _ = os.Remove(contentFile) }()
+
+	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
+
+	client := client.MakeClient(*cfg)
+	resp, err := client.HeadObject(&s3.HeadObjectInput{
+		Bucket: aws.String(cfg.BucketName),
+		Key:    aws.String(s3Filename),
+	})
+	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+
+	gomega.Expect(resp.ServerSideEncryption).To(gomega.Equal(cfg.ServerSideEncryption))
 }
 
 // AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object

@@ -32,6 +32,12 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		return S3Blobstore{}, err
 	}
 
+	s3Client := MakeClient(c)
+
+	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
+}
+
+func MakeClient(c config.S3Cli) *s3.S3 {
 	transport := *http.DefaultTransport.(*http.Transport)
 	transport.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: !c.SSLVerifyPeer,
@@ -66,7 +72,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		setv2Handlers(s3Client)
 	}
 
-	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
+	return s3Client
 }
 
 // Get fetches a blob from an S3 compatible blobstore
@@ -99,7 +105,7 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		Bucket:               aws.String(cfg.BucketName),
 		Key:                  aws.String(dest),
 		ServerSideEncryption: cfg.ServerSideEncryption,
-		SSEKMSKeyID:          cfg.SSEKMSKeyID,
+		SSEKMSKeyId:          cfg.SSEKMSKeyID,
 	})
 
 	if err != nil {

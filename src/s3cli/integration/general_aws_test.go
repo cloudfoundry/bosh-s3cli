@@ -5,6 +5,8 @@ import (
 	"s3cli/config"
 	"s3cli/integration"
 
+	"github.com/aws/aws-sdk-go/aws"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -50,6 +52,26 @@ var _ = Describe("General testing for all AWS regions", func() {
 		)
 		DescribeTable("Invoking `s3cli delete` on a non-existent-key does not fail",
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
+			configurations...,
+		)
+
+		configurations = []TableEntry{
+			Entry("with encryption", &config.S3Cli{
+				AccessKeyID:          accessKeyID,
+				SecretAccessKey:      secretAccessKey,
+				BucketName:           bucketName,
+				Region:               region,
+				ServerSideEncryption: aws.String("AES256"),
+			}),
+			Entry("without encryption", &config.S3Cli{
+				AccessKeyID:     accessKeyID,
+				SecretAccessKey: secretAccessKey,
+				BucketName:      bucketName,
+				Region:          region,
+			}),
+		}
+		DescribeTable("Invoking `s3cli put` uploads with options",
+			func(cfg *config.S3Cli) { integration.AssertPutOptionsApplied(s3CLIPath, cfg) },
 			configurations...,
 		)
 	})
