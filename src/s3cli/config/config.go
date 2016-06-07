@@ -10,18 +10,18 @@ import (
 
 // The S3Cli represents configuration for the s3cli
 type S3Cli struct {
-	AccessKeyID          string  `json:"access_key_id"`
-	SecretAccessKey      string  `json:"secret_access_key"`
-	BucketName           string  `json:"bucket_name"`
-	CredentialsSource    string  `json:"credentials_source"`
-	Host                 string  `json:"host"`
-	Port                 int     `json:"port"` // 0 means no custom port
-	Region               string  `json:"region"`
-	SSLVerifyPeer        bool    `json:"ssl_verify_peer"`
-	UseSSL               bool    `json:"use_ssl"`
-	SignatureVersion     int     `json:"signature_version,string"`
-	ServerSideEncryption *string `json:"server_side_encryption"`
-	SSEKMSKeyID          *string `json:"sse_kms_key_id"`
+	AccessKeyID          string `json:"access_key_id"`
+	SecretAccessKey      string `json:"secret_access_key"`
+	BucketName           string `json:"bucket_name"`
+	CredentialsSource    string `json:"credentials_source"`
+	Host                 string `json:"host"`
+	Port                 int    `json:"port"` // 0 means no custom port
+	Region               string `json:"region"`
+	SSLVerifyPeer        bool   `json:"ssl_verify_peer"`
+	UseSSL               bool   `json:"use_ssl"`
+	SignatureVersion     int    `json:"signature_version,string"`
+	ServerSideEncryption string `json:"server_side_encryption"`
+	SSEKMSKeyID          string `json:"sse_kms_key_id"`
 	UseV2SigningMethod   bool
 }
 

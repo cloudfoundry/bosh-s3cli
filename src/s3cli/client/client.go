@@ -100,13 +100,20 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
-	putResult, err := uploader.Upload(&s3manager.UploadInput{
-		Body:                 src,
-		Bucket:               aws.String(cfg.BucketName),
-		Key:                  aws.String(dest),
-		ServerSideEncryption: cfg.ServerSideEncryption,
-		SSEKMSKeyId:          cfg.SSEKMSKeyID,
-	})
+
+	uploadInput := &s3manager.UploadInput{
+		Body:   src,
+		Bucket: aws.String(cfg.BucketName),
+		Key:    aws.String(dest),
+	}
+	if cfg.ServerSideEncryption != "" {
+		uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
+	}
+	if cfg.SSEKMSKeyID != "" {
+		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
+	}
+
+	putResult, err := uploader.Upload(uploadInput)
 
 	if err != nil {
 		return err

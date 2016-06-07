@@ -8,7 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/onsi/gomega"
+	. "github.com/onsi/gomega"
 )
 
 // AssertLifecycleWorks tests the main blobstore object lifecycle from
@@ -24,36 +24,36 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	defer func() { _ = os.Remove(contentFile) }()
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
-	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.MatchRegexp("File '.*' exists in bucket '.*'"))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
+	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' exists in bucket '.*'"))
 
 	tmpLocalFile, err := ioutil.TempFile("", "s3cli-download")
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	Expect(err).ToNot(HaveOccurred())
 	err = tmpLocalFile.Close()
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
+	Expect(err).ToNot(HaveOccurred())
 	defer func() { _ = os.Remove(tmpLocalFile.Name()) }()
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "get", s3Filename, tmpLocalFile.Name())
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	gottenBytes, err := ioutil.ReadFile(tmpLocalFile.Name())
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(string(gottenBytes)).To(gomega.Equal(expectedString))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(string(gottenBytes)).To(Equal(expectedString))
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.Equal(3))
-	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.MatchRegexp("File '.*' does not exist in bucket '.*'"))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(Equal(3))
+	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' does not exist in bucket '.*'"))
 }
 
 // AssertPutOptionsApplied asserts that `s3cli put` uploads files with
@@ -75,10 +75,14 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 		Bucket: aws.String(cfg.BucketName),
 		Key:    aws.String(s3Filename),
 	})
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 
-	gomega.Expect(resp.ServerSideEncryption).To(gomega.Equal(cfg.ServerSideEncryption))
+	if cfg.ServerSideEncryption == "" {
+		Expect(resp.ServerSideEncryption).To(BeNil())
+	} else {
+		Expect(*resp.ServerSideEncryption).To(Equal(cfg.ServerSideEncryption))
+	}
 }
 
 // AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object
@@ -88,9 +92,9 @@ func AssertGetNonexistentFails(s3CLIPath string, cfg *config.S3Cli) {
 	defer func() { _ = os.Remove(configPath) }()
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "get", "non-existent-file", "/dev/null")
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).ToNot(gomega.BeZero())
-	gomega.Expect(s3CLISession.Err.Contents()).To(gomega.ContainSubstring("NoSuchKey"))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).ToNot(BeZero())
+	Expect(s3CLISession.Err.Contents()).To(ContainSubstring("NoSuchKey"))
 }
 
 // AssertDeleteNonexistentWorks asserts that `s3cli delete` on a non-existent
@@ -100,6 +104,6 @@ func AssertDeleteNonexistentWorks(s3CLIPath string, cfg *config.S3Cli) {
 	defer func() { _ = os.Remove(configPath) }()
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "delete", "non-existent-file")
-	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	gomega.Expect(s3CLISession.ExitCode()).To(gomega.BeZero())
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 }

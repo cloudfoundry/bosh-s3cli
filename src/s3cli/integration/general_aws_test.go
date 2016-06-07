@@ -5,8 +5,6 @@ import (
 	"s3cli/config"
 	"s3cli/integration"
 
-	"github.com/aws/aws-sdk-go/aws"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -61,7 +59,7 @@ var _ = Describe("General testing for all AWS regions", func() {
 				SecretAccessKey:      secretAccessKey,
 				BucketName:           bucketName,
 				Region:               region,
-				ServerSideEncryption: aws.String("AES256"),
+				ServerSideEncryption: "AES256",
 			}),
 			Entry("without encryption", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
