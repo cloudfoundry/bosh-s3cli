@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"s3cli/config"
 
@@ -93,17 +94,30 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
-	putResult, err := uploader.Upload(&s3manager.UploadInput{
-		Body:   src,
-		Bucket: aws.String(client.s3cliConfig.BucketName),
-		Key:    aws.String(dest),
-	})
 
-	if err != nil {
-		return err
+	retry := 0
+	maxRetries := 3
+	for {
+		putResult, err := uploader.Upload(&s3manager.UploadInput{
+			Body:   src,
+			Bucket: aws.String(client.s3cliConfig.BucketName),
+			Key:    aws.String(dest),
+		})
+
+		if err != nil {
+			if _, ok := err.(s3manager.MultiUploadFailure); ok {
+				if retry > maxRetries {
+					return err
+				}
+				retry++
+				time.Sleep(time.Second * time.Duration(retry))
+				continue
+			}
+			return err
+		}
+
+		log.Println("Successfully uploaded file to", putResult.Location)
 	}
-
-	log.Println("Successfully uploaded file to", putResult.Location)
 	return nil
 }
 
