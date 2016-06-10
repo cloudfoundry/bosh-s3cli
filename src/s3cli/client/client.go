@@ -33,6 +33,12 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		return S3Blobstore{}, err
 	}
 
+	s3Client := MakeClient(c)
+
+	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
+}
+
+func MakeClient(c config.S3Cli) *s3.S3 {
 	transport := *http.DefaultTransport.(*http.Transport)
 	transport.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: !c.SSLVerifyPeer,
@@ -67,7 +73,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 		setv2Handlers(s3Client)
 	}
 
-	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
+	return s3Client
 }
 
 // Get fetches a blob from an S3 compatible blobstore
@@ -89,7 +95,8 @@ func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
 
 // Put uploads a blob to an S3 compatible blobstore
 func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
-	if client.s3cliConfig.CredentialsSource == config.NoneCredentialsSource {
+	cfg := client.s3cliConfig
+	if cfg.CredentialsSource == config.NoneCredentialsSource {
 		return errorInvalidCredentialsSourceValue
 	}
 
@@ -98,12 +105,19 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	retry := 0
 	maxRetries := 3
 	for {
-		putResult, err := uploader.Upload(&s3manager.UploadInput{
+		uploadInput := &s3manager.UploadInput{
 			Body:   src,
-			Bucket: aws.String(client.s3cliConfig.BucketName),
+			Bucket: aws.String(cfg.BucketName),
 			Key:    aws.String(dest),
-		})
+		}
+		if cfg.ServerSideEncryption != "" {
+			uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
+		}
+		if cfg.SSEKMSKeyID != "" {
+			uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
+		}
 
+		putResult, err := uploader.Upload(uploadInput)
 		if err != nil {
 			if _, ok := err.(s3manager.MultiUploadFailure); ok {
 				if retry > maxRetries {
