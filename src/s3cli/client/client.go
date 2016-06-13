@@ -38,6 +38,7 @@ func New(configFile io.Reader) (S3Blobstore, error) {
 	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
 }
 
+// MakeClient returns a configured S3 client
 func MakeClient(c config.S3Cli) *s3.S3 {
 	transport := *http.DefaultTransport.(*http.Transport)
 	transport.TLSClientConfig = &tls.Config{
