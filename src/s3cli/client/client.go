@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"s3cli/config"
 
@@ -101,36 +100,26 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
-	retry := 0
-	maxRetries := 3
-	for {
-		uploadInput := &s3manager.UploadInput{
-			Body:   src,
-			Bucket: aws.String(cfg.BucketName),
-			Key:    aws.String(dest),
-		}
-		if cfg.ServerSideEncryption != "" {
-			uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
-		}
-		if cfg.SSEKMSKeyID != "" {
-			uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
-		}
 
-		putResult, err := uploader.Upload(uploadInput)
-		if err != nil {
-			if _, ok := err.(s3manager.MultiUploadFailure); ok {
-				if retry > maxRetries {
-					return err
-				}
-				retry++
-				time.Sleep(time.Second * time.Duration(retry))
-				continue
-			}
-			return err
-		}
-
-		log.Println("Successfully uploaded file to", putResult.Location)
+	uploadInput := &s3manager.UploadInput{
+		Body:   src,
+		Bucket: aws.String(cfg.BucketName),
+		Key:    aws.String(dest),
 	}
+	if cfg.ServerSideEncryption != "" {
+		uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
+	}
+	if cfg.SSEKMSKeyID != "" {
+		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
+	}
+
+	putResult, err := uploader.Upload(uploadInput)
+
+	if err != nil {
+		return err
+	}
+
+	log.Println("Successfully uploaded file to", putResult.Location)
 	return nil
 }
 
