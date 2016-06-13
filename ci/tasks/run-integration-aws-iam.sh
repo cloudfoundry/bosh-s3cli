@@ -27,7 +27,7 @@ trap "cat ${lambda_log}" EXIT
 
 pushd ${release_dir} > /dev/null
   . .envrc
-  GOOS=linux GOARCH=amd64 go build s3cli/s3cli
+  GOOS=linux GOARCH=amd64 go build s3cli
   GOOS=linux GOARCH=amd64 ginkgo build src/s3cli/integration
 
   zip -j payload.zip src/s3cli/integration/integration.test s3cli ci/assets/lambda_function.py

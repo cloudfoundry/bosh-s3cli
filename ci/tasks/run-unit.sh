@@ -15,18 +15,23 @@ pushd ${release_dir} > /dev/null
   version="${semver}-${git_rev}-${timestamp}"
 
   . .envrc
+  S3CLI_FILES=$(find . -type f -name '*.go' -not -path "*/vendor/*")
 
   echo -e "\n Vetting packages for potential issues..."
-  go vet s3cli/...
+  for f in $S3CLI_FILES ; do
+    go vet $f
+  done
 
   echo -e "\n Checking with golint..."
-  golint s3cli/...
+  for f in $S3CLI_FILES ; do
+    golint $f
+  done
 
   echo -e "\n Unit testing packages..."
   ginkgo -r -race -skipPackage=integration src/s3cli/
 
   echo -e "\n Running build script to confirm everything compiles..."
-  go build -ldflags "-X main.version ${version}" -o out/s3cli s3cli/s3cli
+  go build -ldflags "-X main.version=${version}" -o out/s3cli s3cli
 
   echo -e "\n Testing version information"
   app_version=$(out/s3cli -v)
