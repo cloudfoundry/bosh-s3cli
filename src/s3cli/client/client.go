@@ -101,27 +101,29 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
-	uploadInput := &s3manager.UploadInput{
-		Body:   src,
-		Bucket: aws.String(cfg.BucketName),
-		Key:    aws.String(dest),
-	}
-	if cfg.ServerSideEncryption != "" {
-		uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
-	}
-	if cfg.SSEKMSKeyID != "" {
-		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
-	}
-
+	retry := 0
 	maxRetries := 3
-	for retry := 0; retry <= maxRetries; retry++ {
+	for {
+		uploadInput := &s3manager.UploadInput{
+			Body:   src,
+			Bucket: aws.String(cfg.BucketName),
+			Key:    aws.String(dest),
+		}
+		if cfg.ServerSideEncryption != "" {
+			uploadInput.ServerSideEncryption = aws.String(cfg.ServerSideEncryption)
+		}
+		if cfg.SSEKMSKeyID != "" {
+			uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
+		}
+
 		putResult, err := uploader.Upload(uploadInput)
 		if err != nil {
 			if _, ok := err.(s3manager.MultiUploadFailure); ok {
-				if retry == maxRetries {
+				if retry > maxRetries {
 					return err
 				}
-				time.Sleep(time.Second * time.Duration(retry+1))
+				retry++
+				time.Sleep(time.Second * time.Duration(retry))
 				continue
 			}
 			return err
@@ -129,7 +131,6 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 
 		log.Println("Successfully uploaded file to", putResult.Location)
 	}
-
 	return nil
 }
 
