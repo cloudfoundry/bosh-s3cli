@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"s3cli/config"
 
@@ -100,7 +101,6 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 	}
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client)
-
 	uploadInput := &s3manager.UploadInput{
 		Body:   src,
 		Bucket: aws.String(cfg.BucketName),
@@ -113,13 +113,23 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
 	}
 
-	putResult, err := uploader.Upload(uploadInput)
+	maxRetries := 3
+	for retry := 0; retry <= maxRetries; retry++ {
+		putResult, err := uploader.Upload(uploadInput)
+		if err != nil {
+			if _, ok := err.(s3manager.MultiUploadFailure); ok {
+				if retry == maxRetries {
+					return err
+				}
+				time.Sleep(time.Second * time.Duration(retry+1))
+				continue
+			}
+			return err
+		}
 
-	if err != nil {
-		return err
+		log.Println("Successfully uploaded file to", putResult.Location)
 	}
 
-	log.Println("Successfully uploaded file to", putResult.Location)
 	return nil
 }
 
