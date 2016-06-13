@@ -1,10 +1,11 @@
 package integration_test
 
 import (
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"os"
 
 	"testing"
 )
@@ -22,12 +23,12 @@ var _ = BeforeSuite(func() {
 	s3CLIPath = os.Getenv("S3_CLI_PATH")
 
 	if len(s3CLIPath) == 0 {
-	  var err error
-	  s3CLIPath, err = gexec.Build("s3cli/s3cli")
-	  Expect(err).ShouldNot(HaveOccurred())
+		var err error
+		s3CLIPath, err = gexec.Build("s3cli")
+		Expect(err).ShouldNot(HaveOccurred())
 	}
 })
 
 var _ = AfterSuite(func() {
-  gexec.CleanupBuildArtifacts()
+	gexec.CleanupBuildArtifacts()
 })
