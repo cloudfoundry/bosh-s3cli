@@ -2,7 +2,12 @@
 
 set -e
 
-source s3cli-src/ci/tasks/utils.sh
+my_dir="$( cd $(dirname $0) && pwd )"
+release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
+
+export GOPATH=${workspace_dir}
+export PATH=${GOPATH}/bin:${PATH}
 
 : ${access_key_id:?}
 : ${secret_access_key:?}
@@ -16,7 +21,6 @@ export BUCKET_NAME=${bucket_name}
 export S3_HOST=${s3_endpoint_host}
 export S3_PORT=${s3_endpoint_port}
 
-pushd s3cli-src > /dev/null
-  . .envrc
-  ginkgo -r -focus="S3 COMPATIBLE" src/s3cli/integration/
+pushd ${release_dir} > /dev/null
+  ginkgo -r -focus="S3 COMPATIBLE" s3cli/integration/
 popd > /dev/null

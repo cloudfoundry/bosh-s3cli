@@ -4,8 +4,11 @@ set -e
 
 my_dir="$( cd $(dirname $0) && pwd )"
 release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
 
 source ${release_dir}/ci/tasks/utils.sh
+export GOPATH=${workspace_dir}
+export PATH=${GOPATH}/bin:${PATH}
 
 : ${access_key_id:?}
 : ${secret_access_key:?}

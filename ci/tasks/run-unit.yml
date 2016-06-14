@@ -3,5 +3,6 @@ platform: linux
 image: docker:///boshcpi/s3cli
 inputs:
 - name: s3cli-src
+  path: src/github.com/pivotal-golang/s3cli
 run:
-  path: s3cli-src/ci/tasks/run-unit.sh
+  path: src/github.com/pivotal-golang/s3cli/ci/tasks/run-unit.sh

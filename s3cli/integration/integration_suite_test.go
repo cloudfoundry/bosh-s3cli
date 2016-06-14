@@ -24,7 +24,7 @@ var _ = BeforeSuite(func() {
 
 	if len(s3CLIPath) == 0 {
 		var err error
-		s3CLIPath, err = gexec.Build("s3cli")
+		s3CLIPath, err = gexec.Build("github.com/pivotal-golang/s3cli/s3cli")
 		Expect(err).ShouldNot(HaveOccurred())
 	}
 })

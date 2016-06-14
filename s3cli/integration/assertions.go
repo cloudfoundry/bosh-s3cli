@@ -3,8 +3,9 @@ package integration
 import (
 	"io/ioutil"
 	"os"
-	"s3cli/client"
-	"s3cli/config"
+
+	"github.com/pivotal-golang/s3cli/s3cli/client"
+	"github.com/pivotal-golang/s3cli/s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"

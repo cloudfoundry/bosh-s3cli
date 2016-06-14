@@ -3,7 +3,7 @@ import logging
 import subprocess
 
 def test_runner_handler(event, context):
-    os.environ['S3_CLI_PATH'] = './s3cli'
+    os.environ['S3_CLI_PATH'] = './out/s3cli'
     os.environ['BUCKET_NAME'] = event['bucket_name']
     os.environ['REGION'] = event['region']
     os.environ['S3_HOST'] = event['s3_host']

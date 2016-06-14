@@ -3,8 +3,9 @@ platform: linux
 image: docker:///boshcpi/s3cli
 inputs:
 - name: s3cli-src
+  path: src/github.com/pivotal-golang/s3cli
 - name: version-semver
 outputs:
 - name: out
 run:
-  path: s3cli-src/ci/tasks/build.sh
+  path: src/github.com/pivotal-golang/s3cli/ci/tasks/build.sh

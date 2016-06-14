@@ -3,9 +3,10 @@ package integration_test
 import (
 	"io/ioutil"
 	"os"
-	"s3cli/config"
-	"s3cli/integration"
 	"strings"
+
+	"github.com/pivotal-golang/s3cli/s3cli/config"
+	"github.com/pivotal-golang/s3cli/s3cli/integration"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"

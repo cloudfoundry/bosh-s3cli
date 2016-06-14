@@ -4,8 +4,11 @@ set -e
 
 my_dir="$( cd $(dirname $0) && pwd )"
 release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
 
 source ${release_dir}/ci/tasks/utils.sh
+export GOPATH=${workspace_dir}
+export PATH=${GOPATH}/bin:${PATH}
 
 : ${access_key_id:?}
 : ${secret_access_key:?}
@@ -28,6 +31,5 @@ export BUCKET_NAME=$(get_stack_info_of "${stack_info}" "BucketName")
 export S3_HOST=${s3_endpoint_host}
 
 pushd ${release_dir} > /dev/null
-  . .envrc
-  ginkgo -r -focus="${focus_regex}" src/s3cli/integration/
+  ginkgo -r -focus="${focus_regex}" s3cli/integration/
 popd > /dev/null

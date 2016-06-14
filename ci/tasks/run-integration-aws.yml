@@ -3,8 +3,9 @@ platform: linux
 image: docker:///boshcpi/s3cli
 inputs:
   - name: s3cli-src
+    path: src/github.com/pivotal-golang/s3cli
 run:
-  path: s3cli-src/ci/tasks/run-integration-aws.sh
+  path: src/github.com/pivotal-golang/s3cli/ci/tasks/run-integration-aws.sh
 params:
   access_key_id:
   secret_access_key:

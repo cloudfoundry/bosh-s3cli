@@ -4,8 +4,11 @@ set -e
 
 my_dir="$( cd $(dirname $0) && pwd )"
 release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
 
 source ${release_dir}/ci/tasks/utils.sh
+export GOPATH=${workspace_dir}
+export PATH=${GOPATH}/bin:${PATH}
 
 : ${access_key_id:?}
 : ${secret_access_key:?}
@@ -18,7 +21,7 @@ export AWS_DEFAULT_REGION=${region_name}
 
 cmd="aws cloudformation create-stack \
     --stack-name    ${stack_name} \
-    --template-body file://${PWD}/s3cli-src/ci/assets/cloudformation-${stack_name}.template.json \
+    --template-body file://${release_dir}/ci/assets/cloudformation-${stack_name}.template.json \
     --capabilities  CAPABILITY_IAM"
 echo "Running: ${cmd}"; ${cmd}
 

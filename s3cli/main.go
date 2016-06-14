@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"s3cli/client"
+
+	"github.com/pivotal-golang/s3cli/s3cli/client"
 )
 
 var version string

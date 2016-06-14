@@ -4,8 +4,11 @@ set -e
 
 my_dir="$( cd $(dirname $0) && pwd )"
 release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
+workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
 
 source ${release_dir}/ci/tasks/utils.sh
+export GOPATH=${workspace_dir}
+export PATH=${GOPATH}/bin:${PATH}
 
 : ${access_key_id:?}
 : ${secret_access_key:?}
@@ -26,11 +29,11 @@ lambda_log=$(mktemp -t "XXXXXX-lambda.log")
 trap "cat ${lambda_log}" EXIT
 
 pushd ${release_dir} > /dev/null
-  . .envrc
-  GOOS=linux GOARCH=amd64 go build s3cli
-  GOOS=linux GOARCH=amd64 ginkgo build src/s3cli/integration
+  GOOS=linux GOARCH=amd64 go build -o out/s3cli \
+    github.com/pivotal-golang/s3cli/s3cli
+  GOOS=linux GOARCH=amd64 ginkgo build s3cli/integration
 
-  zip -j payload.zip src/s3cli/integration/integration.test s3cli ci/assets/lambda_function.py
+  zip -j payload.zip s3cli/integration/integration.test out/s3cli ci/assets/lambda_function.py
 
   lambda_function_name=s3cli-integration-$(date +%s)
 
