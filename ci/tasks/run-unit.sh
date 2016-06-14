@@ -29,11 +29,11 @@ pushd ${release_dir} > /dev/null
   done
 
   echo -e "\n Unit testing packages..."
-  ginkgo -r -race -skipPackage=integration s3cli/
+  ginkgo -r -race -skipPackage=integration ./
 
   echo -e "\n Running build script to confirm everything compiles..."
   go build -ldflags "-X main.version=${version}" -o out/s3cli \
-    github.com/pivotal-golang/s3cli/s3cli
+    github.com/pivotal-golang/s3cli
 
   echo -e "\n Testing version information"
   app_version=$(out/s3cli -v)

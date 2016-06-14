@@ -8,7 +8,7 @@ Continuous integration: <https://main.bosh-ci.cf-app.com/pipelines/s3cli>
 ## Installation
 
 ```
-go get github.com/pivotal-golang/s3cli/s3cli
+go get github.com/pivotal-golang/s3cli
 ```
 
 ## Usage
@@ -68,12 +68,12 @@ Follow these steps to make a contribution to the project:
   ```
 - Run tests to check your development environment setup
   ``` bash
-  ginkgo -r -race -skipPackage=integration s3cli/
+  ginkgo -r -race -skipPackage=integration ./
   ```
 - Make your changes (*be sure to add/update tests*)
 - Run tests to check your changes
   ``` bash
-  ginkgo -r -race -skipPackage=integration s3cli/
+  ginkgo -r -race -skipPackage=integration ./
   ```
 - Push changes to your fork
   ``` bash

@@ -2,53 +2,69 @@ package integration_test
 
 import (
 	"os"
+	"strconv"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
-	"github.com/pivotal-golang/s3cli/s3cli/integration"
+	"github.com/pivotal-golang/s3cli/config"
+	"github.com/pivotal-golang/s3cli/integration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing only in us-east-1", func() {
-	Context("with AWS US-EAST-1 (static creds) configurations", func() {
+var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func() {
+	Context("with S3 COMPATIBLE (static creds) configurations", func() {
 		accessKeyID := os.Getenv("ACCESS_KEY_ID")
 		secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")
 		bucketName := os.Getenv("BUCKET_NAME")
+		s3Host := os.Getenv("S3_HOST")
+		s3PortString := os.Getenv("S3_PORT")
+		s3Port, atoiErr := strconv.Atoi(s3PortString)
 
 		BeforeEach(func() {
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 			Expect(secretAccessKey).ToNot(BeEmpty(), "SECRET_ACCESS_KEY must be set")
 			Expect(bucketName).ToNot(BeEmpty(), "BUCKET_NAME must be set")
+			Expect(s3Host).ToNot(BeEmpty(), "S3_HOST must be set")
+			Expect(s3PortString).ToNot(BeEmpty(), "S3_PORT must be set")
+			Expect(atoiErr).ToNot(HaveOccurred())
 		})
 
 		configurations := []TableEntry{
-			Entry("with minimal config", &config.S3Cli{
+			Entry("with the minimal configuration", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
+				Host:            s3Host,
 			}),
-			Entry("with signature version 2", &config.S3Cli{
-				SignatureVersion: 2,
-				AccessKeyID:      accessKeyID,
-				SecretAccessKey:  secretAccessKey,
-				BucketName:       bucketName,
-			}),
-			Entry("with alternate host", &config.S3Cli{
+			Entry("with region specified", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
-				Host:            "s3-external-1.amazonaws.com",
+				Host:            s3Host,
+				Region:          "invalid-region",
 			}),
-			Entry("with alternate host and a different region", &config.S3Cli{
+			Entry("with use_ssl set to false", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
-				Host:            "s3-external-1.amazonaws.com",
-				Region:          "us-west-1",
+				Host:            s3Host,
+				UseSSL:          false,
+			}),
+			Entry("with the maximal configuration", &config.S3Cli{
+				SignatureVersion:  2,
+				CredentialsSource: "static",
+				AccessKeyID:       accessKeyID,
+				SecretAccessKey:   secretAccessKey,
+				BucketName:        bucketName,
+				Host:              s3Host,
+				Port:              s3Port,
+				UseSSL:            true,
+				SSLVerifyPeer:     true,
+				Region:            "invalid-region",
 			}),
 		}
+
 		DescribeTable("Blobstore lifecycle works",
 			func(cfg *config.S3Cli) { integration.AssertLifecycleWorks(s3CLIPath, cfg) },
 			configurations...,

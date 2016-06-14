@@ -31,5 +31,5 @@ export BUCKET_NAME=$(get_stack_info_of "${stack_info}" "BucketName")
 export S3_HOST=${s3_endpoint_host}
 
 pushd ${release_dir} > /dev/null
-  ginkgo -r -focus="${focus_regex}" s3cli/integration/
+  ginkgo -r -focus="${focus_regex}" integration/
 popd > /dev/null

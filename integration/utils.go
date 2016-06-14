@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
+	"github.com/pivotal-golang/s3cli/config"
 
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
+	"github.com/pivotal-golang/s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"

@@ -3,16 +3,16 @@ package integration_test
 import (
 	"os"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
-	"github.com/pivotal-golang/s3cli/s3cli/integration"
+	"github.com/pivotal-golang/s3cli/config"
+	"github.com/pivotal-golang/s3cli/integration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("General testing for all AWS regions", func() {
-	Context("with GENERAL AWS (static creds) configurations", func() {
+var _ = Describe("Testing in any AWS region that supports v4 signature version", func() {
+	Context("with AWS V4 REGION (static creds) configurations", func() {
 		accessKeyID := os.Getenv("ACCESS_KEY_ID")
 		secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")
 		bucketName := os.Getenv("BUCKET_NAME")
@@ -29,16 +29,32 @@ var _ = Describe("General testing for all AWS regions", func() {
 
 		configurations := []TableEntry{
 			Entry("with region and without host", &config.S3Cli{
-				AccessKeyID:     accessKeyID,
-				SecretAccessKey: secretAccessKey,
-				BucketName:      bucketName,
-				Region:          region,
+				SignatureVersion:  4,
+				CredentialsSource: "static",
+				AccessKeyID:       accessKeyID,
+				SecretAccessKey:   secretAccessKey,
+				BucketName:        bucketName,
+				Region:            region,
 			}),
 			Entry("with host and without region", &config.S3Cli{
-				AccessKeyID:     accessKeyID,
-				SecretAccessKey: secretAccessKey,
-				BucketName:      bucketName,
-				Host:            s3Host,
+				SignatureVersion:  4,
+				CredentialsSource: "static",
+				AccessKeyID:       accessKeyID,
+				SecretAccessKey:   secretAccessKey,
+				BucketName:        bucketName,
+				Host:              s3Host,
+			}),
+			Entry("with maximal config", &config.S3Cli{
+				SignatureVersion:  4,
+				CredentialsSource: "static",
+				AccessKeyID:       accessKeyID,
+				SecretAccessKey:   secretAccessKey,
+				BucketName:        bucketName,
+				Host:              s3Host,
+				Port:              443,
+				UseSSL:            true,
+				SSLVerifyPeer:     true,
+				Region:            region,
 			}),
 		}
 		DescribeTable("Blobstore lifecycle works",
@@ -51,26 +67,6 @@ var _ = Describe("General testing for all AWS regions", func() {
 		)
 		DescribeTable("Invoking `s3cli delete` on a non-existent-key does not fail",
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
-			configurations...,
-		)
-
-		configurations = []TableEntry{
-			Entry("with encryption", &config.S3Cli{
-				AccessKeyID:          accessKeyID,
-				SecretAccessKey:      secretAccessKey,
-				BucketName:           bucketName,
-				Region:               region,
-				ServerSideEncryption: "AES256",
-			}),
-			Entry("without encryption", &config.S3Cli{
-				AccessKeyID:     accessKeyID,
-				SecretAccessKey: secretAccessKey,
-				BucketName:      bucketName,
-				Region:          region,
-			}),
-		}
-		DescribeTable("Invoking `s3cli put` uploads with options",
-			func(cfg *config.S3Cli) { integration.AssertPutOptionsApplied(s3CLIPath, cfg) },
 			configurations...,
 		)
 	})

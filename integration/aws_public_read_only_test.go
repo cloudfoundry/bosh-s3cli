@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
-	"github.com/pivotal-golang/s3cli/s3cli/integration"
+	"github.com/pivotal-golang/s3cli/config"
+	"github.com/pivotal-golang/s3cli/integration"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"

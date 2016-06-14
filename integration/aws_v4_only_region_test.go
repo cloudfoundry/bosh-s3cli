@@ -3,16 +3,16 @@ package integration_test
 import (
 	"os"
 
-	"github.com/pivotal-golang/s3cli/s3cli/config"
-	"github.com/pivotal-golang/s3cli/s3cli/integration"
+	"github.com/pivotal-golang/s3cli/config"
+	"github.com/pivotal-golang/s3cli/integration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Testing in any AWS region isolated from the US standard regions (i.e., cn-north-1)", func() {
-	Context("with AWS ISOLATED REGION (static creds) configurations", func() {
-		It("fails with a config that specifies a valid region but invalid host", func() {
+var _ = Describe("Testing in any AWS region that only supports v4 signature version", func() {
+	Context("with AWS V4 ONLY REGION (static creds) configurations", func() {
+		It("fails with a config that specifies signature version 2", func() {
 			accessKeyID := os.Getenv("ACCESS_KEY_ID")
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 
@@ -26,13 +26,11 @@ var _ = Describe("Testing in any AWS region isolated from the US standard region
 			Expect(region).ToNot(BeEmpty(), "REGION must be set")
 
 			cfg := &config.S3Cli{
-				SignatureVersion:  4,
-				CredentialsSource: "static",
-				AccessKeyID:       accessKeyID,
-				SecretAccessKey:   secretAccessKey,
-				BucketName:        bucketName,
-				Region:            region,
-				Host:              "s3-external-1.amazonaws.com",
+				SignatureVersion: 2,
+				AccessKeyID:      accessKeyID,
+				SecretAccessKey:  secretAccessKey,
+				BucketName:       bucketName,
+				Region:           region,
 			}
 			s3Filename := integration.GenerateRandomString()
 
@@ -45,12 +43,10 @@ var _ = Describe("Testing in any AWS region isolated from the US standard region
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
-			Expect(s3CLISession.Err.Contents()).To(ContainSubstring("InvalidAccessKeyId"))
 
 			s3CLISession, err = integration.RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
-			Expect(s3CLISession.Err.Contents()).To(ContainSubstring("InvalidAccessKeyId"))
 		})
 	})
 })
