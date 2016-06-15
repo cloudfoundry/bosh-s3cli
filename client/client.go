@@ -67,28 +67,27 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
 	}
 
-	// TODO: consider restoring the infinite loop and return within
+	retry := 0
 	maxRetries := 3
-	for retry := 0; retry <= maxRetries; retry++ {
+	for {
 		putResult, err := uploader.Upload(uploadInput)
 		if err != nil {
 			if _, ok := err.(s3manager.MultiUploadFailure); ok {
 				if retry == maxRetries {
-					// TODO: log
+					log.Println("Upload retry limit exceeded:", err.Error())
 					return fmt.Errorf("upload retry limit exceeded: %s", err.Error())
 				}
-				time.Sleep(time.Second * time.Duration(retry+1))
+				retry++
+				time.Sleep(time.Second * time.Duration(retry))
 				continue
 			}
-			// TODO: log
+			log.Println("Upload failed:", err.Error())
 			return fmt.Errorf("upload failure: %s", err.Error())
 		}
 
 		log.Println("Successfully uploaded file to", putResult.Location)
-		break
+		return nil
 	}
-
-	return nil
 }
 
 // Delete removes a blob from an S3 compatible blobstore. If the object does
