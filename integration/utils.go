@@ -17,9 +17,13 @@ import (
 
 const alphanum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// GenerateRandomString generates a random string of len 25
-func GenerateRandomString() string {
+// GenerateRandomString generates a random string of desired length (default: 25)
+func GenerateRandomString(params ...int) string {
 	size := 25
+	if len(params) == 1 {
+		size = params[0]
+	}
+
 	randBytes := make([]byte, size)
 	for i := range randBytes {
 		randInt, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphanum))))

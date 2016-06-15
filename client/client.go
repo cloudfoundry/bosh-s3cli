@@ -1,19 +1,16 @@
 package client
 
 import (
-	"crypto/tls"
 	"errors"
+	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/pivotal-golang/s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
@@ -21,60 +18,14 @@ import (
 // S3Blobstore encapsulates interactions with an S3 compatible blobstore
 type S3Blobstore struct {
 	s3Client    *s3.S3
-	s3cliConfig config.S3Cli
+	s3cliConfig *config.S3Cli
 }
 
 var errorInvalidCredentialsSourceValue = errors.New("the client operates in read only mode. Change 'credentials_source' parameter value ")
 
 // New returns a BlobstoreClient if the configuration file backing configFile is valid
-func New(configFile io.Reader) (S3Blobstore, error) {
-	c, err := config.NewFromReader(configFile)
-	if err != nil {
-		return S3Blobstore{}, err
-	}
-
-	s3Client := MakeClient(c)
-
-	return S3Blobstore{s3Client: s3Client, s3cliConfig: c}, nil
-}
-
-// MakeClient returns a configured S3 client
-func MakeClient(c config.S3Cli) *s3.S3 {
-	transport := *http.DefaultTransport.(*http.Transport)
-	transport.TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: !c.SSLVerifyPeer,
-	}
-
-	httpClient := &http.Client{Transport: &transport}
-
-	s3Config := aws.NewConfig().
-		WithLogLevel(aws.LogOff).
-		WithS3ForcePathStyle(true).
-		WithDisableSSL(!c.UseSSL).
-		WithHTTPClient(httpClient)
-
-	if c.UseRegion() {
-		s3Config = s3Config.WithRegion(c.Region).WithEndpoint(c.S3Endpoint())
-	} else {
-		s3Config = s3Config.WithRegion(config.EmptyRegion).WithEndpoint(c.S3Endpoint())
-	}
-
-	if c.CredentialsSource == config.StaticCredentialsSource {
-		s3Config = s3Config.WithCredentials(credentials.NewStaticCredentials(c.AccessKeyID, c.SecretAccessKey, ""))
-	}
-
-	if c.CredentialsSource == config.NoneCredentialsSource {
-		s3Config = s3Config.WithCredentials(credentials.AnonymousCredentials)
-	}
-
-	s3Session := session.New(s3Config)
-	s3Client := s3.New(s3Session)
-
-	if c.UseV2SigningMethod {
-		setv2Handlers(s3Client)
-	}
-
-	return s3Client
+func New(s3Client *s3.S3, s3cliConfig *config.S3Cli) (S3Blobstore, error) {
+	return S3Blobstore{s3Client: s3Client, s3cliConfig: s3cliConfig}, nil
 }
 
 // Get fetches a blob from an S3 compatible blobstore
@@ -101,7 +52,9 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		return errorInvalidCredentialsSourceValue
 	}
 
-	uploader := s3manager.NewUploaderWithClient(client.s3Client)
+	uploader := s3manager.NewUploaderWithClient(client.s3Client, func(u *s3manager.Uploader) {
+		u.LeavePartsOnError = false
+	})
 	uploadInput := &s3manager.UploadInput{
 		Body:   src,
 		Bucket: aws.String(cfg.BucketName),
@@ -114,25 +67,27 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		uploadInput.SSEKMSKeyId = aws.String(cfg.SSEKMSKeyID)
 	}
 
+	retry := 0
 	maxRetries := 3
-	for retry := 0; retry <= maxRetries; retry++ {
+	for {
 		putResult, err := uploader.Upload(uploadInput)
 		if err != nil {
 			if _, ok := err.(s3manager.MultiUploadFailure); ok {
 				if retry == maxRetries {
-					return err
+					log.Println("Upload retry limit exceeded:", err.Error())
+					return fmt.Errorf("upload retry limit exceeded: %s", err.Error())
 				}
-				time.Sleep(time.Second * time.Duration(retry+1))
+				retry++
+				time.Sleep(time.Second * time.Duration(retry))
 				continue
 			}
-			return err
+			log.Println("Upload failed:", err.Error())
+			return fmt.Errorf("upload failure: %s", err.Error())
 		}
 
 		log.Println("Successfully uploaded file to", putResult.Location)
-		break
+		return nil
 	}
-
-	return nil
 }
 
 // Delete removes a blob from an S3 compatible blobstore. If the object does

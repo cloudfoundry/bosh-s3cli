@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/pivotal-golang/s3cli/client"
+	"github.com/pivotal-golang/s3cli/config"
 )
 
 var version string
@@ -26,7 +27,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	blobstoreClient, err := client.New(configFile)
+	s3Config, err := config.NewFromReader(configFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	s3Client, err := client.NewSDK(s3Config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	blobstoreClient, err := client.New(s3Client, &s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -73,5 +73,31 @@ var _ = Describe("General testing for all AWS regions", func() {
 			func(cfg *config.S3Cli) { integration.AssertPutOptionsApplied(s3CLIPath, cfg) },
 			configurations...,
 		)
+
+		Describe("Invoking `s3cli put` with arbitrary upload failures", func() {
+			It("returns the appropriate error message", func() {
+				cfg := &config.S3Cli{
+					AccessKeyID:     accessKeyID,
+					SecretAccessKey: secretAccessKey,
+					BucketName:      bucketName,
+					Host:            "localhost",
+				}
+				msg := "upload failure"
+				integration.AssertOnPutFailures(s3CLIPath, cfg, msg)
+			})
+		})
+
+		Describe("Invoking `s3cli put` with multipart upload failures", func() {
+			It("returns the appropriate error message", func() {
+				cfg := &config.S3Cli{
+					AccessKeyID:     accessKeyID,
+					SecretAccessKey: secretAccessKey,
+					BucketName:      bucketName,
+					Region:          region,
+				}
+				msg := "upload retry limit exceeded"
+				integration.AssertOnPutFailures(s3CLIPath, cfg, msg)
+			})
+		})
 	})
 })
