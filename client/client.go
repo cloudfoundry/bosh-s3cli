@@ -129,6 +129,7 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 		}
 
 		log.Println("Successfully uploaded file to", putResult.Location)
+		break
 	}
 
 	return nil
