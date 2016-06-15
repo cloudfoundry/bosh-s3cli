@@ -25,10 +25,10 @@ Given a JSON config file (`config.json`)...
 
   "region":                 "<string> (optional - default: 'us-east-1')",
   "host":                   "<string> (optional)",
-  "port":                   "<string> (optional)",
+  "port":                   <int> (optional),
 
-  "ssl_verify_peer":        "<string> (optional)",
-  "use_ssl":                "<string> (optional)",
+  "ssl_verify_peer":        <bool> (optional),
+  "use_ssl":                <bool> (optional),
   "signature_version":      "<string> (optional)",
   "server_side_encryption": "<string> (optional)",
   "sse_kms_key_id":         "<string> (optional)"
