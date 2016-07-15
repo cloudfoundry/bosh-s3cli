@@ -3,7 +3,7 @@
 A CLI for uploading, fetching and deleting content to/from an S3-compatible
 blobstore.
 
-Continuous integration: <https://main.bosh-ci.cf-app.com/pipelines/s3cli>
+Continuous integration: <https://bosh-cpi.ci.cf-app.com/pipelines/s3cli>
 
 ## Installation
 
