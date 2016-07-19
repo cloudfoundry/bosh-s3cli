@@ -23,6 +23,7 @@ type S3Cli struct {
 	ServerSideEncryption string `json:"server_side_encryption"`
 	SSEKMSKeyID          string `json:"sse_kms_key_id"`
 	UseV2SigningMethod   bool
+	MultipartUpload      bool
 }
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
@@ -126,6 +127,8 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		}
 	}
 
+	c.MultipartUpload = c.allowMultipart()
+
 	return c, nil
 }
 
@@ -148,6 +151,15 @@ func (c *S3Cli) S3Endpoint() string {
 func (c *S3Cli) isAWSHost() bool {
 	_, hasKey := awsHostToRegion[c.Host]
 	return hasKey
+}
+
+func (c *S3Cli) allowMultipart() bool {
+	for _, host := range multipartBlacklist {
+		if host == c.Host {
+			return false
+		}
+	}
+	return true
 }
 
 func (c *S3Cli) getRegionFromHost() string {

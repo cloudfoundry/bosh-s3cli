@@ -1,10 +1,14 @@
 package integration
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/pivotal-golang/s3cli/client"
 	"github.com/pivotal-golang/s3cli/config"
@@ -60,10 +64,9 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' does not exist in bucket '.*'"))
 }
 
-func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, errorMessage string) {
-	expectedString := GenerateRandomString(1024 * 1024 * 6)
+func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMessage string) {
 	s3Filename := GenerateRandomString()
-	sourceContent := strings.NewReader(expectedString)
+	sourceContent := strings.NewReader(content)
 
 	configPath := MakeConfigFile(cfg)
 	defer func() { _ = os.Remove(configPath) }()
@@ -155,4 +158,74 @@ func AssertDeleteNonexistentWorks(s3CLIPath string, cfg *config.S3Cli) {
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "delete", "non-existent-file")
 	Expect(err).ToNot(HaveOccurred())
 	Expect(s3CLISession.ExitCode()).To(BeZero())
+}
+
+func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content string) {
+	s3Filename := GenerateRandomString()
+	sourceContent := strings.NewReader(content)
+
+	configPath := MakeConfigFile(cfg)
+	defer func() { _ = os.Remove(configPath) }()
+
+	configFile, err := os.Open(configPath)
+	Expect(err).ToNot(HaveOccurred())
+
+	s3Config, err := config.NewFromReader(configFile)
+	Expect(err).ToNot(HaveOccurred())
+
+	s3Client, err := client.NewSDK(s3Config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tracedS3, calls := traceS3(s3Client)
+
+	blobstoreClient, err := client.New(tracedS3, &s3Config)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = blobstoreClient.Put(sourceContent, s3Filename)
+	Expect(err).ToNot(HaveOccurred())
+
+	switch cfg.Host {
+	case "storage.googleapis.com":
+		Expect(*calls).To(Equal([]string{"PutObject"}))
+	default:
+		Expect(*calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
+	}
+}
+
+func traceS3(svc *s3.S3) (*s3.S3, *[]string) {
+	var m sync.Mutex
+	calls := []string{}
+	partNum := 0
+
+	svc.Handlers.Send.Clear()
+	svc.Handlers.Send.PushBack(func(r *request.Request) {
+		m.Lock()
+		defer m.Unlock()
+
+		r.HTTPResponse = &http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+		}
+
+		switch data := r.Data.(type) {
+		case *s3.CreateMultipartUploadOutput:
+			calls = append(calls, "CreateMultipart")
+			data.UploadId = aws.String("UPLOAD-ID")
+		case *s3.UploadPartOutput:
+			calls = append(calls, "UploadPart")
+			partNum++
+			data.ETag = aws.String(fmt.Sprintf("ETAG%d", partNum))
+		case *s3.CompleteMultipartUploadOutput:
+			calls = append(calls, "CompleteMultipart")
+			data.Location = aws.String("https://location")
+			data.VersionId = aws.String("VERSION-ID")
+		case *s3.PutObjectOutput:
+			calls = append(calls, "PutObject")
+			data.VersionId = aws.String("VERSION-ID")
+		}
+	})
+
+	return svc, &calls
 }

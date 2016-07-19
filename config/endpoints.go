@@ -23,3 +23,7 @@ var awsHostToRegion = map[string]string{
 
 	"s3.cn-north-1.amazonaws.com.cn": "cn-north-1",
 }
+
+var multipartBlacklist = []string{
+	"storage.googleapis.com",
+}
