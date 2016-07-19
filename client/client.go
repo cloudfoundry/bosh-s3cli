@@ -22,6 +22,7 @@ type S3Blobstore struct {
 }
 
 var errorInvalidCredentialsSourceValue = errors.New("the client operates in read only mode. Change 'credentials_source' parameter value ")
+var oneTB = int64(1000 * 1024 * 1024 * 1024)
 
 // New returns a BlobstoreClient if the configuration file backing configFile is valid
 func New(s3Client *s3.S3, s3cliConfig *config.S3Cli) (S3Blobstore, error) {
@@ -54,6 +55,11 @@ func (client *S3Blobstore) Put(src io.ReadSeeker, dest string) error {
 
 	uploader := s3manager.NewUploaderWithClient(client.s3Client, func(u *s3manager.Uploader) {
 		u.LeavePartsOnError = false
+
+		if !cfg.MultipartUpload {
+			// disable multipart uploads by way of large PartSize configuration
+			u.PartSize = oneTB
+		}
 	})
 	uploadInput := &s3manager.UploadInput{
 		Body:   src,
