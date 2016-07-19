@@ -21,8 +21,6 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 		s3PortString := os.Getenv("S3_PORT")
 		s3Port, atoiErr := strconv.Atoi(s3PortString)
 
-		content := ""
-
 		BeforeEach(func() {
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
 			Expect(secretAccessKey).ToNot(BeEmpty(), "SECRET_ACCESS_KEY must be set")
@@ -30,11 +28,6 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			Expect(s3Host).ToNot(BeEmpty(), "S3_HOST must be set")
 			Expect(s3PortString).ToNot(BeEmpty(), "S3_PORT must be set")
 			Expect(atoiErr).ToNot(HaveOccurred())
-
-			// content... large enough to trigger multipart uploads
-			if content == "" {
-				content = integration.GenerateRandomString(1024 * 1024 * 6)
-			}
 		})
 
 		configurations := []TableEntry{
@@ -85,7 +78,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			configurations...,
 		)
 		DescribeTable("Invoking `s3cli put` handling of mulitpart uploads",
-			func(cfg *config.S3Cli) { integration.AssertOnMultipartUploads(s3CLIPath, cfg, content) },
+			func(cfg *config.S3Cli) { integration.AssertOnMultipartUploads(s3CLIPath, cfg, largeContent) },
 			configurations...,
 		)
 	})

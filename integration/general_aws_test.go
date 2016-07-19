@@ -83,7 +83,7 @@ var _ = Describe("General testing for all AWS regions", func() {
 					Host:            "localhost",
 				}
 				msg := "upload failure"
-				integration.AssertOnPutFailures(s3CLIPath, cfg, msg)
+				integration.AssertOnPutFailures(s3CLIPath, cfg, largeContent, msg)
 			})
 		})
 
@@ -96,7 +96,7 @@ var _ = Describe("General testing for all AWS regions", func() {
 					Region:          region,
 				}
 				msg := "upload retry limit exceeded"
-				integration.AssertOnPutFailures(s3CLIPath, cfg, msg)
+				integration.AssertOnPutFailures(s3CLIPath, cfg, largeContent, msg)
 			})
 		})
 	})

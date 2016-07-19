@@ -64,10 +64,9 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' does not exist in bucket '.*'"))
 }
 
-func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, errorMessage string) {
-	expectedString := GenerateRandomString(1024 * 1024 * 6)
+func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMessage string) {
 	s3Filename := GenerateRandomString()
-	sourceContent := strings.NewReader(expectedString)
+	sourceContent := strings.NewReader(content)
 
 	configPath := MakeConfigFile(cfg)
 	defer func() { _ = os.Remove(configPath) }()
