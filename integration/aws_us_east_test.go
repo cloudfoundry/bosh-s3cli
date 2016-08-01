@@ -41,12 +41,12 @@ var _ = Describe("Testing only in us-east-1", func() {
 				BucketName:      bucketName,
 				Host:            "s3-external-1.amazonaws.com",
 			}),
-			Entry("with alternate host and a different region", &config.S3Cli{
+			Entry("with alternate host and region", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
 				Host:            "s3-external-1.amazonaws.com",
-				Region:          "us-west-1",
+				Region:          "us-east-1",
 			}),
 		}
 		DescribeTable("Blobstore lifecycle works",
