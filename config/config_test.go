@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("BlobstoreClient configuration", func() {
-	Describe("ignoring region configuration", func() {
+	Describe("empty region configuration", func() {
 		It("allows for the S3 SDK to be configured with empty region information", func() {
 			Expect(config.EmptyRegion).To(Equal(" "))
 		})
@@ -73,14 +73,14 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 
 			Context("when AWS host and region have been set", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "s3-us-west-1.amazonaws.com", "region": "us-east-1"}`)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "s3.amazonaws.com", "region": "us-west-1"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
-				It("overrides the user-specified region based on the hostname", func() {
+				It("does not override the user-specified region based on the hostname", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.UseRegion()).To(BeTrue())
-					Expect(c.Host).To(Equal("s3-us-west-1.amazonaws.com"))
+					Expect(c.Host).To(Equal("s3.amazonaws.com"))
 					Expect(c.Region).To(Equal("us-west-1"))
 				})
 			})

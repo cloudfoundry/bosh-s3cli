@@ -110,7 +110,7 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	if c.Region == "" && c.Host == "" {
 		c.Region = defaultRegion
 	}
-	if c.Host != "" && c.isAWSHost() {
+	if c.Region == "" && c.Host != "" && c.isAWSHost() {
 		c.Region = c.getRegionFromHost()
 	}
 
