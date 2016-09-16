@@ -9,6 +9,7 @@ workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
 source ${release_dir}/ci/tasks/utils.sh
 export GOPATH=${workspace_dir}
 export PATH=${GOPATH}/bin:${PATH}
+export GOOS=${GOOS:-linux}
 
 # inputs
 semver_dir="${workspace_dir}/version-semver"
@@ -25,11 +26,11 @@ pushd ${release_dir} > /dev/null
 
   echo -e "\n building artifact..."
   go build -ldflags "-X main.version=${version}" \
-    -o "out/s3cli-${semver}-linux-amd64"         \
+    -o "out/s3cli-${semver}-${GOOS}-amd64"         \
     github.com/pivotal-golang/s3cli
 
   echo -e "\n sha1 of artifact..."
-  sha1sum out/s3cli-${semver}-linux-amd64
+  sha1sum out/s3cli-${semver}-${GOOS}-amd64
 
-  mv out/s3cli-${semver}-linux-amd64 ${output_dir}/
+  mv out/s3cli-${semver}-${GOOS}-amd64 ${output_dir}/
 popd > /dev/null
