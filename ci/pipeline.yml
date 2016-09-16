@@ -164,25 +164,26 @@ jobs:
             aws-s3-public-read-integration,
             gcs-s3-compatible-integration
           ]
-        - {trigger: false, get: version-semver, params: {bump: patch} }
+        - put: version-semver
+          params:
+            bump: patch
 
-      - {put: version-semver, params: {file: version-semver/number}}
+      - aggregate:
+        - do:
+          - task: build-linux
+            file: s3cli-src/ci/tasks/build.yml
+            params:
+              GOOS: linux
+          - put: release-bucket-linux
+            params: {file: out/s3cli-*-linux-amd64}
 
-      - task: build-linux
-        file: s3cli-src/ci/tasks/build.yml
-        params:
-          GOOS: linux
-
-      - put: release-bucket-linux
-        params: {file: out/s3cli-*-linux-amd64}
-
-      - task: build-windows
-        file: s3cli-src/ci/tasks/build.yml
-        params:
-          GOOS: windows
-
-      - put: release-bucket-windows
-        params: {file: out/s3cli-*-windows-amd64}
+        - do:
+          - task: build-windows
+            file: s3cli-src/ci/tasks/build.yml
+            params:
+              GOOS: windows
+          - put: release-bucket-windows
+            params: {file: out/s3cli-*-windows-amd64}
 
       - put: s3cli-src
         resource: s3cli-out

@@ -12,4 +12,4 @@ outputs:
 run:
   path: src/github.com/pivotal-golang/s3cli/ci/tasks/build.sh
 params:
-  GOOS: REPLACE_ME
+  GOOS: linux
