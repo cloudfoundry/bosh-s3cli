@@ -171,18 +171,20 @@ jobs:
       - aggregate:
         - task: build-linux
           file: s3cli-src/ci/tasks/build.yml
+          output_mapping: { out: out-linux }
           params:
             GOOS: linux
         - task: build-windows
           file: s3cli-src/ci/tasks/build.yml
+          output_mapping: { out: out-windows }
           params:
             GOOS: windows
 
       - aggregate:
         - put: release-bucket-linux
-          params: {file: out/s3cli-*-linux-amd64}
+          params: {file: out-linux/s3cli-*-linux-amd64}
         - put: release-bucket-windows
-          params: {file: out/s3cli-*-windows-amd64}
+          params: {file: out-windows/s3cli-*-windows-amd64}
 
       - put: s3cli-src
         resource: s3cli-out
