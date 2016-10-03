@@ -164,15 +164,27 @@ jobs:
             aws-s3-public-read-integration,
             gcs-s3-compatible-integration
           ]
-        - {trigger: false, get: version-semver, params: {bump: patch} }
+        - put: version-semver
+          params:
+            bump: patch
 
-      - {put: version-semver, params: {file: version-semver/number}}
+      - aggregate:
+        - task: build-linux
+          file: s3cli-src/ci/tasks/build.yml
+          output_mapping: { out: out-linux }
+          params:
+            GOOS: linux
+        - task: build-windows
+          file: s3cli-src/ci/tasks/build.yml
+          output_mapping: { out: out-windows }
+          params:
+            GOOS: windows
 
-      - task: build-linux
-        file: s3cli-src/ci/tasks/build.yml
-
-      - put: release-bucket-linux
-        params: {file: out/s3cli-*-linux-amd64}
+      - aggregate:
+        - put: release-bucket-linux
+          params: {file: out-linux/s3cli-*-linux-amd64}
+        - put: release-bucket-windows
+          params: {file: out-windows/s3cli-*-windows-amd64}
 
       - put: s3cli-src
         resource: s3cli-out
@@ -206,6 +218,14 @@ resources:
     type: s3
     source:
       regexp: s3cli-(.*)-linux-amd64
+      bucket: {{s3cli_release_bucket}}
+      access_key_id: {{s3cli_release_bucket_access_key}}
+      secret_access_key: {{s3cli_release_bucket_secret_key}}
+
+  - name: release-bucket-windows
+    type: s3
+    source:
+      regexp: s3cli-(.*)-windows-amd64
       bucket: {{s3cli_release_bucket}}
       access_key_id: {{s3cli_release_bucket_access_key}}
       secret_access_key: {{s3cli_release_bucket_secret_key}}
