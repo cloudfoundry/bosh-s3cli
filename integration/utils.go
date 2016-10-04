@@ -1,10 +1,9 @@
 package integration
 
 import (
-	"crypto/rand"
+	"math/rand"
 	"encoding/json"
 	"io/ioutil"
-	"math/big"
 	"os/exec"
 	"time"
 
@@ -26,9 +25,7 @@ func GenerateRandomString(params ...int) string {
 
 	randBytes := make([]byte, size)
 	for i := range randBytes {
-		randInt, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphanum))))
-		gomega.Expect(err).ToNot(gomega.HaveOccurred())
-		randBytes[i] = alphanum[randInt.Uint64()]
+		randBytes[i] = alphanum[rand.Intn(len(alphanum))]
 	}
 	return string(randBytes)
 }
