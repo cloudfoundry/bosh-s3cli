@@ -225,7 +225,7 @@ resources:
   - name: release-bucket-windows
     type: s3
     source:
-      regexp: s3cli-(.*)-windows-amd64
+      regexp: s3cli-(.*)-windows-amd64\.exe
       bucket: {{s3cli_release_bucket}}
       access_key_id: {{s3cli_release_bucket_access_key}}
       secret_access_key: {{s3cli_release_bucket_secret_key}}
