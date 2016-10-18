@@ -1,8 +1,8 @@
 package client
 
 import (
-	"net/http"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
+	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -16,7 +16,7 @@ func NewSDK(c config.S3Cli) (*s3.S3, error) {
 
 	if c.SSLVerifyPeer {
 		httpClient = boshhttp.CreateDefaultClient(nil)
-	}	else {
+	} else {
 		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
 	}
 

@@ -1,9 +1,9 @@
 package integration
 
 import (
-	"math/rand"
 	"encoding/json"
 	"io/ioutil"
+	"math/rand"
 	"os/exec"
 	"time"
 
