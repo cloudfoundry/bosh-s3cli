@@ -19,7 +19,6 @@ func NewSDK(c config.S3Cli) (*s3.S3, error) {
 	}	else {
 		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
 	}
-	httpClient := http.DefaultClient
 
 	s3Config := aws.NewConfig().
 		WithLogLevel(aws.LogOff).
