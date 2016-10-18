@@ -1,8 +1,8 @@
 package client
 
 import (
-	"crypto/tls"
 	"net/http"
+	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -12,12 +12,14 @@ import (
 )
 
 func NewSDK(c config.S3Cli) (*s3.S3, error) {
-	transport := *http.DefaultTransport.(*http.Transport)
-	transport.TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: !c.SSLVerifyPeer,
-	}
+	var httpClient *http.Client
 
-	httpClient := &http.Client{Transport: &transport}
+	if c.SSLVerifyPeer {
+		httpClient = boshhttp.CreateDefaultClient(nil)
+	}	else {
+		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
+	}
+	httpClient := http.DefaultClient
 
 	s3Config := aws.NewConfig().
 		WithLogLevel(aws.LogOff).

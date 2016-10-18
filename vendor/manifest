@@ -10,6 +10,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/cloudfoundry/bosh-utils",
+			"repository": "https://github.com/cloudfoundry/bosh-utils",
+			"vcs": "git",
+			"revision": "5785db6070d06e70ada10faebfbe9e7748ffdc99",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
