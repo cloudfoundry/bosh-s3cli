@@ -4,6 +4,9 @@ var awsHostToRegion = map[string]string{
 	"s3.amazonaws.com":            "us-east-1",
 	"s3-external-1.amazonaws.com": "us-east-1",
 
+	"s3.us-east-2.amazonaws.com": "us-east-2",
+	"s3-us-east-2.amazonaws.com": "us-east-2",
+
 	"s3-us-west-1.amazonaws.com": "us-west-1",
 	"s3-us-west-2.amazonaws.com": "us-west-2",
 
