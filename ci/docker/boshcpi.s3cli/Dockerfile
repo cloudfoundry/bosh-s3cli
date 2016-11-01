@@ -18,11 +18,3 @@ ENV GOPATH /opt/go
 ENV PATH /usr/local/go/bin:/opt/go/bin:$PATH
 
 RUN go get github.com/onsi/ginkgo/ginkgo; go get github.com/golang/lint/golint
-
-RUN cd /tmp && \
-    curl -O -L https://github.com/s3tools/s3cmd/archive/v1.6.0.tar.gz && \
-    tar xzf v1.6.0.tar.gz && \
-    cd s3cmd-1.6.0 && \
-    cp -R s3cmd S3 /usr/local/bin && \
-    cd /tmp && \
-    rm -rf s3cmd-1.6.0/ v1.6.0.tar.gz
