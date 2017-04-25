@@ -32,10 +32,7 @@ func New(s3Client *s3.S3, s3cliConfig *config.S3Cli) (S3Blobstore, error) {
 // Get fetches a blob from an S3 compatible blobstore
 // Destination will be overwritten if exists
 func (client *S3Blobstore) Get(src string, dest io.WriterAt) error {
-	setConcurrency := func(d *s3manager.Downloader) {
-		d.Concurrency = 105 // creates 525MB buffer, to avoid hanging on download w/ broken network
-	}
-	downloader := s3manager.NewDownloaderWithClient(client.s3Client, setConcurrency)
+	downloader := s3manager.NewDownloaderWithClient(client.s3Client)
 
 	_, err := downloader.Download(dest, &s3.GetObjectInput{
 		Bucket: aws.String(client.s3cliConfig.BucketName),
