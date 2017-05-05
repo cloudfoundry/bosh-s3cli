@@ -5,8 +5,8 @@
 			"importpath": "github.com/aws/aws-sdk-go",
 			"repository": "https://github.com/aws/aws-sdk-go",
 			"vcs": "git",
-			"revision": "0e1d7f7c9ff58350ce8f53866ba45487e7153d46",
-			"branch": "master",
+			"revision": "fa7f88097f64d1a2bcc65f9b9b547f363082d496",
+			"branch": "HEAD",
 			"notests": true
 		},
 		{
