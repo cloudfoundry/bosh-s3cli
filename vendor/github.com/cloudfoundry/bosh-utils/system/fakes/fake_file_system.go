@@ -503,6 +503,10 @@ func (fs *FakeFileSystem) RegisterReadFileError(path string, err error) {
 	fs.readFileErrorByPath[path] = err
 }
 
+func (fs *FakeFileSystem) UnregisterReadFileError(path string) {
+	delete(fs.readFileErrorByPath, path)
+}
+
 func (fs *FakeFileSystem) ReadFile(path string) ([]byte, error) {
 	stats := fs.GetFileTestStat(path)
 	if stats != nil {
