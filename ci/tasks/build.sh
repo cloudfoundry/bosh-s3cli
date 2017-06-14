@@ -31,7 +31,7 @@ pushd ${release_dir} > /dev/null
   echo -e "\n building artifact..."
   go build -ldflags "-X main.version=${version}" \
     -o "out/${binname}"                          \
-    github.com/pivotal-golang/s3cli
+    github.com/cloudfoundry/bosh-s3cli
 
   echo -e "\n sha1 of artifact..."
   sha1sum "out/${binname}"

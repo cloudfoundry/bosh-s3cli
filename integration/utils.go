@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/pivotal-golang/s3cli/config"
+	"github.com/cloudfoundry/bosh-s3cli/config"
 
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"

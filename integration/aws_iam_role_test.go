@@ -3,8 +3,8 @@ package integration_test
 import (
 	"os"
 
-	"github.com/pivotal-golang/s3cli/config"
-	"github.com/pivotal-golang/s3cli/integration"
+	"github.com/cloudfoundry/bosh-s3cli/config"
+	"github.com/cloudfoundry/bosh-s3cli/integration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

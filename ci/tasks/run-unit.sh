@@ -33,7 +33,7 @@ pushd ${release_dir} > /dev/null
 
   echo -e "\n Running build script to confirm everything compiles..."
   go build -ldflags "-X main.version=${version}" -o out/s3cli \
-    github.com/pivotal-golang/s3cli
+    github.com/cloudfoundry/bosh-s3cli
 
   echo -e "\n Testing version information"
   app_version=$(out/s3cli -v)

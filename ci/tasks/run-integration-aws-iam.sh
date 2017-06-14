@@ -30,7 +30,7 @@ trap "cat ${lambda_log}" EXIT
 
 pushd ${release_dir} > /dev/null
   GOOS=linux GOARCH=amd64 go build -o out/s3cli \
-    github.com/pivotal-golang/s3cli
+    github.com/cloudfoundry/bosh-s3cli
   GOOS=linux GOARCH=amd64 ginkgo build integration
 
   zip -j payload.zip integration/integration.test out/s3cli ci/assets/lambda_function.py

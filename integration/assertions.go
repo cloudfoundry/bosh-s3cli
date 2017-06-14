@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pivotal-golang/s3cli/client"
-	"github.com/pivotal-golang/s3cli/config"
+	"github.com/cloudfoundry/bosh-s3cli/client"
+	"github.com/cloudfoundry/bosh-s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"

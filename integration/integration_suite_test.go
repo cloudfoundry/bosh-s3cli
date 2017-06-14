@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"github.com/pivotal-golang/s3cli/integration"
+	"github.com/cloudfoundry/bosh-s3cli/integration"
 
 	"testing"
 )
@@ -27,7 +27,7 @@ var _ = BeforeSuite(func() {
 
 	if len(s3CLIPath) == 0 {
 		var err error
-		s3CLIPath, err = gexec.Build("github.com/pivotal-golang/s3cli")
+		s3CLIPath, err = gexec.Build("github.com/cloudfoundry/bosh-s3cli")
 		Expect(err).ShouldNot(HaveOccurred())
 	}
 })

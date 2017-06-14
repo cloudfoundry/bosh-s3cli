@@ -10,7 +10,7 @@ Releases can be found in https://s3cli-artifacts.s3.amazonaws.com. The Linux bin
 ## Installation
 
 ```
-go get github.com/pivotal-golang/s3cli
+go get github.com/cloudfoundry/bosh-s3cli
 ```
 
 ## Usage

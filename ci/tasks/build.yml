@@ -5,11 +5,11 @@ image_resource:
   source: {repository: boshcpi/s3cli}
 inputs:
 - name: s3cli-src
-  path: src/github.com/pivotal-golang/s3cli
+  path: src/github.com/cloudfoundry/bosh-s3cli
 - name: version-semver
 outputs:
 - name: out
 run:
-  path: src/github.com/pivotal-golang/s3cli/ci/tasks/build.sh
+  path: src/github.com/cloudfoundry/bosh-s3cli/ci/tasks/build.sh
 params:
   GOOS: linux

@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/pivotal-golang/s3cli/config"
+	"github.com/cloudfoundry/bosh-s3cli/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"

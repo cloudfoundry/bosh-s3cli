@@ -196,14 +196,14 @@ resources:
   - name: s3cli-in
     type: git
     source:
-      uri: git@github.com:pivotal-golang/s3cli.git
+      uri: git@github.com:cloudfoundry/bosh-s3cli.git
       branch: develop
       private_key: {{github_deployment_key__s3cli}}
 
   - name: s3cli-out
     type: git
     source:
-      uri: git@github.com:pivotal-golang/s3cli.git
+      uri: git@github.com:cloudfoundry/bosh-s3cli.git
       branch: master
       private_key: {{github_deployment_key__s3cli}}
 

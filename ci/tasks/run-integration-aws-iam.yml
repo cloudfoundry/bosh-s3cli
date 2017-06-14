@@ -5,9 +5,9 @@ image_resource:
   source: {repository: boshcpi/s3cli}
 inputs:
   - name: s3cli-src
-    path: src/github.com/pivotal-golang/s3cli
+    path: src/github.com/cloudfoundry/bosh-s3cli
 run:
-  path: src/github.com/pivotal-golang/s3cli/ci/tasks/run-integration-aws-iam.sh
+  path: src/github.com/cloudfoundry/bosh-s3cli/ci/tasks/run-integration-aws-iam.sh
 params:
   access_key_id:
   secret_access_key:
