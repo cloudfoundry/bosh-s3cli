@@ -123,6 +123,22 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 		})
 
+		Describe("when folder is specified", func() {
+			emptyJSONBytes := []byte(`{
+				"access_key_id": "id",
+				"secret_access_key": "key",
+				"bucket_name": "some-bucket",
+				"folder_name": "some-folder/other-folder"
+			}`)
+			emptyJSONReader := bytes.NewReader(emptyJSONBytes)
+
+			It("uses the given folder", func() {
+				c, err := config.NewFromReader(emptyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.FolderName).To(Equal("some-folder/other-folder"))
+			})
+		})
+
 		Describe("Default SSL options", func() {
 			emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket"}`)
 			emptyJSONReader := bytes.NewReader(emptyJSONBytes)

@@ -13,6 +13,7 @@ type S3Cli struct {
 	AccessKeyID          string `json:"access_key_id"`
 	SecretAccessKey      string `json:"secret_access_key"`
 	BucketName           string `json:"bucket_name"`
+	FolderName           string `json:"folder_name"`
 	CredentialsSource    string `json:"credentials_source"`
 	Host                 string `json:"host"`
 	Port                 int    `json:"port"` // 0 means no custom port

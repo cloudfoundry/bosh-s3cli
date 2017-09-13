@@ -35,6 +35,17 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(s3CLISession.ExitCode()).To(BeZero())
 
+	if len(cfg.FolderName) != 0 {
+		folderName := cfg.FolderName
+		cfg.FolderName = ""
+		noFolderConfigPath := MakeConfigFile(cfg)
+		defer func() { _ = os.Remove(noFolderConfigPath) }()
+
+		s3CLISession, err := RunS3CLI(s3CLIPath, noFolderConfigPath, "exists", fmt.Sprintf("%s/%s", folderName, s3Filename))
+		Expect(err).ToNot(HaveOccurred())
+		Expect(s3CLISession.ExitCode()).To(BeZero())
+	}
+
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "exists", s3Filename)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(s3CLISession.ExitCode()).To(BeZero())
