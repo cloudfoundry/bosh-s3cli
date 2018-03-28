@@ -388,6 +388,35 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 		})
 	})
+
+	Describe("returning the alicloud region", func() {
+		Context("when host is provided", func() {
+			It("returns a region id in the public `host`", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.Region).To(Equal("some-region"))
+			})
+			It("returns a region id in the private `host`", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region-internal.aliyuncs.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.Region).To(Equal("some-region"))
+			})
+			It("returns a empty string if `host` is empty", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": ""}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal(""))
+			})
+		})
+	})
 })
 
 type explodingReader struct{}
