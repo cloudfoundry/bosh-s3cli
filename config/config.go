@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
+	"regexp"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -45,6 +47,8 @@ const credentialsSourceEnvOrProfile = "env_or_profile"
 
 // Nothing was provided in configuration
 const noCredentialsSourceProvided = ""
+
+const AlicloudHostRegex  = "^oss-[a-z]+-[a-z]+(-[1-9])?(-internal)?.aliyuncs.com"
 
 var errorStaticCredentialsMissing = errors.New("access_key_id and secret_access_key must be provided")
 
@@ -108,11 +112,17 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}
 
+	// For Alibaba Cloud, host is required.
 	if c.Region == "" && c.Host == "" {
 		c.Region = defaultRegion
 	}
-	if c.Region == "" && c.Host != "" && c.isAWSHost() {
-		c.Region = c.getRegionFromHost()
+	if c.Region == "" && c.Host != "" {
+		if c.isAWSHost() {
+			c.Region = c.getRegionFromHost()
+		}
+		if c.isAlicloudHost() {
+			c.Region = c.getAlicloudRegionFromHost()
+		}
 	}
 
 	switch c.SignatureVersion {
@@ -160,9 +170,20 @@ func (c *S3Cli) allowMultipart() bool {
 			return false
 		}
 	}
+	if c.isAlicloudHost() {
+		return false
+	}
 	return true
 }
 
 func (c *S3Cli) getRegionFromHost() string {
 	return AWSHostToRegion[c.Host]
+}
+
+func (c *S3Cli) isAlicloudHost() bool {
+	return regexp.MustCompile(AlicloudHostRegex).MatchString(c.Host)
+}
+
+func (c *S3Cli) getAlicloudRegionFromHost() string {
+	return strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(c.Host, ".aliyuncs.com"), "oss-"), "-internal")
 }
