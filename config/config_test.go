@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -16,6 +17,20 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			Expect(config.EmptyRegion).To(Equal(" "))
 		})
 	})
+
+	DescribeTable("Provider",
+		func(host, provider string) {
+			Expect(config.Provider(host)).To(Equal(provider))
+		},
+		Entry("aws 1", "s3.amazonaws.com", "aws"),
+		Entry("aws 2", "s3.external-1.amazonaws.com", "aws"),
+		Entry("aws 3", "s3.some-region.amazonaws.com", "aws"),
+		Entry("alicloud 1", "oss-r-s-1-internal.aliyuncs.com", "alicloud"),
+		Entry("alicloud 2", "oss-r-s-internal.aliyuncs.com", "alicloud"),
+		Entry("alicloud 3", "oss-r-s-1.aliyuncs.com", "alicloud"),
+		Entry("alicloud 4", "oss-r-s.aliyuncs.com", "alicloud"),
+		Entry("google 1", "storage.googleapis.com", "google"),
+	)
 
 	Describe("building a configuration", func() {
 		Describe("checking that either host or region has been set", func() {
@@ -168,6 +183,20 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					"secret_access_key":  "key",
 					"bucket_name":        "some-bucket",
 					"host":               "s3-external-1.amazonaws.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
+			})
+
+			It("uses v4 signing when the hostname maps to a known Amazon china region", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "s3.cn-north-1.amazonaws.com.cn"
 				}`)
 
 				configReader := bytes.NewReader(configBytes)

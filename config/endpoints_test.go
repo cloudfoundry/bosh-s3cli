@@ -17,6 +17,7 @@ var _ = Describe("Endpoints", func() {
 		Entry("us-east-1", "s3-external-1.amazonaws.com", "us-east-1"),
 		Entry("us-east-2", "s3.us-east-2.amazonaws.com", "us-east-2"),
 		Entry("us-east-2", "s3-us-east-2.amazonaws.com", "us-east-2"),
+		Entry("cn-north-1", "s3.cn-north-1.amazonaws.com.cn", "cn-north-1"),
 		Entry("whatever-region", "s3.whatever-region.amazonaws.com", "whatever-region"),
 		Entry("some-region", "s3-some-region.amazonaws.com", "some-region"),
 	)

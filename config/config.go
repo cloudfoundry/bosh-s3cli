@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strings"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -126,16 +125,10 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 // Provider returns one of (aws, alicloud, google) based on a host name.
 // Returns "" if a known provider cannot be detected.
 func Provider(host string) string {
-	if host == "" || strings.HasSuffix(host, "amazonaws.com") {
-		return "aws"
-	}
-
-	if strings.HasSuffix(host, "aliyuncs.com") {
-		return "alicloud"
-	}
-
-	if strings.HasSuffix(host, "googleapis.com") {
-		return "google"
+	for provider, regex := range providerRegex {
+		if regex.MatchString(host) {
+			return provider
+		}
 	}
 
 	return ""
