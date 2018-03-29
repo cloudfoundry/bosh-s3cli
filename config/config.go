@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
-	"regexp"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -47,8 +46,6 @@ const credentialsSourceEnvOrProfile = "env_or_profile"
 
 // Nothing was provided in configuration
 const noCredentialsSourceProvided = ""
-
-const AlicloudHostRegex  = "^oss-[a-z]+-[a-z]+(-[1-9])?(-internal)?.aliyuncs.com"
 
 var errorStaticCredentialsMissing = errors.New("access_key_id and secret_access_key must be provided")
 
@@ -112,17 +109,43 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, fmt.Errorf("Invalid credentials_source: %s", c.CredentialsSource)
 	}
 
-	// For Alibaba Cloud, host is required.
-	if c.Region == "" && c.Host == "" {
-		c.Region = defaultRegion
+	switch Provider(c.Host) {
+	case "aws":
+		c.configureAWS()
+	case "alicloud":
+		c.configureAlicloud()
+	case "google":
+		c.configureGoogle()
+	default:
+		c.configureDefault()
 	}
-	if c.Region == "" && c.Host != "" {
-		if c.isAWSHost() {
-			c.Region = c.getRegionFromHost()
-		}
-		if c.isAlicloudHost() {
-			c.Region = c.getAlicloudRegionFromHost()
-		}
+
+	return c, nil
+}
+
+// Provider returns one of (aws, alicloud, google) based on a host name.
+// Returns "" if a known provider cannot be detected.
+func Provider(host string) string {
+	if host == "" || strings.HasSuffix(host, "amazonaws.com") {
+		return "aws"
+	}
+
+	if strings.HasSuffix(host, "aliyuncs.com") {
+		return "alicloud"
+	}
+
+	if strings.HasSuffix(host, "googleapis.com") {
+		return "google"
+	}
+
+	return ""
+}
+
+func (c *S3Cli) configureAWS() {
+	c.MultipartUpload = true
+
+	if c.Region == "" {
+		c.Region = AWSHostToRegion(c.Host)
 	}
 
 	switch c.SignatureVersion {
@@ -131,16 +154,38 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	case 4:
 		c.UseV2SigningMethod = false
 	default:
-		if c.Host == "" || c.isAWSHost() {
-			c.UseV2SigningMethod = false
-		} else {
-			c.UseV2SigningMethod = true
-		}
+		c.UseV2SigningMethod = false
 	}
+}
 
-	c.MultipartUpload = c.allowMultipart()
+func (c *S3Cli) configureAlicloud() {
+	c.MultipartUpload = false
+	c.configureDefaultSigningMethod()
 
-	return c, nil
+	if c.Region == "" {
+		c.Region = AlicloudHostToRegion(c.Host)
+	}
+}
+
+func (c *S3Cli) configureGoogle() {
+	c.MultipartUpload = false
+	c.configureDefaultSigningMethod()
+}
+
+func (c *S3Cli) configureDefault() {
+	c.MultipartUpload = true
+	c.configureDefaultSigningMethod()
+}
+
+func (c *S3Cli) configureDefaultSigningMethod() {
+	switch c.SignatureVersion {
+	case 2:
+		c.UseV2SigningMethod = true
+	case 4:
+		c.UseV2SigningMethod = false
+	default:
+		c.UseV2SigningMethod = true
+	}
 }
 
 // UseRegion signals to users of the S3Cli whether to use Region information
@@ -157,33 +202,4 @@ func (c *S3Cli) S3Endpoint() string {
 		return fmt.Sprintf("%s:%d", c.Host, c.Port)
 	}
 	return c.Host
-}
-
-func (c *S3Cli) isAWSHost() bool {
-	_, hasKey := AWSHostToRegion[c.Host]
-	return hasKey
-}
-
-func (c *S3Cli) allowMultipart() bool {
-	for _, host := range multipartBlacklist {
-		if host == c.Host {
-			return false
-		}
-	}
-	if c.isAlicloudHost() {
-		return false
-	}
-	return true
-}
-
-func (c *S3Cli) getRegionFromHost() string {
-	return AWSHostToRegion[c.Host]
-}
-
-func (c *S3Cli) isAlicloudHost() bool {
-	return regexp.MustCompile(AlicloudHostRegex).MatchString(c.Host)
-}
-
-func (c *S3Cli) getAlicloudRegionFromHost() string {
-	return strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(c.Host, ".aliyuncs.com"), "oss-"), "-internal")
 }

@@ -3,7 +3,6 @@ package config_test
 import (
 	"bytes"
 	"errors"
-	"fmt"
 
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
@@ -24,16 +23,13 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			Context("when AWS endpoint has been set but not region", func() {
 
 				It("sets the AWS region based on the hostname", func() {
-					Expect(config.AWSHostToRegion).ToNot(BeEmpty())
-					for endpoint, region := range config.AWSHostToRegion {
-						dummyJSONBytes := []byte(fmt.Sprintf(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "%s"}`, endpoint))
-						dummyJSONReader := bytes.NewReader(dummyJSONBytes)
-						c, err := config.NewFromReader(dummyJSONReader)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(c.UseRegion()).To(BeTrue(), "Expected UseRegion to be true")
-						Expect(c.Host).To(Equal(endpoint))
-						Expect(c.Region).To(Equal(region))
-					}
+					dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "s3.amazonaws.com"}`)
+					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.UseRegion()).To(BeTrue(), "Expected UseRegion to be true")
+					Expect(c.Host).To(Equal("s3.amazonaws.com"))
+					Expect(c.Region).To(Equal("us-east-1"))
 				})
 			})
 
@@ -193,20 +189,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(s3CliConfig.UseV2SigningMethod).To(BeFalse())
-			})
-
-			It("uses v2 signing when the hostname does not map to a known Amazon region", func() {
-				configBytes := []byte(`{
-					"access_key_id":      "id",
-					"secret_access_key":  "key",
-					"bucket_name":        "some-bucket",
-					"host":               "s3.private-region.amazonaws.com"
-				}`)
-
-				configReader := bytes.NewReader(configBytes)
-				s3CliConfig, err := config.NewFromReader(configReader)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(s3CliConfig.UseV2SigningMethod).To(BeTrue())
 			})
 
 			It("uses v2 signing when the hostname is a non-Amazon endpoint", func() {

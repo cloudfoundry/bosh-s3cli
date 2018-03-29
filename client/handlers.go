@@ -17,7 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"regexp"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 )
 
@@ -134,8 +133,7 @@ func (v2 *signer) Sign() error {
 	v2.Request.Header["x-amz-date"] = []string{v2.Time.In(time.UTC).Format(time.RFC1123)}
 
 	// Alibaba Cloud OSS date's formate must be http.TimeFormat
-	if regexp.MustCompile(config.AlicloudHostRegex).MatchString(host) {
-		log.Printf("Using Alicloud host: %#v", host)
+	if config.Provider(host) == "alicloud" {
 		v2.Request.Header["x-amz-date"] = []string{v2.Time.In(time.UTC).Format(http.TimeFormat)}
 	}
 

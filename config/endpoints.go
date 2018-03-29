@@ -1,37 +1,34 @@
 package config
 
-var AWSHostToRegion = map[string]string{
-	"s3.amazonaws.com":            "us-east-1",
-	"s3-external-1.amazonaws.com": "us-east-1",
+import (
+	"regexp"
+)
 
-	"s3.us-east-2.amazonaws.com": "us-east-2",
-	"s3-us-east-2.amazonaws.com": "us-east-2",
+var (
+	awsHostRegex      = regexp.MustCompile(`s3[-.](.*)\.amazonaws\.com`)
+	alicloudHostRegex = regexp.MustCompile(`^oss-([a-z]+-[a-z]+(-[1-9])?)(-internal)?.aliyuncs.com`)
+)
 
-	"s3-us-west-1.amazonaws.com": "us-west-1",
-	"s3-us-west-2.amazonaws.com": "us-west-2",
+func AWSHostToRegion(host string) string {
+	regexMatches := awsHostRegex.FindStringSubmatch(host)
 
-	"s3.ca-central-1.amazonaws.com": "ca-central-1",
-	"s3-ca-central-1.amazonaws.com": "ca-central-1",
+	region := "us-east-1"
 
-	"s3-eu-west-1.amazonaws.com": "eu-west-1",
-	"s3-eu-west-2.amazonaws.com": "eu-west-2",
+	if len(regexMatches) == 2 && regexMatches[1] != "external-1" {
+		region = regexMatches[1]
+	}
 
-	"s3.eu-central-1.amazonaws.com": "eu-central-1",
-	"s3-eu-central-1.amazonaws.com": "eu-central-1",
+	return region
+}
 
-	"s3.ap-south-1.amazonaws.com": "ap-south-1",
-	"s3-ap-south-1.amazonaws.com": "ap-south-1",
+func AlicloudHostToRegion(host string) string {
+	regexMatches := alicloudHostRegex.FindStringSubmatch(host)
 
-	"s3-ap-southeast-1.amazonaws.com": "ap-southeast-1",
-	"s3-ap-southeast-2.amazonaws.com": "ap-southeast-2",
+	if len(regexMatches) == 4 {
+		return regexMatches[1]
+	}
 
-	"s3-ap-northeast-1.amazonaws.com": "ap-northeast-1",
-	"s3.ap-northeast-2.amazonaws.com": "ap-northeast-2",
-	"s3-ap-northeast-2.amazonaws.com": "ap-northeast-2",
-
-	"s3-sa-east-1.amazonaws.com": "sa-east-1",
-
-	"s3.cn-north-1.amazonaws.com.cn": "cn-north-1",
+	return ""
 }
 
 var multipartBlacklist = []string{
