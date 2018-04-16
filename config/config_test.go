@@ -400,7 +400,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 	})
 
-	Describe("returning the alicloud region", func() {
+	Describe("returning the alibaba cloud region", func() {
 		Context("when host is provided", func() {
 			It("returns a region id in the public `host`", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com"}`)
@@ -419,6 +419,46 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(c.Region).To(Equal("some-region"))
 			})
 			It("returns a empty string if `host` is empty", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": ""}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal(""))
+			})
+		})
+	})
+
+	Describe("returning the alibaba cloud endpoint", func() {
+		Context("when port is provided", func() {
+			It("returns a URI in the form `host:port`", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com", "port": 443}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal("oss-some-region.aliyuncs.com:443"))
+			})
+			It("returns a empty string URI if `host` is empty", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "", "port": 443}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal(""))
+			})
+		})
+
+		Context("when port is not provided", func() {
+			It("returns a URI in the form `host` only", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal("oss-some-region.aliyuncs.com"))
+			})
+			It("returns a empty string URI if `host` is empty", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": ""}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
