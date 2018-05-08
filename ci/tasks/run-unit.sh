@@ -16,28 +16,19 @@ pushd ${release_dir} > /dev/null
   git_rev=`git rev-parse --short HEAD`
   version="${semver}-${git_rev}-${timestamp}"
 
-  S3CLI_FILES=$(find . -type f -name '*.go' -not -path "*/vendor/*")
-
   echo -e "\n Vetting packages for potential issues..."
-  for f in $S3CLI_FILES ; do
-    go vet $f
-  done
+  go vet ./...
 
-  echo -e "\n Checking with golint..."
-  for f in $S3CLI_FILES ; do
-    golint $f
-  done
+  echo -e "\n Installing ginkgo..."
+  go get ./vendor/github.com/onsi/ginkgo/ginkgo
 
   echo -e "\n Unit testing packages..."
   ginkgo -r -race -skipPackage=integration ./
 
   echo -e "\n Running build script to confirm everything compiles..."
-  go build -ldflags "-X main.version=${version}" -o out/s3cli \
-    github.com/cloudfoundry/bosh-s3cli
+  go build -ldflags "-X main.version=${version}" -o out/s3cli .
 
   echo -e "\n Testing version information"
   app_version=$(out/s3cli -v)
   test "${app_version}" = "version ${version}"
-
-  echo -e "\n suite success"
 popd > /dev/null
