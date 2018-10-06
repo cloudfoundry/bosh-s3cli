@@ -250,6 +250,64 @@ var _ = Describe("BlobstoreClient configuration", func() {
 			})
 		})
 
+		Describe("configing force path style", func() {
+			It("when Alibaba Cloud provider", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host":               "oss-some-region.aliyuncs.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.ForcePathStyle).To(BeFalse())
+			})
+
+			It("when AWS provider", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host": 	      "s3.amazonaws.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+			})
+
+			It("when Google provider", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host": 	      "storage.googleapis.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+			})
+
+			It("when Default provider", func() {
+				configBytes := []byte(`{
+					"access_key_id":      "id",
+					"secret_access_key":  "key",
+					"bucket_name":        "some-bucket",
+					"host": 	      "storage.googleapis.com"
+				}`)
+
+				configReader := bytes.NewReader(configBytes)
+				s3CliConfig, err := config.NewFromReader(configReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+			})
+		})
+
 		Context("when the configuration file cannot be read", func() {
 			It("returns an error", func() {
 				f := explodingReader{}
@@ -438,6 +496,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				c, err := config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal("oss-some-region.aliyuncs.com:443"))
+				Expect(c.Host).To(Equal("oss-some-region.aliyuncs.com"))
 			})
 			It("returns a empty string URI if `host` is empty", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "", "port": 443}`)
@@ -446,6 +505,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				c, err := config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal(""))
+				Expect(c.Host).To(Equal(""))
 			})
 		})
 
@@ -457,6 +517,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				c, err := config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal("oss-some-region.aliyuncs.com"))
+				Expect(c.Host).To(Equal("oss-some-region.aliyuncs.com"))
 			})
 			It("returns a empty string URI if `host` is empty", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": ""}`)
@@ -466,6 +527,17 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal(""))
 			})
+		})
+	})
+
+	Describe("checking the alibaba cloud MultipartUpload", func() {
+		emptyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com"}`)
+		emptyJSONReader := bytes.NewReader(emptyJSONBytes)
+
+		It("defaults to support multipart uploading", func() {
+			c, err := config.NewFromReader(emptyJSONReader)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.MultipartUpload).To(BeTrue())
 		})
 	})
 })
