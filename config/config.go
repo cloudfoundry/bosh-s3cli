@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
 )
 
 // The S3Cli represents configuration for the s3cli
@@ -25,6 +26,7 @@ type S3Cli struct {
 	SSEKMSKeyID          string `json:"sse_kms_key_id"`
 	UseV2SigningMethod   bool
 	MultipartUpload      bool
+	ForcePathStyle       bool
 }
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
@@ -69,8 +71,9 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	}
 
 	c := S3Cli{
-		SSLVerifyPeer: true,
-		UseSSL:        true,
+		SSLVerifyPeer:  true,
+		UseSSL:         true,
+		ForcePathStyle: true,
 	}
 
 	err = json.Unmarshal(bytes, &c)
@@ -152,9 +155,11 @@ func (c *S3Cli) configureAWS() {
 }
 
 func (c *S3Cli) configureAlicloud() {
-	c.MultipartUpload = false
+	c.MultipartUpload = true
 	c.configureDefaultSigningMethod()
+	c.ForcePathStyle = false
 
+	c.Host = strings.Split(c.Host, ":")[0]
 	if c.Region == "" {
 		c.Region = AlicloudHostToRegion(c.Host)
 	}
