@@ -262,7 +262,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				configReader := bytes.NewReader(configBytes)
 				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(s3CliConfig.ForcePathStyle).To(BeFalse())
+				Expect(s3CliConfig.HostStyle).To(BeTrue())
 			})
 
 			It("when AWS provider", func() {
@@ -276,7 +276,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				configReader := bytes.NewReader(configBytes)
 				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+				Expect(s3CliConfig.HostStyle).To(BeFalse())
 			})
 
 			It("when Google provider", func() {
@@ -290,7 +290,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				configReader := bytes.NewReader(configBytes)
 				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+				Expect(s3CliConfig.HostStyle).To(BeFalse())
 			})
 
 			It("when Default provider", func() {
@@ -304,7 +304,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				configReader := bytes.NewReader(configBytes)
 				s3CliConfig, err := config.NewFromReader(configReader)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(s3CliConfig.ForcePathStyle).To(BeTrue())
+				Expect(s3CliConfig.HostStyle).To(BeFalse())
 			})
 		})
 
