@@ -187,10 +187,6 @@ jobs:
       - put: s3cli-src
         resource: s3cli-out
         params: {repository: s3cli-src, tag: version-semver/number, tag_prefix: v}
-      - put: tracker-output
-        params:
-          repos:
-          - s3cli-src
 
 resources:
   - name: s3cli-in
@@ -231,10 +227,3 @@ resources:
       bucket: {{s3cli_release_bucket}}
       access_key_id: {{s3cli_release_bucket_access_key}}
       secret_access_key: {{s3cli_release_bucket_secret_key}}
-
-  - name: tracker-output
-    type: tracker
-    source:
-      token: {{tracker_api_token}}
-      project_id: {{tracker_project_id}}
-      tracker_url: https://www.pivotaltracker.com
