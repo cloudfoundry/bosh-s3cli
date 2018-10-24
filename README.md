@@ -84,3 +84,19 @@ Follow these steps to make a contribution to the project:
   git push origin feature-name
   ```
 - Create a GitHub pull request, selecting `develop` as the target branch
+
+## Running integration tests
+
+To run the integration tests, export the following variables into your environment:
+
+```
+export access_key_id=YOUR_AWS_ACCESS_KEY
+export focus_regex="GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
+export region_name=us-east-1
+export s3_endpoint_host=s3.amazonaws.com
+export secret_access_key=YOUR_SECRET_ACCESS_KEY
+export stack_name=s3cli-iam
+export bucket_name=s3cli-pipeline
+```
+
+Run `ci/tasks/setup-aws-infrastructure.sh` and `ci/tasks/teardown-infrastructure.sh` before and after the `run-integration-*` tests in `ci/tasks`.
