@@ -129,6 +129,14 @@ func (v2 *signer) Sign() error {
 		host = v2.Request.URL.Host
 	}
 
+	// If port is not 0, v2.Request.Host will be set by vendor/github.com/aws/aws-sdk-go/aws/request/request.go method SanitizeHostForHeader
+	// If setting HostStyle, the v2.Request.URL.Host will be set by vendor/github.com/aws/aws-sdk-go/service/s3/host_style_bucket.go
+	// method moveBucketToHost but it can not change v2.Request.Host.
+	// If v2.Request.Host is set, the request will be send to v2.Request.Host not v2.Request.Header["Host"]
+	if host != "" && v2.Request.Host != host {
+		v2.Request.Host = host
+	}
+
 	v2.Request.Header["Host"] = []string{host}
 	v2.Request.Header["x-amz-date"] = []string{v2.Time.In(time.UTC).Format(time.RFC1123)}
 
