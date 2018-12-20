@@ -111,6 +111,26 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					Expect(c.Region).To(Equal("us-east-1"))
 				})
 			})
+
+			Context("when MultipartUpload have been set", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region", "multipart_upload": false}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				It("sets MultipartUpload to user-specified values", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.MultipartUpload).To(BeFalse())
+				})
+			})
+
+			Context("when MultipartUpload have not been set", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				It("default MultipartUpload to true", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.MultipartUpload).To(BeTrue())
+				})
+			})
 		})
 
 		Describe("when bucket is not specified", func() {

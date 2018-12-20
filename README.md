@@ -34,6 +34,7 @@ Given a JSON config file (`config.json`)...
   "signature_version":      "<string> (optional)",
   "server_side_encryption": "<string> (optional)",
   "sse_kms_key_id":         "<string> (optional)"
+  "multipart_upload":       <bool> (optional - default: true)
 }
 ```
 
