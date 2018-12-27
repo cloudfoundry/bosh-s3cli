@@ -36,6 +36,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
 				Host:            s3Host,
+				MultipartUpload: true,
 			}),
 			Entry("with region specified", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
@@ -43,6 +44,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				BucketName:      bucketName,
 				Host:            s3Host,
 				Region:          "invalid-region",
+				MultipartUpload: true,
 			}),
 			Entry("with use_ssl set to false", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
@@ -50,6 +52,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				BucketName:      bucketName,
 				Host:            s3Host,
 				UseSSL:          false,
+				MultipartUpload: true,
 			}),
 			Entry("with the maximal configuration", &config.S3Cli{
 				SignatureVersion:  2,
@@ -62,6 +65,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				UseSSL:            true,
 				SSLVerifyPeer:     true,
 				Region:            "invalid-region",
+				MultipartUpload:   true,
 			}),
 		}
 
