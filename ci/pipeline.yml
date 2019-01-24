@@ -10,13 +10,13 @@ groups:
       - s3-compatible-integration
       - gcs-s3-compatible-integration
       - promote
+      - build-s3cli-docker-image
 
 jobs:
   - name: unit
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, resource: s3cli-in}
-
       - task: test
         file: s3cli-src/ci/tasks/run-unit.yml
 
@@ -188,6 +188,17 @@ jobs:
         resource: s3cli-out
         params: {repository: s3cli-src, tag: version-semver/number, tag_prefix: v}
 
+  - name: build-s3cli-docker-image
+    plan:
+    - get: s3cli-src
+      resource: s3cli-in
+      trigger: true
+    - put: s3cli-docker-image
+      params:
+        build: "s3cli-src/ci/docker/boshcpi.s3cli"
+      get_params:
+        skip_download: true
+
 resources:
   - name: s3cli-in
     type: git
@@ -227,3 +238,11 @@ resources:
       bucket: {{s3cli_release_bucket}}
       access_key_id: {{s3cli_release_bucket_access_key}}
       secret_access_key: {{s3cli_release_bucket_secret_key}}
+
+  - name: s3cli-docker-image
+    type: docker-image
+    source:
+      repository: bosh/s3cli
+      email: ((dockerhub_email))
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
