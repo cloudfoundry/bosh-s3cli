@@ -2,6 +2,7 @@
 
 
 [[projects]]
+  digest = "1:96f6c570d11e1925d28c130eebb992a967009b22365f75cc1688dad72ee8bbbb"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -13,6 +14,7 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
     "aws/credentials/stscreds",
     "aws/csm",
     "aws/defaults",
@@ -21,6 +23,8 @@
     "aws/request",
     "aws/session",
     "aws/signer/v4",
+    "internal/ini",
+    "internal/s3err",
     "internal/sdkio",
     "internal/sdkrand",
     "internal/sdkuri",
@@ -28,6 +32,7 @@
     "private/protocol",
     "private/protocol/eventstream",
     "private/protocol/eventstream/eventstreamapi",
+    "private/protocol/json/jsonutil",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
@@ -36,53 +41,60 @@
     "service/s3",
     "service/s3/s3iface",
     "service/s3/s3manager",
-    "service/sts"
+    "service/sts",
+    "service/sts/stsiface",
   ]
-  revision = "9e9afa0895e9daff556cc18f90dc53eb91f41ffd"
-  version = "v1.14.26"
+  pruneopts = "NUT"
+  revision = "782e25af382e14e671fafa168293c52f24fc1992"
+  version = "v1.23.4"
 
 [[projects]]
   branch = "master"
+  digest = "1:c4800f7832e963f97cac5db9c6994c0bcc778562523903c69dee6cda34c53c05"
   name = "github.com/cloudfoundry/bosh-utils"
   packages = [
     "errors",
     "httpclient",
     "logger",
     "retrystrategy",
-    "uuid"
+    "uuid",
   ]
+  pruneopts = "NUT"
   revision = "8407325b97e759e58a377421422c476d042e0290"
 
 [[projects]]
   branch = "master"
+  digest = "1:3d3a6beb04065e29628f9d4f8fefeca4cc96932a8b0b83a03e9a3405b3538c11"
   name = "github.com/cloudfoundry/go-socks5"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
 
 [[projects]]
   branch = "master"
+  digest = "1:5f29a6db136978d1515aa9909eacc36beeed758fe7d191dfa19fb8a86e42a5ce"
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "3659db090cb23a57807b53e2f8580b2427dc2659"
 
 [[projects]]
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  revision = "358ee7663966325963d4e8b2e1fbd570c5195153"
-  version = "v1.38.1"
-
-[[projects]]
+  digest = "1:1f2aebae7e7c856562355ec0198d8ca2fa222fb05e5b1b66632a1fce39631885"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "0b12d6b5"
+  pruneopts = "NUT"
+  revision = "c2b33e84"
 
 [[projects]]
   branch = "master"
+  digest = "1:16bbae9910129be5a18b951eabacd54414d3faea094dfab92bb3c84884d46b11"
   name = "github.com/nu7hatch/gouuid"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
+  digest = "1:d3b49f5ff7a4f0c024fb7ba57cca30815545357142da04f69d73fa701761a0cc"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -110,12 +122,14 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types"
+    "types",
   ]
+  pruneopts = "NUT"
   revision = "fa5fabab2a1bfbd924faf4c067d07ae414e2aedf"
   version = "v1.5.0"
 
 [[projects]]
+  digest = "1:3ec3d482f3a7c3718b0330711a0d0de8148af3dfaa66df63426969b0ec820961"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -131,19 +145,23 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types"
+    "types",
   ]
+  pruneopts = "NUT"
   revision = "62bff4df71bdbc266561a0caee19f0594b17c240"
   version = "v1.4.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:13979d473f6b97aeadb4a882bf4c519324ced3975479e54686e08c3e9e50bc25"
   name = "github.com/pivotal-cf/paraphernalia"
   packages = ["secure/tlsconfig"]
+  pruneopts = "NUT"
   revision = "a64ae2051c20c5cde13292a41db01029566134ba"
 
 [[projects]]
   branch = "master"
+  digest = "1:1922d177ca458baf48c2bf730493d9b09df4090c8e478bd0777ae253bf47985b"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -152,12 +170,14 @@
     "internal/chacha20",
     "internal/subtle",
     "poly1305",
-    "ssh"
+    "ssh",
   ]
+  pruneopts = "NUT"
   revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
+  digest = "1:be6736d15cbd85821959e9db65524f8e834e75121b30b986cde8d34477b7607e"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -165,17 +185,21 @@
     "html/atom",
     "html/charset",
     "internal/socks",
-    "proxy"
+    "proxy",
   ]
+  pruneopts = "NUT"
   revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
 
 [[projects]]
   branch = "master"
+  digest = "1:df8e9dc7e57401a55f00096dfa9ff55d0a2fd7d2baf7362d53ac1937695a7cf1"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "NUT"
   revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [[projects]]
+  digest = "1:7c61a813b250ba8bb02bebb0382e6c3d00e04da2b577dc58985b86312fb89ffd"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -194,20 +218,38 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = "NUT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
+  digest = "1:7c95b35057a0ff2e19f707173cc1a947fa43a6eb5c4d300d196ece0334046082"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a92c7918b896b98e4869de81b4fd1b8db2c60c155bee29faea8c8d2c75d70560"
+  input-imports = [
+    "github.com/aws/aws-sdk-go/aws",
+    "github.com/aws/aws-sdk-go/aws/awserr",
+    "github.com/aws/aws-sdk-go/aws/corehandlers",
+    "github.com/aws/aws-sdk-go/aws/credentials",
+    "github.com/aws/aws-sdk-go/aws/request",
+    "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/s3",
+    "github.com/aws/aws-sdk-go/service/s3/s3manager",
+    "github.com/cloudfoundry/bosh-utils/httpclient",
+    "github.com/onsi/ginkgo",
+    "github.com/onsi/ginkgo/extensions/table",
+    "github.com/onsi/ginkgo/ginkgo",
+    "github.com/onsi/gomega",
+    "github.com/onsi/gomega/gexec",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
