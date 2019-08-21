@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
@@ -203,6 +204,42 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	default:
 		Expect(*calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
 	}
+}
+
+// AssertOnSignedURLs asserts on using signed URLs for upload and download
+func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
+	s3Filename := GenerateRandomString()
+
+	configPath := MakeConfigFile(cfg)
+	defer func() { _ = os.Remove(configPath) }()
+
+	configFile, err := os.Open(configPath)
+	Expect(err).ToNot(HaveOccurred())
+
+	s3Config, err := config.NewFromReader(configFile)
+	Expect(err).ToNot(HaveOccurred())
+
+	s3Client, err := client.NewSDK(s3Config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tracedS3, _ := traceS3(s3Client)
+
+	blobstoreClient, err := client.New(tracedS3, &s3Config)
+	Expect(err).ToNot(HaveOccurred())
+
+	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
+
+	// get
+	url, err := blobstoreClient.Sign(s3Filename, "get", time.Duration(1 * time.Minute))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(url).To(MatchRegexp(regex))
+
+	// put
+	url, err = blobstoreClient.Sign(s3Filename, "put", time.Duration(1 * time.Minute))
+	Expect(err).ToNot(HaveOccurred())
+	Expect(url).To(MatchRegexp(regex))
 }
 
 func traceS3(svc *s3.S3) (*s3.S3, *[]string) {

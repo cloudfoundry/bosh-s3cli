@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
@@ -97,7 +99,32 @@ func main() {
 		if err == nil && !exists {
 			os.Exit(3)
 		}
+	case "sign":
+		if len(nonFlagArgs) != 4 {
+			log.Fatalf("Sign method expects 3 arguments got %d\n", len(nonFlagArgs) - 1)
+		}
 
+		objectID, action := nonFlagArgs[1], nonFlagArgs[2]
+
+		if action != "get" && action != "put" {
+			log.Fatalf("Action not implemented: %s. Available actions are 'get' and 'put'", action)
+		}
+
+		expiration, err := strconv.Atoi(nonFlagArgs[3])
+
+		if err != nil {
+			log.Fatalf("Expiration should be an integer value. Got: %s", nonFlagArgs[3])
+		}
+
+		signedURL, err := blobstoreClient.Sign(objectID, action, time.Duration(expiration))
+
+		if err != nil {
+			log.Fatalf("Failed to sign request: %s", err)
+			os.Exit(1)
+		}
+
+		fmt.Print(signedURL)
+		os.Exit(0)
 	default:
 		log.Fatalf("unknown command: '%s'\n", cmd)
 	}

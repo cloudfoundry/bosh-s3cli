@@ -58,6 +58,10 @@ s3cli -c config.json delete <remote-blob>
 # Command: "exists"
 # Checks if blob exists in an S3-compatible blobstore.
 s3cli -c config.json exists <remote-blob>
+
+# Command: "sign"
+# Create a self-signed url for an object
+s3cli -c config.json sign <remote-blob> <get|put> <minutes-to-expiration>
 ```
 
 ## Contributing

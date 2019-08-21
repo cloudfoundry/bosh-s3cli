@@ -60,6 +60,10 @@ var _ = Describe("General testing for all AWS regions", func() {
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
 			configurations...,
 		)
+		DescribeTable("Invoking `s3cli sign` returns a signed URL",
+			func(cfg *config.S3Cli) { integration.AssertOnSignedURLs(s3CLIPath, cfg) },
+			configurations...,
+		)
 
 		configurations = []TableEntry{
 			Entry("with encryption", &config.S3Cli{

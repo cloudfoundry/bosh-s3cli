@@ -85,5 +85,9 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			func(cfg *config.S3Cli) { integration.AssertOnMultipartUploads(s3CLIPath, cfg, largeContent) },
 			configurations...,
 		)
+		DescribeTable("Invoking `s3cli sign` returns a signed URL",
+			func(cfg *config.S3Cli) { integration.AssertOnSignedURLs(s3CLIPath, cfg) },
+			configurations...,
+		)
 	})
 })
