@@ -229,7 +229,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	blobstoreClient, err := client.New(tracedS3, &s3Config)
 	Expect(err).ToNot(HaveOccurred())
 
-	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
+	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
 	// get
 	url, err := blobstoreClient.Sign(s3Filename, "get", time.Duration(1 * time.Minute))
