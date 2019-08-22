@@ -61,7 +61,7 @@ s3cli -c config.json exists <remote-blob>
 
 # Command: "sign"
 # Create a self-signed url for an object
-s3cli -c config.json sign <remote-blob> <get|put> <minutes-to-expiration>
+s3cli -c config.json sign <remote-blob> <get|put> <seconds-to-expiration>
 ```
 
 ## Contributing

@@ -177,7 +177,7 @@ func (client *S3Blobstore) getSigned(objectID string, expiration time.Duration) 
 
 	req, _ := client.s3Client.GetObjectRequest(signParams)
 
-	return req.Presign(expiration * time.Minute)
+	return req.Presign(expiration * time.Second)
 }
 
 func (client *S3Blobstore) putSigned(objectID string, expiration time.Duration) (string, error) {
@@ -188,5 +188,5 @@ func (client *S3Blobstore) putSigned(objectID string, expiration time.Duration) 
 
 	req, _ := client.s3Client.PutObjectRequest(signParams)
 
-	return req.Presign(expiration * time.Minute)
+	return req.Presign(expiration * time.Second)
 }

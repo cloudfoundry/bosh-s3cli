@@ -113,7 +113,7 @@ func main() {
 		expiration, err := strconv.Atoi(nonFlagArgs[3])
 
 		if err != nil {
-			log.Fatalf("Expiration should be an integer value. Got: %s", nonFlagArgs[3])
+			log.Fatalf("Expiration should be an integer value representing seconds. Got: %s", nonFlagArgs[3])
 		}
 
 		signedURL, err := blobstoreClient.Sign(objectID, action, time.Duration(expiration))
