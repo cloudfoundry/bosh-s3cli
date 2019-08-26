@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/cloudfoundry/bosh-s3cli/client"
@@ -101,7 +100,7 @@ func main() {
 		}
 	case "sign":
 		if len(nonFlagArgs) != 4 {
-			log.Fatalf("Sign method expects 3 arguments got %d\n", len(nonFlagArgs) - 1)
+			log.Fatalf("Sign method expects 3 arguments got %d\n", len(nonFlagArgs)-1)
 		}
 
 		objectID, action := nonFlagArgs[1], nonFlagArgs[2]
@@ -110,13 +109,12 @@ func main() {
 			log.Fatalf("Action not implemented: %s. Available actions are 'get' and 'put'", action)
 		}
 
-		expiration, err := strconv.Atoi(nonFlagArgs[3])
-
+		expiration, err := time.ParseDuration(nonFlagArgs[3])
 		if err != nil {
-			log.Fatalf("Expiration should be an integer value representing seconds. Got: %s", nonFlagArgs[3])
+			log.Fatalf("Expiration should be in the format of a duration i.e. 1h, 60m, 3600s. Got: %s", nonFlagArgs[3])
 		}
 
-		signedURL, err := blobstoreClient.Sign(objectID, action, time.Duration(expiration))
+		signedURL, err := blobstoreClient.Sign(objectID, action, expiration)
 
 		if err != nil {
 			log.Fatalf("Failed to sign request: %s", err)
