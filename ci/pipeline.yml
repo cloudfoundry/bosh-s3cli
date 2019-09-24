@@ -33,7 +33,7 @@ jobs:
           region_name:       us-east-1
           stack_name:        s3cli-iam
 
-      - in_parallel:
+      - aggregate:
         - task: test-static-credentials
           file: s3cli-src/ci/tasks/run-integration-aws.yml
           params:
@@ -151,7 +151,7 @@ jobs:
 
   - name: promote
     plan:
-      - in_parallel:
+      - aggregate:
         - get: s3cli-src
           resource: s3cli-in
           trigger: true
@@ -167,7 +167,7 @@ jobs:
         - put: version-semver
           params:
             bump: patch
-      - in_parallel:
+      - aggregate:
         - task: build-linux
           file: s3cli-src/ci/tasks/build.yml
           output_mapping: { out: out-linux }
@@ -178,7 +178,7 @@ jobs:
           output_mapping: { out: out-windows }
           params:
             GOOS: windows
-      - in_parallel:
+      - aggregate:
         - put: release-bucket-linux
           params: {file: out-linux/s3cli-*-linux-amd64}
         - put: release-bucket-windows
