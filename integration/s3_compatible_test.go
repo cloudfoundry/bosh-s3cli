@@ -67,24 +67,6 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				Region:            "invalid-region",
 				MultipartUpload:   true,
 			}),
-			// TODO test with encryption
-			// involves adding a key for every S3 host we test against,
-			// and key management for each & bucket config
-			// Entry("with encryption configuration", &config.S3Cli{
-			// 	SignatureVersion:     2,
-			// 	CredentialsSource:    "static",
-			// 	AccessKeyID:          accessKeyID,
-			// 	SecretAccessKey:      secretAccessKey,
-			// 	BucketName:           bucketName,
-			// 	Host:                 s3Host,
-			// 	Port:                 s3Port,
-			// 	UseSSL:               true,
-			// 	SSLVerifyPeer:        true,
-			// 	Region:               "invalid-region",
-			// 	MultipartUpload:      true,
-			// 	SSEKMSKeyID:          "sse-key-id", // TODO need real key
-			// 	ServerSideEncryption: "aws:kms",
-			// }),
 		}
 
 		DescribeTable("Blobstore lifecycle works",
