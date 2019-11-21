@@ -175,13 +175,6 @@ func (client *S3Blobstore) getSigned(objectID string, expiration time.Duration) 
 		Key:    client.key(objectID),
 	}
 
-	if client.s3cliConfig.ServerSideEncryption != "" {
-		signParams.ServerSideEncryption = aws.String(client.s3cliConfig.ServerSideEncryption)
-	}
-	if client.s3cliConfig.SSEKMSKeyID != "" {
-		signParams.SSEKMSKeyId = aws.String(client.s3cliConfig.SSEKMSKeyID)
-	}
-
 	req, _ := client.s3Client.GetObjectRequest(signParams)
 
 	return req.Presign(expiration)
@@ -191,13 +184,6 @@ func (client *S3Blobstore) putSigned(objectID string, expiration time.Duration) 
 	signParams := &s3.PutObjectInput{
 		Bucket: aws.String(client.s3cliConfig.BucketName),
 		Key:    client.key(objectID),
-	}
-
-	if client.s3cliConfig.ServerSideEncryption != "" {
-		signParams.ServerSideEncryption = aws.String(client.s3cliConfig.ServerSideEncryption)
-	}
-	if client.s3cliConfig.SSEKMSKeyID != "" {
-		signParams.SSEKMSKeyId = aws.String(client.s3cliConfig.SSEKMSKeyID)
 	}
 
 	req, _ := client.s3Client.PutObjectRequest(signParams)
