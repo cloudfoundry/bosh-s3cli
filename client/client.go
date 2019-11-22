@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/cloudfoundry/bosh-s3cli/config"
@@ -149,15 +148,15 @@ func (client *S3Blobstore) Exists(dest string) (bool, error) {
 
 // Sign presigns URLs for a S3 compatible blobstore
 func (client *S3Blobstore) Sign(objectID string, action string, expiration time.Duration) (string, error) {
-	action = strings.ToUpper(action)
 	switch action {
-	case "GET":
+	case "get":
 		return client.getSigned(objectID, expiration)
-	case "PUT":
+	case "put":
 		return client.putSigned(objectID, expiration)
 	default:
 		return "", fmt.Errorf("action not implemented: %s", action)
 	}
+
 }
 
 func (client *S3Blobstore) key(srcOrDest string) *string {
