@@ -47,6 +47,13 @@ var _ = Describe("General testing for all AWS regions", func() {
 				FolderName:      "test-folder/a-folder",
 				Region:          region,
 			}),
+			Entry("with host style enabled", &config.S3Cli{
+				AccessKeyID:     accessKeyID,
+				SecretAccessKey: secretAccessKey,
+				BucketName:      bucketName,
+				Region:          region,
+				HostStyle:       true,
+			}),
 		}
 		DescribeTable("Blobstore lifecycle works",
 			func(cfg *config.S3Cli) { integration.AssertLifecycleWorks(s3CLIPath, cfg) },
