@@ -131,6 +131,16 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					Expect(c.MultipartUpload).To(BeTrue())
 				})
 			})
+
+			Context("when HostStyle has been set", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host", "region": "some-region", "host_style": true}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+				It("sets HostStyle to user-specified value", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.HostStyle).To(BeTrue())
+				})
+			})
 		})
 
 		Describe("when bucket is not specified", func() {
