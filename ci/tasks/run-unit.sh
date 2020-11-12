@@ -20,7 +20,7 @@ pushd ${release_dir} > /dev/null
   go vet ./...
 
   echo -e "\n Installing ginkgo..."
-  go get ./vendor/github.com/onsi/ginkgo/ginkgo
+  ggo get github.com/onsi/ginkgo/ginkgo
 
   echo -e "\n Unit testing packages..."
   ginkgo -r -race -skipPackage=integration ./
