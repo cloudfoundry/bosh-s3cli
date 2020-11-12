@@ -361,12 +361,27 @@ var _ = Describe("BlobstoreClient configuration", func() {
 	Describe("returning the S3 endpoint", func() {
 		Context("when port is provided", func() {
 			It("returns a URI in the form `host:port`", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host-name", "port": 443}`)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": false, "host": "some-host-name", "port": 443}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
 				c, err := config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal("some-host-name:443"))
+			})
+			It("returns a URI in the form `host` when protocol and port match", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": true, "host": "some-host-name", "port": 443}`)				
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				c, err := config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal("some-host-name"))
+
+				dummyJSONBytes = []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": false, "host": "some-host-name", "port": 80}`)				
+				dummyJSONReader = bytes.NewReader(dummyJSONBytes)
+
+				c, err = config.NewFromReader(dummyJSONReader)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(c.S3Endpoint()).To(Equal("some-host-name"))
 			})
 			It("returns a empty string URI if `host` is empty", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "", "port": 443}`)
@@ -520,7 +535,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 	Describe("returning the alibaba cloud endpoint", func() {
 		Context("when port is provided", func() {
 			It("returns a URI in the form `host:port`", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region.aliyuncs.com", "port": 443}`)
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": false, "host": "oss-some-region.aliyuncs.com", "port": 443}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
 				c, err := config.NewFromReader(dummyJSONReader)
