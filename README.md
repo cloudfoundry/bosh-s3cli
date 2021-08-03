@@ -75,12 +75,12 @@ Follow these steps to make a contribution to the project:
   ```
 - Run tests to check your development environment setup
   ``` bash
-  ginkgo -r -race -skipPackage=integration ./
+  go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./
   ```
 - Make your changes (*be sure to add/update tests*)
 - Run tests to check your changes
   ``` bash
-  ginkgo -r -race -skipPackage=integration ./
+  go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./
   ```
 - Push changes to your fork
   ``` bash
