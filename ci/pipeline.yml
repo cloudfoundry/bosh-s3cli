@@ -1,17 +1,4 @@
 ---
-groups:
-  - name: s3cli
-    jobs:
-      - unit
-      - aws-s3-us-integration
-      - aws-s3-china-integration
-      - aws-s3-frankfurt-integration
-      - aws-s3-public-read-integration
-      - s3-compatible-integration
-      - gcs-s3-compatible-integration
-      - promote
-      - build-s3cli-docker-image
-
 jobs:
   - name: unit
     serial: true
