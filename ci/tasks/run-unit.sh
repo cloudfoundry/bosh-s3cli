@@ -19,11 +19,8 @@ pushd ${release_dir} > /dev/null
   echo -e "\n Vetting packages for potential issues..."
   go vet ./...
 
-  echo -e "\n Installing ginkgo..."
-  go get github.com/onsi/ginkgo/ginkgo
-
   echo -e "\n Unit testing packages..."
-  ginkgo -r -race -skipPackage=integration ./
+  go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./
 
   echo -e "\n Running build script to confirm everything compiles..."
   go build -ldflags "-X main.version=${version}" -o out/s3cli .
