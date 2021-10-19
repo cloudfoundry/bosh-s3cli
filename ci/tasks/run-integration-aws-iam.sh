@@ -44,7 +44,7 @@ pushd ${release_dir} > /dev/null
   --role ${iam_role_arn} \
   --timeout 300 \
   --handler lambda_function.test_runner_handler \
-  --runtime python2.7
+  --runtime python3.9
 
   sleep 2
 
