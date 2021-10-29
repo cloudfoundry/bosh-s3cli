@@ -2,6 +2,7 @@ FROM bosh/golang-release
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+    build-essential \
     curl \
     gcc \
     git \
