@@ -180,11 +180,36 @@ jobs:
     - get: s3cli-src
       resource: s3cli-in
       trigger: true
+    - get: golang-release
+      trigger: true
     - put: s3cli-docker-image
       params:
         build: "s3cli-src/ci/docker/boshcpi.s3cli"
       get_params:
         skip_download: true
+
+  - name: bump-deps
+    plan:
+    - in_parallel:
+      - get: s3cli-src
+        resource: s3cli-in
+      - get: golang-release
+      - get: weekly
+        trigger: true
+    - task: bump-deps
+      file: golang-release/ci/tasks/shared/bump-deps.yml
+      input_mapping:
+        input_repo: s3cli-src
+      output_mapping:
+        output_repo: bumped-s3cli-src
+    - task: test
+      file: s3cli-src/ci/tasks/run-unit.yml
+      input_mapping:
+        s3cli-src: bumped-s3cli-src
+    - put: s3cli-in
+      params:
+        repository: bumped-s3cli-src
+        rebase: true
 
 resources:
   - name: s3cli-in
@@ -200,6 +225,11 @@ resources:
       uri: git@github.com:cloudfoundry/bosh-s3cli.git
       branch: master
       private_key: {{github_deployment_key__s3cli}}
+
+  - name: golang-release
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git
 
   - name: version-semver
     type: semver
@@ -233,3 +263,10 @@ resources:
       email: ((dockerhub_email))
       username: ((dockerhub_username))
       password: ((dockerhub_password))
+
+  - name: weekly
+    type: time
+    source:
+      start: 3:00 -0700
+      stop: 4:30 -0700
+      days: [ Saturday ]
