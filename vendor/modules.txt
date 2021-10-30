@@ -57,7 +57,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.27
+# github.com/cloudfoundry/socks5-proxy v0.2.29
 ## explicit; go 1.17
 github.com/cloudfoundry/socks5-proxy
 # github.com/fsnotify/fsnotify v1.5.1
@@ -145,7 +145,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.0.0-20211029160332-540bb53d3b2e
+# golang.org/x/net v0.0.0-20211029224645-99673261e6eb
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html

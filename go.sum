@@ -11,8 +11,9 @@ github.com/cloudfoundry/bosh-utils v0.0.287 h1:Mu5s3YA5RdJc1cKFO1VoqwoQg0B4nCIZ8
 github.com/cloudfoundry/bosh-utils v0.0.287/go.mod h1:UDDReSqsojwQ6fE94yG+zyZn5pOxj2gTNWziU+0H8zA=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
-github.com/cloudfoundry/socks5-proxy v0.2.27 h1:HK1SBAfNFX9z/DWSLvpGtfw2eNdD14ZCArie5iFlsdA=
 github.com/cloudfoundry/socks5-proxy v0.2.27/go.mod h1:OgQUih8s/9MtA8O/GKXNsUVEFg/klubj5410qPfC6ro=
+github.com/cloudfoundry/socks5-proxy v0.2.29 h1:JBIf6Yeu5pSs+4UYaYZtwsyNTLVOwj7X2OT/mmGKC9w=
+github.com/cloudfoundry/socks5-proxy v0.2.29/go.mod h1:S9aAxpBI0SGmwEijpu1HrGGJLjc9OVqQICe5HLqazyw=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -110,8 +111,8 @@ golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb/go.mod h1:sp8m0HH+o8qH0wwXwY
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210428140749-89ef3d95e781/go.mod h1:OJAsFXCWl8Ukc7SiCT/9KSuxbyM7479/AVlXFRxuMCk=
 golang.org/x/net v0.0.0-20211020060615-d418f374d309/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
-golang.org/x/net v0.0.0-20211029160332-540bb53d3b2e h1:2lVrcCMRP9p7tfk4KUpV1ESqtf49jpihlUtYnSj67k4=
-golang.org/x/net v0.0.0-20211029160332-540bb53d3b2e/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
+golang.org/x/net v0.0.0-20211029224645-99673261e6eb h1:pirldcYWx7rx7kE5r+9WsOXPXK0+WH5+uZ7uPmJ44uM=
+golang.org/x/net v0.0.0-20211029224645-99673261e6eb/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
