@@ -3,8 +3,8 @@ module github.com/cloudfoundry/bosh-s3cli
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.42.52
-	github.com/cloudfoundry/bosh-utils v0.0.300
+	github.com/aws/aws-sdk-go v1.43.2
+	github.com/cloudfoundry/bosh-utils v0.0.301
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
 )
@@ -12,7 +12,7 @@ require (
 require (
 	code.cloudfoundry.org/tlsconfig v0.0.0-20211123175040-23cc9f05b6b3 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
-	github.com/cloudfoundry/socks5-proxy v0.2.42 // indirect
+	github.com/cloudfoundry/socks5-proxy v0.2.43 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -22,7 +22,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/text v0.3.7 // indirect
