@@ -223,7 +223,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh-s3cli.git
-      branch: master
+      branch: main
       private_key: {{github_deployment_key__s3cli}}
 
   - name: golang-release
