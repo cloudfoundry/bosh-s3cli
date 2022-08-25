@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-my_dir="$( cd $(dirname $0) && pwd )"
-release_dir="$( cd ${my_dir} && cd ../.. && pwd )"
-workspace_dir="$( cd ${release_dir} && cd ../../../.. && pwd )"
+my_dir="$( cd "$(dirname "${0}")" && pwd )"
+release_dir="$( cd "${my_dir}" && cd ../.. && pwd )"
+workspace_dir="$( cd "${release_dir}" && cd ../../../.. && pwd )"
 
-source ${release_dir}/ci/tasks/utils.sh
+source "${release_dir}/ci/tasks/utils.sh"
 export GOPATH=${workspace_dir}
 export PATH=${GOPATH}/bin:${PATH}
 
-: ${access_key_id:?}
-: ${secret_access_key:?}
-: ${region_name:?}
-: ${stack_name:?}
+: "${access_key_id:?}"
+: "${secret_access_key:?}"
+: "${region_name:?}"
+: "${stack_name:?}"
 
 # Just need these to get the stack info and to create/invoke the Lambda function
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
 
-stack_info=$(get_stack_info ${stack_name})
+stack_info=$(get_stack_info "${stack_name}")
 bucket_name=$(get_stack_info_of "${stack_info}" "BucketName")
 iam_role_arn=$(get_stack_info_of "${stack_info}" "IamRoleArn")
 lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_name}\", \"s3_host\": \"s3.amazonaws.com\"}"
@@ -27,7 +27,7 @@ lambda_payload="{\"region\": \"${region_name}\", \"bucket_name\": \"${bucket_nam
 lambda_log=$(mktemp -t "XXXXXX-lambda.log")
 trap "cat ${lambda_log}" EXIT
 
-pushd ${release_dir} > /dev/null
+pushd "${release_dir}" > /dev/null
   GOOS=linux GOARCH=amd64 go build -o out/s3cli \
     github.com/cloudfoundry/bosh-s3cli
   GOOS=linux GOARCH=amd64 go run github.com/onsi/ginkgo/ginkgo build integration
@@ -37,10 +37,10 @@ pushd ${release_dir} > /dev/null
   lambda_function_name=s3cli-integration-$(date +%s)
 
   aws lambda create-function \
-  --region ${region_name} \
-  --function-name ${lambda_function_name} \
+  --region "${region_name}" \
+  --function-name "${lambda_function_name}" \
   --zip-file fileb://payload.zip \
-  --role ${iam_role_arn} \
+  --role "${iam_role_arn}" \
   --timeout 300 \
   --handler lambda_function.test_runner_handler \
   --runtime python3.9
@@ -49,11 +49,11 @@ pushd ${release_dir} > /dev/null
 
   aws lambda invoke \
   --invocation-type RequestResponse \
-  --function-name ${lambda_function_name} \
-  --region ${region_name} \
+  --function-name "${lambda_function_name}" \
+  --region "${region_name}" \
   --log-type Tail \
   --payload "${lambda_payload}" \
-  ${lambda_log} | tee lambda_output.json
+  "${lambda_log}" | tee lambda_output.json
 
   set +e
     log_group_name="/aws/lambda/${lambda_function_name}"
@@ -82,15 +82,15 @@ pushd ${release_dir} > /dev/null
     echo "Retrieving CloudWatch events; attempt: $tries"
 
     aws logs get-log-events \
-      --log-group-name=${log_group_name} \
-      --log-stream-name=${log_stream_name} \
+      --log-group-name="${log_group_name}" \
+      --log-stream-name="${log_stream_name}" \
     | jq -r ".events | map(.message) | .[]" | tee lambda_output.log
   done
 
   aws lambda delete-function \
-  --function-name ${lambda_function_name}
+  --function-name "${lambda_function_name}"
 
-  aws logs delete-log-group --log-group-name=${log_group_name}
+  aws logs delete-log-group --log-group-name="${log_group_name}"
 
-  cat lambda_output.json | jq -r ".FunctionError" | grep -v -e "Handled" -e "Unhandled"
+  jq -r ".FunctionError" < lambda_output.json | grep -v -e "Handled" -e "Unhandled"
 popd > /dev/null
