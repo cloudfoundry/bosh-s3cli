@@ -2,13 +2,12 @@ package integration_test
 
 import (
 	"os"
+	"testing"
 
+	"github.com/cloudfoundry/bosh-s3cli/integration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"github.com/cloudfoundry/bosh-s3cli/integration"
-
-	"testing"
 )
 
 func TestIntegration(t *testing.T) {
