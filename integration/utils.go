@@ -2,8 +2,8 @@ package integration
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"os/exec"
 	"time"
 
@@ -34,7 +34,7 @@ func GenerateRandomString(params ...int) string {
 func MakeConfigFile(cfg *config.S3Cli) string {
 	cfgBytes, err := json.Marshal(cfg)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
-	tmpFile, err := ioutil.TempFile("", "s3cli-test")
+	tmpFile, err := os.CreateTemp("", "s3cli-test")
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	_, err = tmpFile.Write(cfgBytes)
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
@@ -45,7 +45,7 @@ func MakeConfigFile(cfg *config.S3Cli) string {
 
 // MakeContentFile creates a temporary file with content to upload to S3
 func MakeContentFile(content string) string {
-	tmpFile, err := ioutil.TempFile("", "s3cli-test-content")
+	tmpFile, err := os.CreateTemp("", "s3cli-test-content")
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())
 	_, err = tmpFile.Write([]byte(content))
 	gomega.Expect(err).ToNot(gomega.HaveOccurred())

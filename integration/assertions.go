@@ -3,7 +3,7 @@ package integration
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -52,7 +52,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.ExitCode()).To(BeZero())
 	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' exists in bucket '.*'"))
 
-	tmpLocalFile, err := ioutil.TempFile("", "s3cli-download")
+	tmpLocalFile, err := os.CreateTemp("", "s3cli-download")
 	Expect(err).ToNot(HaveOccurred())
 	err = tmpLocalFile.Close()
 	Expect(err).ToNot(HaveOccurred())
@@ -62,7 +62,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(s3CLISession.ExitCode()).To(BeZero())
 
-	gottenBytes, err := ioutil.ReadFile(tmpLocalFile.Name())
+	gottenBytes, err := os.ReadFile(tmpLocalFile.Name())
 	Expect(err).ToNot(HaveOccurred())
 	Expect(string(gottenBytes)).To(Equal(expectedString))
 
@@ -129,7 +129,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	configFile, err := os.Open(configPath)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
+	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename) //nolint:ineffassign,staticcheck
 
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
@@ -232,12 +232,12 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
 	// get
-	url, err := blobstoreClient.Sign(s3Filename, "get", time.Duration(1 * time.Minute))
+	url, err := blobstoreClient.Sign(s3Filename, "get", time.Duration(1*time.Minute))
 	Expect(err).ToNot(HaveOccurred())
 	Expect(url).To(MatchRegexp(regex))
 
 	// put
-	url, err = blobstoreClient.Sign(s3Filename, "put", time.Duration(1 * time.Minute))
+	url, err = blobstoreClient.Sign(s3Filename, "put", time.Duration(1*time.Minute))
 	Expect(err).ToNot(HaveOccurred())
 	Expect(url).To(MatchRegexp(regex))
 }
@@ -254,7 +254,7 @@ func traceS3(svc *s3.S3) (*s3.S3, *[]string) {
 
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 		}
 
 		switch data := r.Data.(type) {

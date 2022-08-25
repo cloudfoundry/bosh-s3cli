@@ -16,7 +16,8 @@ pushd "${release_dir}" > /dev/null
   version="${semver}-${git_rev}-${timestamp}"
 
   echo -e "\n Vetting packages for potential issues..."
-  go vet ./...
+  go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  golangci-lint run ./...
 
   echo -e "\n Unit testing packages..."
   go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./

@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -34,7 +33,7 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			s3Filename := integration.GenerateRandomString()
 			s3FileContents := integration.GenerateRandomString()
 
-			s3Client := s3.New(session.New(&aws.Config{
+			s3Client := s3.New(session.New(&aws.Config{ //nolint:staticcheck
 				Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
 				Region:      aws.String(region),
 			}))
@@ -61,7 +60,7 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			defer func() { _ = os.Remove("public-file") }()
 			Expect(s3CLISession.ExitCode()).To(BeZero())
 
-			gottenBytes, err := ioutil.ReadFile("public-file")
+			gottenBytes, err := os.ReadFile("public-file")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(gottenBytes)).To(Equal(s3FileContents))
 

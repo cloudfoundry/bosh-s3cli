@@ -369,14 +369,14 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				Expect(c.S3Endpoint()).To(Equal("some-host-name:443"))
 			})
 			It("returns a URI in the form `host` when protocol and port match", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": true, "host": "some-host-name", "port": 443}`)				
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": true, "host": "some-host-name", "port": 443}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
 				c, err := config.NewFromReader(dummyJSONReader)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(c.S3Endpoint()).To(Equal("some-host-name"))
 
-				dummyJSONBytes = []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": false, "host": "some-host-name", "port": 80}`)				
+				dummyJSONBytes = []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "use_ssl": false, "host": "some-host-name", "port": 80}`)
 				dummyJSONReader = bytes.NewReader(dummyJSONBytes)
 
 				c, err = config.NewFromReader(dummyJSONReader)
@@ -453,7 +453,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
 					_, err := config.NewFromReader(dummyJSONReader)
-					Expect(err).To(MatchError("Invalid credentials_source: magical_unicorns"))
+					Expect(err).To(MatchError("invalid credentials_source: magical_unicorns"))
 				})
 			})
 
