@@ -5,9 +5,6 @@ my_dir="$( cd "$(dirname "${0}")" && pwd )"
 release_dir="$( cd "${my_dir}" && cd ../.. && pwd )"
 workspace_dir="$( cd "${release_dir}" && cd ../../../.. && pwd )"
 
-export GOPATH=${workspace_dir}
-export PATH=${GOPATH}/bin:${PATH}
-
 semver='1.2.3.4'
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -16,8 +13,12 @@ pushd "${release_dir}" > /dev/null
   version="${semver}-${git_rev}-${timestamp}"
 
   echo -e "\n Vetting packages for potential issues..."
-  go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-  golangci-lint run ./...
+  if ! command -v golangci-lint &> /dev/null; then
+    go_bin="$(go env GOPATH)/bin"
+    export PATH=${go_bin}:${PATH}
+    go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  fi
+  golangci-lint run --enable goimports ./...
 
   echo -e "\n Unit testing packages..."
   go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./
