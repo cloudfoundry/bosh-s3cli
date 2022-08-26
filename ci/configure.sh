@@ -2,10 +2,10 @@
 
 project_dir="$( cd "$(dirname "${0}")/.." && pwd )"
 
-until lpass status;do
-  LPASS_DISABLE_PINENTRY=1 lpass ls a
-  sleep 1
-done
+if [[ $(lpass status -q; echo $?) != 0 ]]; then
+  echo "Login with lpass first"
+  exit 1
+fi
 
 fly -t bosh-ecosystem sp -p bosh-s3cli -c "${project_dir}/ci/pipeline.yml" \
   -l <(lpass show --notes "s3cli concourse secrets") \
