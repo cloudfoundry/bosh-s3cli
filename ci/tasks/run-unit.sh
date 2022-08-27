@@ -3,7 +3,6 @@ set -euo pipefail
 
 my_dir="$( cd "$(dirname "${0}")" && pwd )"
 release_dir="$( cd "${my_dir}" && cd ../.. && pwd )"
-workspace_dir="$( cd "${release_dir}" && cd ../../../.. && pwd )"
 
 semver='1.2.3.4'
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

@@ -5,9 +5,9 @@ image_resource:
   source: {repository: bosh/s3cli}
 inputs:
   - name: s3cli-src
-    path: src/github.com/cloudfoundry/bosh-s3cli
+    path: bosh-s3cli
 run:
-  path: src/github.com/cloudfoundry/bosh-s3cli/ci/tasks/setup-aws-infrastructure.sh
+  path: bosh-s3cli/ci/tasks/setup-aws-infrastructure.sh
 params:
   access_key_id:
   secret_access_key:

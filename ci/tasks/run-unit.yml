@@ -5,6 +5,6 @@ image_resource:
   source: {repository: bosh/s3cli}
 inputs:
 - name: s3cli-src
-  path: src/github.com/cloudfoundry/bosh-s3cli
+  path: bosh-s3cli
 run:
-  path: src/github.com/cloudfoundry/bosh-s3cli/ci/tasks/run-unit.sh
+  path: bosh-s3cli/ci/tasks/run-unit.sh
