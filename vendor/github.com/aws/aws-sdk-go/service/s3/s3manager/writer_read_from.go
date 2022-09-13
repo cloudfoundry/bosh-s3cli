@@ -73,11 +73,3 @@ func (p *PooledBufferedReadFromProvider) GetReadFrom(writer io.Writer) (r Writer
 	}
 	return r, cleanup
 }
-
-type suppressWriterAt struct {
-	suppressed io.Reader
-}
-
-func (s *suppressWriterAt) Read(p []byte) (n int, err error) {
-	return s.suppressed.Read(p)
-}
