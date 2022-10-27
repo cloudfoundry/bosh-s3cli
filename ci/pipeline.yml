@@ -4,6 +4,8 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, resource: s3cli-in}
+      - get: s3cli-docker-image
+        trigger: true
       - task: test
         file: s3cli-src/ci/tasks/run-unit.yml
 
@@ -11,6 +13,9 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
@@ -22,12 +27,14 @@ jobs:
 
       - in_parallel:
         - task: test-static-credentials
+          image: s3cli-docker-image
           file: s3cli-src/ci/tasks/run-integration-aws.yml
           params:
             <<: *aws-us-infrastructure-params
             focus_regex:      "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
             s3_endpoint_host: s3.amazonaws.com
         - task: test-env-or-profile
+          image: s3cli-docker-image
           file: s3cli-src/ci/tasks/run-integration-aws-iam.yml
           params:
             <<: *aws-us-infrastructure-params
@@ -41,6 +48,9 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
@@ -51,6 +61,7 @@ jobs:
           stack_name:        s3cli-public-bucket
 
       - task: test
+        image: s3cli-docker-image
         file: s3cli-src/ci/tasks/run-integration-aws.yml
         params:
           <<: *aws-us-public-read-infrastructure-params
@@ -64,6 +75,9 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
@@ -75,6 +89,7 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-aws.yml
+        image: s3cli-docker-image
         params:
           <<: *aws-china-infrastructure-params
           focus_regex:      "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
@@ -88,6 +103,9 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
@@ -99,6 +117,7 @@ jobs:
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-aws.yml
+        image: s3cli-docker-image
         params:
           <<: *aws-frankfurt-infrastructure-params
           focus_regex:       "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
@@ -112,9 +131,13 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: test
         file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
+        image: s3cli-docker-image
         params:
           access_key_id:     ((access_key_id__s3_compat))
           secret_access_key: ((secret_access_key__s3_compat))
@@ -126,8 +149,12 @@ jobs:
     serial: true
     plan:
       - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
+      - get: s3cli-docker-image
+        passed:
+          - unit
 
       - task: test
+        image: s3cli-docker-image
         file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
         params:
           access_key_id:     ((access_key_id__gcs))
@@ -151,16 +178,27 @@ jobs:
             aws-s3-public-read-integration,
             gcs-s3-compatible-integration
           ]
+        - get: s3cli-docker-image
+          passed:
+            - aws-s3-us-integration
+            - aws-s3-china-integration
+            - aws-s3-frankfurt-integration
+            - s3-compatible-integration
+            - aws-s3-public-read-integration
+            - gcs-s3-compatible-integration
+
         - put: version-semver
           params:
             bump: patch
       - in_parallel:
         - task: build-linux
+          image: s3cli-docker-image
           file: s3cli-src/ci/tasks/build.yml
           output_mapping: { out: out-linux }
           params:
             GOOS: linux
         - task: build-windows
+          image: s3cli-docker-image
           file: s3cli-src/ci/tasks/build.yml
           output_mapping: { out: out-windows }
           params:
@@ -180,7 +218,7 @@ jobs:
     - get: s3cli-src
       resource: s3cli-in
       trigger: true
-    - get: golang-release
+    - get: bosh-golang-release-image
       trigger: true
     - put: s3cli-docker-image
       params:
@@ -255,6 +293,13 @@ resources:
       bucket: ((s3cli_release_bucket))
       access_key_id: ((s3cli_release_bucket_access_key))
       secret_access_key: ((s3cli_release_bucket_secret_key))
+
+  - name: bosh-golang-release-image
+    type: docker-image
+    source:
+      repository: bosh/golang-release
+      username: ((docker.username))
+      password: ((docker.password))
 
   - name: s3cli-docker-image
     type: docker-image
