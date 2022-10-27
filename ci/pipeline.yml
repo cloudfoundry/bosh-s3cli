@@ -170,7 +170,6 @@ jobs:
           resource: s3cli-in
           trigger: true
           passed: [
-            unit,
             aws-s3-us-integration,
             aws-s3-china-integration,
             aws-s3-frankfurt-integration,
