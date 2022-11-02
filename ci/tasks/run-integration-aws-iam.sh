@@ -28,6 +28,8 @@ lambda_log=$(mktemp -t "XXXXXX-lambda.log")
 trap "cat ${lambda_log}" EXIT
 
 pushd "${release_dir}" > /dev/null
+  echo -e "\n building artifact with $(go version)..."
+
   GOOS=linux GOARCH=amd64 go build -o out/s3cli \
     github.com/cloudfoundry/bosh-s3cli
   GOOS=linux GOARCH=amd64 go run github.com/onsi/ginkgo/ginkgo build integration
