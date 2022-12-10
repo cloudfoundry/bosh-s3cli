@@ -1,7 +1,7 @@
 # code.cloudfoundry.org/tlsconfig v0.0.0-20220621140725-0e6fbd869921
 ## explicit; go 1.17
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.44.152 => github.com/aws/aws-sdk-go v1.30.15
+# github.com/aws/aws-sdk-go v1.44.157 => github.com/aws/aws-sdk-go v1.30.15
 ## explicit; go 1.11
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -47,7 +47,7 @@ github.com/aws/aws-sdk-go/service/s3/s3iface
 github.com/aws/aws-sdk-go/service/s3/s3manager
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.343
+# github.com/cloudfoundry/bosh-utils v0.0.344
 ## explicit; go 1.19
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -57,7 +57,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.81
+# github.com/cloudfoundry/socks5-proxy v0.2.82
 ## explicit; go 1.19
 github.com/cloudfoundry/socks5-proxy
 # github.com/fsnotify/fsnotify v1.6.0
@@ -141,7 +141,7 @@ github.com/onsi/gomega/types
 github.com/pivotal-cf/paraphernalia/secure/tlsconfig
 # github.com/rogpeppe/go-internal v1.8.0
 ## explicit; go 1.11
-# golang.org/x/crypto v0.3.0
+# golang.org/x/crypto v0.4.0
 ## explicit; go 1.17
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -152,7 +152,7 @@ golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.2.0
+# golang.org/x/net v0.4.0
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html
@@ -160,13 +160,13 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.2.0
+# golang.org/x/sys v0.3.0
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.4.0
+# golang.org/x/text v0.5.0
 ## explicit; go 1.17
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
@@ -185,7 +185,7 @@ golang.org/x/text/internal/utf8internal
 golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
-# golang.org/x/tools v0.3.0
+# golang.org/x/tools v0.4.0
 ## explicit; go 1.18
 golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/internal/typeparams
