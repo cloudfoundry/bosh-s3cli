@@ -304,9 +304,8 @@ resources:
     type: docker-image
     source:
       repository: bosh/s3cli
-      email: ((dockerhub_email))
-      username: ((dockerhub_username))
-      password: ((dockerhub_password))
+      username: ((docker.username))
+      password: ((docker.password))
 
   - name: weekly
     type: time
