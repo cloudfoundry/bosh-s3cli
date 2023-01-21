@@ -82,8 +82,8 @@ jobs:
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
         params: &aws-china-infrastructure-params
-          access_key_id:     ((access_key_id__aws_china))
-          secret_access_key: ((secret_access_key__aws_china))
+          access_key_id:     ((s3cli-ci-user_aws_access_key.username))
+          secret_access_key: ((s3cli-ci-user_aws_access_key.password))
           region_name:       cn-north-1
           stack_name:        s3cli-private-bucket
 
@@ -139,11 +139,11 @@ jobs:
         file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
         image: s3cli-docker-image
         params:
-          access_key_id:     ((access_key_id__s3_compat))
-          secret_access_key: ((secret_access_key__s3_compat))
-          bucket_name:       ((bucket_name__s3_compat))
-          s3_endpoint_host:  ((host__s3_compat))
-          s3_endpoint_port:  ((port__s3_compat))
+          access_key_id:     ((dreamhost_blobstore_access_key.username))
+          secret_access_key: ((dreamhost_blobstore_access_key.password))
+          bucket_name:       s3cli-pipeline
+          s3_endpoint_host:  objects-us-east-1.dream.io
+          s3_endpoint_port:  443
 
   - name: gcs-s3-compatible-integration
     serial: true
@@ -157,11 +157,11 @@ jobs:
         image: s3cli-docker-image
         file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
         params:
-          access_key_id:     ((access_key_id__gcs))
-          secret_access_key: ((secret_access_key__gcs))
-          bucket_name:       ((bucket_name__gcs))
-          s3_endpoint_host:  ((host__gcs))
-          s3_endpoint_port:  ((port__gcs))
+          access_key_id:     ((bosh_cpi_gcp_access_key.username))
+          secret_access_key: ((bosh_cpi_gcp_access_key.password))
+          bucket_name:       s3cli-pipeline
+          s3_endpoint_host:  storage.googleapis.com
+          s3_endpoint_port:  443
 
   - name: promote
     plan:
@@ -254,14 +254,14 @@ resources:
     source:
       uri: git@github.com:cloudfoundry/bosh-s3cli.git
       branch: develop
-      private_key: ((github_deployment_key__s3cli))
+      private_key: ((github_deploy_key_bosh-s3cli.private_key))
 
   - name: s3cli-out
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh-s3cli.git
       branch: main
-      private_key: ((github_deployment_key__s3cli))
+      private_key: ((github_deploy_key_bosh-s3cli.private_key))
 
   - name: golang-release
     type: git
@@ -273,25 +273,25 @@ resources:
     source:
       initial_version: 0.0.1
       key: current-version
-      bucket: ((s3cli_release_bucket))
-      access_key_id: ((s3cli_release_bucket_access_key))
-      secret_access_key: ((s3cli_release_bucket_secret_key))
+      bucket: s3cli-artifacts
+      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
+      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
 
   - name: release-bucket-linux
     type: s3
     source:
       regexp: s3cli-(.*)-linux-amd64
-      bucket: ((s3cli_release_bucket))
-      access_key_id: ((s3cli_release_bucket_access_key))
-      secret_access_key: ((s3cli_release_bucket_secret_key))
+      bucket: s3cli-artifacts
+      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
+      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
 
   - name: release-bucket-windows
     type: s3
     source:
       regexp: s3cli-(.*)-windows-amd64\.exe
-      bucket: ((s3cli_release_bucket))
-      access_key_id: ((s3cli_release_bucket_access_key))
-      secret_access_key: ((s3cli_release_bucket_secret_key))
+      bucket: s3cli-artifacts
+      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
+      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
 
   - name: bosh-golang-release-image
     type: docker-image

@@ -8,5 +8,4 @@ if [[ $(lpass status -q; echo $?) != 0 ]]; then
 fi
 
 fly -t bosh-ecosystem sp -p bosh-s3cli -c "${project_dir}/ci/pipeline.yml" \
-  -l <(lpass show --notes "s3cli concourse secrets") \
-  -l <(lpass show --notes "pivotal-tracker-resource-keys")
+  -l <(lpass show --notes "s3cli concourse secrets")
