@@ -82,8 +82,8 @@ jobs:
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
         params: &aws-china-infrastructure-params
-          access_key_id:     ((s3cli-ci-user_aws_access_key.username))
-          secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+          access_key_id:     ((s3cli-ci-user_cn_aws_access_key.username))
+          secret_access_key: ((s3cli-ci-user_cn_aws_access_key.password))
           region_name:       cn-north-1
           stack_name:        s3cli-private-bucket
 
