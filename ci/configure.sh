@@ -7,5 +7,4 @@ if [[ $(lpass status -q; echo $?) != 0 ]]; then
   exit 1
 fi
 
-fly -t bosh-ecosystem sp -p bosh-s3cli -c "${project_dir}/ci/pipeline.yml" \
-  -l <(lpass show --notes "s3cli concourse secrets")
+fly -t bosh-ecosystem sp -p bosh-s3cli -c "${project_dir}/ci/pipeline.yml"
