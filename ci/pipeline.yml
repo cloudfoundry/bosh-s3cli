@@ -20,8 +20,8 @@ jobs:
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
         params: &aws-us-infrastructure-params
-          access_key_id:     ((access_key_id__aws_us))
-          secret_access_key: ((secret_access_key__aws_us))
+          access_key_id:     ((/concourse/main/s3cli-ci-user_aws_access_key.username))
+          secret_access_key: ((/concourse/main/s3cli-ci-user_aws_access_key.password))
           region_name:       us-east-1
           stack_name:        s3cli-iam
 
@@ -55,8 +55,8 @@ jobs:
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
         params: &aws-us-public-read-infrastructure-params
-          access_key_id:     ((access_key_id__aws_us))
-          secret_access_key: ((secret_access_key__aws_us))
+          access_key_id:     ((/concourse/main/s3cli-ci-user_aws_access_key.username))
+          secret_access_key: ((/concourse/main/s3cli-ci-user_aws_access_key.password))
           region_name:       us-east-1
           stack_name:        s3cli-public-bucket
 
@@ -110,8 +110,8 @@ jobs:
       - task: setup
         file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
         params: &aws-frankfurt-infrastructure-params
-          access_key_id:     ((access_key_id__aws_frankfurt))
-          secret_access_key: ((secret_access_key__aws_frankfurt))
+          access_key_id:     ((/concourse/main/s3cli-ci-user_aws_access_key.username))
+          secret_access_key: ((/concourse/main/s3cli-ci-user_aws_access_key.password))
           region_name:       eu-central-1
           stack_name:        s3cli-private-bucket
 
