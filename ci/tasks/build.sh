@@ -9,6 +9,7 @@ source "${release_dir}/ci/tasks/utils.sh"
 
 go_bin=$(go env GOPATH)
 export PATH=${go_bin}/bin:${PATH}
+export CGO_ENABLED=0
 
 # inputs
 semver_dir="${workspace_dir}/version-semver"
