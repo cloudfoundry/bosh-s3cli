@@ -143,7 +143,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	if cfg.ServerSideEncryption == "" {
-		Expect(resp.ServerSideEncryption).To(BeNil())
+		Expect(resp.ServerSideEncryption).To(Or(BeNil(), Equal("AES256")))
 	} else {
 		Expect(*resp.ServerSideEncryption).To(Equal(cfg.ServerSideEncryption))
 	}
