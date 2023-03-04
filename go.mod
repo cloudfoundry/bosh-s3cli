@@ -3,14 +3,14 @@ module github.com/cloudfoundry/bosh-s3cli
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go v1.44.209
-	github.com/cloudfoundry/bosh-utils v0.0.355
+	github.com/aws/aws-sdk-go v1.44.214
+	github.com/cloudfoundry/bosh-utils v0.0.356
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.27.1
+	github.com/onsi/gomega v1.27.2
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.0.0-20230131191323-96331f8f153d // indirect
+	code.cloudfoundry.org/tlsconfig v0.0.0-20230225100352-b3e9427a4d77 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
 	github.com/cloudfoundry/socks5-proxy v0.2.85 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
