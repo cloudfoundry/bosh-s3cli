@@ -14,12 +14,15 @@ export PATH=${GOPATH}/bin:${PATH}
 : "${region_name:?}"
 : "${stack_name:?}"
 : "${focus_regex:?}"
+: "${assume_role_arn:?}"
 : "${s3_endpoint_host:=unset}"
+
 
 # Just need these to get the stack info
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
+export ASSUME_ROLE_ARN=${assume_role_arn}
 stack_info=$(get_stack_info "${stack_name}")
 
 # Some of these are optional

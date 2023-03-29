@@ -33,6 +33,15 @@ jobs:
             <<: *aws-us-infrastructure-params
             focus_regex:      "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
             s3_endpoint_host: s3.amazonaws.com
+        - task: test-assume-roles
+          image: s3cli-docker-image
+          file: s3cli-src/ci/tasks/run-integration-aws.yml
+          params:
+            access_key_id:     ((s3-cli-artifact-writer_aws_access_key.username))
+            secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
+            assume_role_arn: ((s3-cli-assume-role-arn))
+            focus_regex:      "AWS ASSUME ROLE"
+            s3_endpoint_host: s3.amazonaws.com
         - task: test-env-or-profile
           image: s3cli-docker-image
           file: s3cli-src/ci/tasks/run-integration-aws-iam.yml

@@ -15,3 +15,4 @@ params:
   stack_name:
   focus_regex:
   s3_endpoint_host:
+  assume_role_arn:

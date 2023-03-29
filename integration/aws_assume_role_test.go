@@ -1,0 +1,60 @@
+package integration_test
+
+import (
+	"os"
+
+	"github.com/cloudfoundry/bosh-s3cli/config"
+	"github.com/cloudfoundry/bosh-s3cli/integration"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("Testing AWS assume role ", func() {
+	Context("with AWS ASSUME ROLE configurations", func() {
+		It("get file from assumed role", func() {
+			accessKeyID := os.Getenv("ACCESS_KEY_ID")
+			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
+
+			secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")
+			Expect(secretAccessKey).ToNot(BeEmpty(), "SECRET_ACCESS_KEY must be set")
+
+			assumeRoleArn := os.Getenv("ASSUME_ROLE_ARN")
+			Expect(assumeRoleArn).ToNot(BeEmpty(), "ASSUME_ROLE_ARN must be set")
+
+			bucketName := "bosh-s3cli-assume-integration-tests"
+			region := "us-west-1"
+
+			not_assumed_role_cfg := &config.S3Cli{
+				AccessKeyID:     accessKeyID,
+				SecretAccessKey: secretAccessKey,
+				BucketName:      bucketName,
+				Region:          region,
+			}
+
+			assumed_role_cfg := &config.S3Cli{
+				AccessKeyID:     accessKeyID,
+				SecretAccessKey: secretAccessKey,
+				BucketName:      bucketName,
+				Region:          region,
+				AssumeRoleArn:   assumeRoleArn,
+			}
+			s3Filename := "test-file"
+
+			notAssumeRoleConfigPath := integration.MakeConfigFile(not_assumed_role_cfg)
+			defer func() { _ = os.Remove(notAssumeRoleConfigPath) }()
+
+			s3CLISession, err := integration.RunS3CLI(s3CLIPath, notAssumeRoleConfigPath, "exists", s3Filename)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
+
+			assumeRoleConfigPath := integration.MakeConfigFile(assumed_role_cfg)
+			defer func() { _ = os.Remove(assumeRoleConfigPath) }()
+
+			s3CLISession, err = integration.RunS3CLI(s3CLIPath, assumeRoleConfigPath, "exists", s3Filename)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(s3CLISession.ExitCode()).To(BeZero())
+		})
+	})
+})
