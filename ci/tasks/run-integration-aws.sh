@@ -14,7 +14,7 @@ export PATH=${GOPATH}/bin:${PATH}
 : "${region_name:?}"
 : "${stack_name:?}"
 : "${focus_regex:?}"
-: "${assume_role_arn:?}"
+: "${assume_role_arn:=unset}"
 : "${s3_endpoint_host:=unset}"
 
 

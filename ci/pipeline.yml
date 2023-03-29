@@ -37,6 +37,7 @@ jobs:
           image: s3cli-docker-image
           file: s3cli-src/ci/tasks/run-integration-aws.yml
           params:
+            <<: *aws-us-infrastructure-params
             access_key_id:     ((s3-cli-artifact-writer_aws_access_key.username))
             secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
             assume_role_arn: ((s3-cli-assume-role-arn))
