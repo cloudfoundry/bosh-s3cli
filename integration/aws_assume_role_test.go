@@ -30,6 +30,7 @@ var _ = Describe("Testing AWS assume role ", func() {
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
 				Region:          region,
+				UseSSL:          true,
 			}
 
 			assumed_role_cfg := &config.S3Cli{
@@ -38,6 +39,7 @@ var _ = Describe("Testing AWS assume role ", func() {
 				BucketName:      bucketName,
 				Region:          region,
 				AssumeRoleArn:   assumeRoleArn,
+				UseSSL:          true,
 			}
 			s3Filename := "test-file"
 
