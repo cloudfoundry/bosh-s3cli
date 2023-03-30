@@ -11,9 +11,9 @@ export PATH=${GOPATH}/bin:${PATH}
 
 : "${access_key_id:?}"
 : "${secret_access_key:?}"
-: "${region_name:?}"
-: "${stack_name:?}"
+: "${region_name:=unset}"
 : "${focus_regex:?}"
+: "${assume_role_arn:=unset}"
 : "${s3_endpoint_host:=unset}"
 
 
@@ -21,14 +21,12 @@ export PATH=${GOPATH}/bin:${PATH}
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
-stack_info=$(get_stack_info "${stack_name}")
+export ASSUME_ROLE_ARN=${assume_role_arn}
 
 # Some of these are optional
 export ACCESS_KEY_ID=${access_key_id}
 export SECRET_ACCESS_KEY=${secret_access_key}
 export REGION=${region_name}
-export BUCKET_NAME
-BUCKET_NAME=$(get_stack_info_of "${stack_info}" "BucketName")
 export S3_HOST=${s3_endpoint_host}
 
 pushd "${release_dir}" > /dev/null

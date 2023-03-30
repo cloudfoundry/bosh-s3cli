@@ -7,11 +7,10 @@ inputs:
   - name: s3cli-src
     path: bosh-s3cli
 run:
-  path: bosh-s3cli/ci/tasks/run-integration-aws.sh
+  path: bosh-s3cli/ci/tasks/run-integration-aws-assume.sh
 params:
   access_key_id:
   secret_access_key:
-  region_name:
-  stack_name:
   focus_regex:
   s3_endpoint_host:
+  assume_role_arn:
