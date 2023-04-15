@@ -1,7 +1,7 @@
 # code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.44.239 => github.com/aws/aws-sdk-go v1.30.15
+# github.com/aws/aws-sdk-go v1.44.244 => github.com/aws/aws-sdk-go v1.30.15
 ## explicit; go 1.11
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -47,7 +47,7 @@ github.com/aws/aws-sdk-go/service/s3/s3iface
 github.com/aws/aws-sdk-go/service/s3/s3manager
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.360
+# github.com/cloudfoundry/bosh-utils v0.0.361
 ## explicit; go 1.20
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
