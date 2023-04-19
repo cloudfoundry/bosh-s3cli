@@ -37,9 +37,9 @@ jobs:
           image: s3cli-docker-image
           file: s3cli-src/ci/tasks/run-integration-aws-assume.yml
           params:
-            access_key_id:     ((s3-cli-artifact-writer_aws_access_key.username))
-            secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
-            assume_role_arn: ((s3-cli-assume-role-arn))
+            access_key_id:     ((s3-cli-artifact-writer_assume_aws_access_key.username))
+            secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+            assume_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
             focus_regex:      "AWS ASSUME ROLE"
             s3_endpoint_host: s3.amazonaws.com
         - task: test-env-or-profile
@@ -291,16 +291,18 @@ resources:
     source:
       regexp: s3cli-(.*)-linux-amd64
       bucket: s3cli-artifacts
-      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
-      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
+      access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
+      secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+      aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
 
   - name: release-bucket-windows
     type: s3
     source:
       regexp: s3cli-(.*)-windows-amd64\.exe
       bucket: s3cli-artifacts
-      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
-      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
+      access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
+      secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+      aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
 
   - name: bosh-golang-release-image
     type: docker-image
