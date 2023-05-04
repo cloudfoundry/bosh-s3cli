@@ -69,9 +69,9 @@ s3cli -c config.json sign <remote-blob> <get|put> <seconds-to-expiration>
 Follow these steps to make a contribution to the project:
 
 - Fork this repository
-- Create a feature branch based upon the `develop` branch (*pull requests must be made against this branch*)
+- Create a feature branch based upon the `main` branch (*pull requests must be made against this branch*)
   ``` bash
-  git checkout -b feature-name origin/develop
+  git checkout -b feature-name origin/main
   ```
 - Run tests to check your development environment setup
   ``` bash
@@ -88,7 +88,7 @@ Follow these steps to make a contribution to the project:
   git commit -m "Commit message"
   git push origin feature-name
   ```
-- Create a GitHub pull request, selecting `develop` as the target branch
+- Create a GitHub pull request, selecting `main` as the target branch
 
 ## Running integration tests
 
