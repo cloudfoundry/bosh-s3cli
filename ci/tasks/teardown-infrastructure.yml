@@ -2,10 +2,9 @@
 platform: linux
 image_resource:
   type: docker-image
-  source: {repository: bosh/s3cli}
+  source: { repository: bosh/s3cli }
 inputs:
-  - name: s3cli-src
-    path: bosh-s3cli
+- name: bosh-s3cli
 run:
   path: bosh-s3cli/ci/tasks/teardown-infrastructure.sh
 params:

@@ -1,326 +1,316 @@
 ---
 jobs:
-  - name: unit
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, resource: s3cli-in}
-      - get: s3cli-docker-image
-        trigger: true
-      - task: test
-        file: s3cli-src/ci/tasks/run-unit.yml
+- name: unit
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    trigger: true
+  - get: s3cli-docker-image
+    trigger: true
+  - task: test
+    file: bosh-s3cli/ci/tasks/run-unit.yml
 
-  - name: aws-s3-us-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
+- name: aws-s3-us-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: setup
+    file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    params: &aws-us-infrastructure-params
+      access_key_id: ((s3cli-ci-user_aws_access_key.username))
+      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      region_name: us-east-1
+      stack_name: s3cli-iam
 
-      - task: setup
-        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        params: &aws-us-infrastructure-params
-          access_key_id:     ((s3cli-ci-user_aws_access_key.username))
-          secret_access_key: ((s3cli-ci-user_aws_access_key.password))
-          region_name:       us-east-1
-          stack_name:        s3cli-iam
-
-      - in_parallel:
-        - task: test-static-credentials
-          image: s3cli-docker-image
-          file: s3cli-src/ci/tasks/run-integration-aws.yml
-          params:
-            <<: *aws-us-infrastructure-params
-            focus_regex:      "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
-            s3_endpoint_host: s3.amazonaws.com
-        - task: test-assume-roles
-          image: s3cli-docker-image
-          file: s3cli-src/ci/tasks/run-integration-aws-assume.yml
-          params:
-            access_key_id:     ((s3-cli-artifact-writer_assume_aws_access_key.username))
-            secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-            assume_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
-            focus_regex:      "AWS ASSUME ROLE"
-            s3_endpoint_host: s3.amazonaws.com
-        - task: test-env-or-profile
-          image: s3cli-docker-image
-          file: s3cli-src/ci/tasks/run-integration-aws-iam.yml
-          params:
-            <<: *aws-us-infrastructure-params
-            s3_endpoint_host: s3.amazonaws.com
-        ensure:
-          task: teardown
-          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          params: *aws-us-infrastructure-params
-
-  - name: aws-s3-public-read-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
-
-      - task: setup
-        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        params: &aws-us-public-read-infrastructure-params
-          access_key_id:     ((s3cli-ci-user_aws_access_key.username))
-          secret_access_key: ((s3cli-ci-user_aws_access_key.password))
-          region_name:       us-east-1
-          stack_name:        s3cli-public-bucket
-
-      - task: test
-        image: s3cli-docker-image
-        file: s3cli-src/ci/tasks/run-integration-aws.yml
-        params:
-          <<: *aws-us-public-read-infrastructure-params
-          focus_regex: "PUBLIC READ ONLY"
-        ensure:
-          task: teardown
-          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          params: *aws-us-public-read-infrastructure-params
-
-  - name: aws-s3-china-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
-
-      - task: setup
-        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        params: &aws-china-infrastructure-params
-          access_key_id:     ((s3cli-ci-user_cn_aws_access_key.username))
-          secret_access_key: ((s3cli-ci-user_cn_aws_access_key.password))
-          region_name:       cn-north-1
-          stack_name:        s3cli-private-bucket
-
-      - task: test
-        file: s3cli-src/ci/tasks/run-integration-aws.yml
-        image: s3cli-docker-image
-        params:
-          <<: *aws-china-infrastructure-params
-          focus_regex:      "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
-          s3_endpoint_host: s3.cn-north-1.amazonaws.com.cn
-        ensure:
-          task: teardown
-          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          params: *aws-china-infrastructure-params
-
-  - name: aws-s3-frankfurt-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
-
-      - task: setup
-        file: s3cli-src/ci/tasks/setup-aws-infrastructure.yml
-        params: &aws-frankfurt-infrastructure-params
-          access_key_id:     ((s3cli-ci-user_aws_access_key.username))
-          secret_access_key: ((s3cli-ci-user_aws_access_key.password))
-          region_name:       eu-central-1
-          stack_name:        s3cli-private-bucket
-
-      - task: test
-        file: s3cli-src/ci/tasks/run-integration-aws.yml
-        image: s3cli-docker-image
-        params:
-          <<: *aws-frankfurt-infrastructure-params
-          focus_regex:       "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
-          s3_endpoint_host:  s3.eu-central-1.amazonaws.com
-        ensure:
-          task: teardown
-          file: s3cli-src/ci/tasks/teardown-infrastructure.yml
-          params: *aws-frankfurt-infrastructure-params
-
-  - name: s3-compatible-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
-
-      - task: test
-        file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
-        image: s3cli-docker-image
-        params:
-          access_key_id:     ((dreamhost_blobstore_access_key.username))
-          secret_access_key: ((dreamhost_blobstore_access_key.password))
-          bucket_name:       s3cli-pipeline
-          s3_endpoint_host:  objects-us-east-1.dream.io
-          s3_endpoint_port:  443
-
-  - name: gcs-s3-compatible-integration
-    serial: true
-    plan:
-      - {trigger: true, get: s3cli-src, passed: [unit], resource: s3cli-in}
-      - get: s3cli-docker-image
-        passed:
-          - unit
-
-      - task: test
-        image: s3cli-docker-image
-        file: s3cli-src/ci/tasks/run-integration-s3-compat.yml
-        params:
-          access_key_id:     ((bosh_cpi_gcp_access_key.username))
-          secret_access_key: ((bosh_cpi_gcp_access_key.password))
-          bucket_name:       s3cli-pipeline
-          s3_endpoint_host:  storage.googleapis.com
-          s3_endpoint_port:  443
-
-  - name: promote
-    plan:
-      - in_parallel:
-        - get: s3cli-src
-          resource: s3cli-in
-          trigger: true
-          passed: [
-            aws-s3-us-integration,
-            aws-s3-china-integration,
-            aws-s3-frankfurt-integration,
-            s3-compatible-integration,
-            aws-s3-public-read-integration,
-            gcs-s3-compatible-integration
-          ]
-        - get: s3cli-docker-image
-          passed:
-            - aws-s3-us-integration
-            - aws-s3-china-integration
-            - aws-s3-frankfurt-integration
-            - s3-compatible-integration
-            - aws-s3-public-read-integration
-            - gcs-s3-compatible-integration
-
-        - put: version-semver
-          params:
-            bump: patch
-      - in_parallel:
-        - task: build-linux
-          image: s3cli-docker-image
-          file: s3cli-src/ci/tasks/build.yml
-          output_mapping: { out: out-linux }
-          params:
-            GOOS: linux
-        - task: build-windows
-          image: s3cli-docker-image
-          file: s3cli-src/ci/tasks/build.yml
-          output_mapping: { out: out-windows }
-          params:
-            GOOS: windows
-      - in_parallel:
-        - put: release-bucket-linux
-          params: {file: out-linux/s3cli-*-linux-amd64}
-        - put: release-bucket-windows
-          params: {file: out-windows/s3cli-*-windows-amd64.exe}
-
-      - put: s3cli-src
-        resource: s3cli-out
-        params: {repository: s3cli-src, tag: version-semver/number, tag_prefix: v}
-
-  - name: build-s3cli-docker-image
-    plan:
-    - get: s3cli-src
-      resource: s3cli-in
-      trigger: true
-    - get: bosh-golang-release-image
-      trigger: true
-    - put: s3cli-docker-image
+  - in_parallel:
+    - task: test-static-credentials
+      image: s3cli-docker-image
+      file: bosh-s3cli/ci/tasks/run-integration-aws.yml
       params:
-        build: "s3cli-src/ci/docker/boshcpi.s3cli"
-      get_params:
-        skip_download: true
-
-  - name: bump-deps
-    plan:
-    - in_parallel:
-      - get: s3cli-src
-        resource: s3cli-in
-      - get: golang-release
-      - get: weekly
-        trigger: true
-    - task: bump-deps
-      file: golang-release/ci/tasks/shared/bump-deps.yml
-      input_mapping:
-        input_repo: s3cli-src
-      output_mapping:
-        output_repo: bumped-s3cli-src
-    - task: test
-      file: s3cli-src/ci/tasks/run-unit.yml
-      input_mapping:
-        s3cli-src: bumped-s3cli-src
-    - put: s3cli-in
+        <<: *aws-us-infrastructure-params
+        focus_regex: "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
+        s3_endpoint_host: s3.amazonaws.com
+    - task: test-assume-roles
+      image: s3cli-docker-image
+      file: bosh-s3cli/ci/tasks/run-integration-aws-assume.yml
       params:
-        repository: bumped-s3cli-src
-        rebase: true
+        access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
+        secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+        assume_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+        focus_regex: "AWS ASSUME ROLE"
+        s3_endpoint_host: s3.amazonaws.com
+    - task: test-env-or-profile
+      image: s3cli-docker-image
+      file: bosh-s3cli/ci/tasks/run-integration-aws-iam.yml
+      params:
+        <<: *aws-us-infrastructure-params
+        s3_endpoint_host: s3.amazonaws.com
+    ensure:
+      task: teardown
+      file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      params: *aws-us-infrastructure-params
+
+- name: aws-s3-public-read-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: setup
+    file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    params: &aws-us-public-read-infrastructure-params
+      access_key_id: ((s3cli-ci-user_aws_access_key.username))
+      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      region_name: us-east-1
+      stack_name: s3cli-public-bucket
+
+  - task: test
+    image: s3cli-docker-image
+    file: bosh-s3cli/ci/tasks/run-integration-aws.yml
+    params:
+      <<: *aws-us-public-read-infrastructure-params
+      focus_regex: "PUBLIC READ ONLY"
+    ensure:
+      task: teardown
+      file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      params: *aws-us-public-read-infrastructure-params
+
+- name: aws-s3-china-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: setup
+    file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    params: &aws-china-infrastructure-params
+      access_key_id: ((s3cli-ci-user_cn_aws_access_key.username))
+      secret_access_key: ((s3cli-ci-user_cn_aws_access_key.password))
+      region_name: cn-north-1
+      stack_name: s3cli-private-bucket
+
+  - task: test
+    file: bosh-s3cli/ci/tasks/run-integration-aws.yml
+    image: s3cli-docker-image
+    params:
+      <<: *aws-china-infrastructure-params
+      focus_regex: "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
+      s3_endpoint_host: s3.cn-north-1.amazonaws.com.cn
+    ensure:
+      task: teardown
+      file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      params: *aws-china-infrastructure-params
+
+- name: aws-s3-frankfurt-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: setup
+    file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    params: &aws-frankfurt-infrastructure-params
+      access_key_id: ((s3cli-ci-user_aws_access_key.username))
+      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      region_name: eu-central-1
+      stack_name: s3cli-private-bucket
+
+  - task: test
+    file: bosh-s3cli/ci/tasks/run-integration-aws.yml
+    image: s3cli-docker-image
+    params:
+      <<: *aws-frankfurt-infrastructure-params
+      focus_regex: "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
+      s3_endpoint_host: s3.eu-central-1.amazonaws.com
+    ensure:
+      task: teardown
+      file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      params: *aws-frankfurt-infrastructure-params
+
+- name: s3-compatible-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: test
+    file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
+    image: s3cli-docker-image
+    params:
+      access_key_id: ((dreamhost_blobstore_access_key.username))
+      secret_access_key: ((dreamhost_blobstore_access_key.password))
+      bucket_name: s3cli-pipeline
+      s3_endpoint_host: objects-us-east-1.dream.io
+      s3_endpoint_port: 443
+
+- name: gcs-s3-compatible-integration
+  serial: true
+  plan:
+  - get: bosh-s3cli
+    passed: [ unit ]
+    trigger: true
+  - get: s3cli-docker-image
+    passed: [ unit ]
+  - task: test
+    image: s3cli-docker-image
+    file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
+    params:
+      access_key_id: ((bosh_cpi_gcp_access_key.username))
+      secret_access_key: ((bosh_cpi_gcp_access_key.password))
+      bucket_name: s3cli-pipeline
+      s3_endpoint_host: storage.googleapis.com
+      s3_endpoint_port: 443
+
+- name: publish-and-tag
+  plan:
+  - in_parallel:
+    - get: bosh-s3cli
+      trigger: true
+      passed:
+      - aws-s3-us-integration
+      - aws-s3-china-integration
+      - aws-s3-frankfurt-integration
+      - s3-compatible-integration
+      - aws-s3-public-read-integration
+      - gcs-s3-compatible-integration
+    - get: s3cli-docker-image
+      passed:
+      - aws-s3-us-integration
+      - aws-s3-china-integration
+      - aws-s3-frankfurt-integration
+      - s3-compatible-integration
+      - aws-s3-public-read-integration
+      - gcs-s3-compatible-integration
+    - put: version-semver
+      params:
+        bump: patch
+  - in_parallel:
+    - task: build-linux
+      image: s3cli-docker-image
+      file: bosh-s3cli/ci/tasks/build.yml
+      output_mapping: { out: out-linux }
+      params:
+        GOOS: linux
+    - task: build-windows
+      image: s3cli-docker-image
+      file: bosh-s3cli/ci/tasks/build.yml
+      output_mapping: { out: out-windows }
+      params:
+        GOOS: windows
+  - in_parallel:
+    - put: release-bucket-linux
+      params: { file: out-linux/s3cli-*-linux-amd64 }
+    - put: release-bucket-windows
+      params: { file: out-windows/s3cli-*-windows-amd64.exe }
+  - put: bosh-s3cli
+    params:
+      repository: bosh-s3cli
+      tag: version-semver/number
+      tag_prefix: v
+
+- name: build-s3cli-docker-image
+  plan:
+  - get: bosh-s3cli
+    trigger: true
+  - get: bosh-golang-release-image
+    trigger: true
+  - put: s3cli-docker-image
+    params:
+      build: "bosh-s3cli/ci/docker/boshcpi.s3cli"
+    get_params:
+      skip_download: true
+
+- name: bump-deps
+  plan:
+  - in_parallel:
+    - get: bosh-s3cli
+    - get: golang-release
+    - get: weekly
+      trigger: true
+  - task: bump-deps
+    file: golang-release/ci/tasks/shared/bump-deps.yml
+    input_mapping:
+      input_repo: bosh-s3cli
+    output_mapping:
+      output_repo: bumped-bosh-s3cli
+  - task: test
+    file: bosh-s3cli/ci/tasks/run-unit.yml
+    input_mapping:
+      bosh-s3cli: bumped-bosh-s3cli
+  - put: bosh-s3cli
+    params:
+      repository: bumped-bosh-s3cli
+      rebase: true
 
 resources:
-  - name: s3cli-in
-    type: git
-    source:
-      uri: git@github.com:cloudfoundry/bosh-s3cli.git
-      branch: develop
-      private_key: ((github_deploy_key_bosh-s3cli.private_key))
+- name: bosh-s3cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/bosh-s3cli.git
+    branch: main
+    private_key: ((github_deploy_key_bosh-s3cli.private_key))
 
-  - name: s3cli-out
-    type: git
-    source:
-      uri: git@github.com:cloudfoundry/bosh-s3cli.git
-      branch: main
-      private_key: ((github_deploy_key_bosh-s3cli.private_key))
+- name: golang-release
+  type: git
+  source:
+    uri: https://github.com/bosh-packages/golang-release.git
 
-  - name: golang-release
-    type: git
-    source:
-      uri: https://github.com/bosh-packages/golang-release.git
+- name: version-semver
+  type: semver
+  source:
+    initial_version: 0.0.1
+    key: current-version
+    bucket: s3cli-artifacts
+    access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
+    secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
 
-  - name: version-semver
-    type: semver
-    source:
-      initial_version: 0.0.1
-      key: current-version
-      bucket: s3cli-artifacts
-      access_key_id: ((s3-cli-artifact-writer_aws_access_key.username))
-      secret_access_key: ((s3-cli-artifact-writer_aws_access_key.password))
+- name: release-bucket-linux
+  type: s3
+  source:
+    regexp: s3cli-(.*)-linux-amd64
+    bucket: s3cli-artifacts
+    access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
+    secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+    aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
 
-  - name: release-bucket-linux
-    type: s3
-    source:
-      regexp: s3cli-(.*)-linux-amd64
-      bucket: s3cli-artifacts
-      access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-      secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-      aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+- name: release-bucket-windows
+  type: s3
+  source:
+    regexp: s3cli-(.*)-windows-amd64\.exe
+    bucket: s3cli-artifacts
+    access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
+    secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
+    aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
 
-  - name: release-bucket-windows
-    type: s3
-    source:
-      regexp: s3cli-(.*)-windows-amd64\.exe
-      bucket: s3cli-artifacts
-      access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-      secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-      aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+- name: bosh-golang-release-image
+  type: docker-image
+  source:
+    repository: bosh/golang-release
+    username: ((docker.username))
+    password: ((docker.password))
 
-  - name: bosh-golang-release-image
-    type: docker-image
-    source:
-      repository: bosh/golang-release
-      username: ((docker.username))
-      password: ((docker.password))
+- name: s3cli-docker-image
+  type: docker-image
+  source:
+    repository: bosh/s3cli
+    username: ((docker.username))
+    password: ((docker.password))
 
-  - name: s3cli-docker-image
-    type: docker-image
-    source:
-      repository: bosh/s3cli
-      username: ((docker.username))
-      password: ((docker.password))
-
-  - name: weekly
-    type: time
-    source:
-      start: 3:00 -0700
-      stop: 4:30 -0700
-      days: [ Saturday ]
+- name: weekly
+  type: time
+  source:
+    start: 3:00 -0700
+    stop: 4:30 -0700
+    days: [ Saturday ]
