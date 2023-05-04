@@ -4,11 +4,27 @@
       "Type": "AWS::S3::Bucket",
       "DeletionPolicy": "Delete",
       "Properties": {
-        "AccessControl": "PublicRead"
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": false,
+          "BlockPublicPolicy": false,
+          "IgnorePublicAcls": false,
+          "RestrictPublicBuckets": false
+        },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "ObjectWriter"
+            }
+          ]
+        }
       }
     }
   },
   "Outputs": {
-    "BucketName": { "Value": { "Ref": "S3PublicReadBucket" }}
+    "BucketName": {
+      "Value": {
+        "Ref": "S3PublicReadBucket"
+      }
+    }
   }
 }
