@@ -32,7 +32,7 @@ pushd "${release_dir}" > /dev/null
 
   GOOS=linux GOARCH=amd64 go build -o out/s3cli \
     github.com/cloudfoundry/bosh-s3cli
-  GOOS=linux GOARCH=amd64 go run github.com/onsi/ginkgo/ginkgo build integration
+  scripts/ginkgo build integration
 
   zip -j payload.zip integration/integration.test out/s3cli ci/assets/lambda_function.py
 

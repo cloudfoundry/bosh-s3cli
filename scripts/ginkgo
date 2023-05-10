@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+
+(
+  cd "${ROOT_DIR}"
+  go run github.com/onsi/ginkgo/ginkgo "${@}"
+)
