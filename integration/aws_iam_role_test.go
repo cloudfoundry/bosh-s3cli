@@ -6,8 +6,7 @@ import (
 	"github.com/cloudfoundry/bosh-s3cli/config"
 	"github.com/cloudfoundry/bosh-s3cli/integration"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -47,15 +46,15 @@ var _ = Describe("Testing inside an AWS compute resource with an IAM role", func
 		}
 		DescribeTable("Blobstore lifecycle works",
 			func(cfg *config.S3Cli) { integration.AssertLifecycleWorks(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 		DescribeTable("Invoking `s3cli get` on a non-existent-key fails",
 			func(cfg *config.S3Cli) { integration.AssertGetNonexistentFails(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 		DescribeTable("Invoking `s3cli delete` on a non-existent-key does not fail",
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 	})
 })

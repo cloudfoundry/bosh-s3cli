@@ -31,5 +31,5 @@ export S3_HOST=${s3_endpoint_host}
 
 pushd "${release_dir}" > /dev/null
   echo -e "\n running tests with $(go version)..."
-  scripts/ginkgo -r -focus="${focus_regex}" integration/
+  scripts/ginkgo -r --focus="${focus_regex}" integration/
 popd > /dev/null

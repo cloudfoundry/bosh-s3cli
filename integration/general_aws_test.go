@@ -6,8 +6,7 @@ import (
 	"github.com/cloudfoundry/bosh-s3cli/config"
 	"github.com/cloudfoundry/bosh-s3cli/integration"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -57,19 +56,19 @@ var _ = Describe("General testing for all AWS regions", func() {
 		}
 		DescribeTable("Blobstore lifecycle works",
 			func(cfg *config.S3Cli) { integration.AssertLifecycleWorks(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 		DescribeTable("Invoking `s3cli get` on a non-existent-key fails",
 			func(cfg *config.S3Cli) { integration.AssertGetNonexistentFails(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 		DescribeTable("Invoking `s3cli delete` on a non-existent-key does not fail",
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 		DescribeTable("Invoking `s3cli sign` returns a signed URL",
 			func(cfg *config.S3Cli) { integration.AssertOnSignedURLs(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 
 		configurations = []TableEntry{
@@ -89,7 +88,7 @@ var _ = Describe("General testing for all AWS regions", func() {
 		}
 		DescribeTable("Invoking `s3cli put` uploads with options",
 			func(cfg *config.S3Cli) { integration.AssertPutOptionsApplied(s3CLIPath, cfg) },
-			configurations...,
+			configurations,
 		)
 
 		Describe("Invoking `s3cli put` with arbitrary upload failures", func() {

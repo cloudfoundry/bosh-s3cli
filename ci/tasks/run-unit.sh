@@ -20,7 +20,7 @@ pushd "${release_dir}" > /dev/null
   golangci-lint run --enable goimports ./...
 
   echo -e "\n Unit testing packages..."
-  scripts/ginkgo -r -race -skipPackage=integration ./
+  scripts/ginkgo -r -race --skip-package=integration ./
 
   echo -e "\n Running build script to confirm everything compiles..."
   go build -ldflags "-X main.version=${version}" -o out/s3cli .
