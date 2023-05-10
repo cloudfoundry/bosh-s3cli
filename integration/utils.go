@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
-	"github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 )
@@ -63,7 +63,7 @@ func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...st
 	}
 	cmdArgs = append(cmdArgs, args...)
 	command := exec.Command(s3CLIPath, cmdArgs...)
-	gexecSession, err := gexec.Start(command, ginkgo.GinkgoWriter, ginkgo.GinkgoWriter)
+	gexecSession, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 	if err != nil {
 		return nil, err
 	}
