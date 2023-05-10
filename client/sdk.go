@@ -42,7 +42,10 @@ func NewSDK(c config.S3Cli) (*s3.S3, error) {
 		s3Config = s3Config.WithCredentials(credentials.AnonymousCredentials)
 	}
 
-	s3Session := session.New(s3Config) //nolint:staticcheck
+	s3Session, err := session.NewSession(s3Config)
+	if err != nil {
+		return nil, err
+	}
 
 	var s3Client *s3.S3
 	if c.AssumeRoleArn != "" {
