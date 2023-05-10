@@ -203,6 +203,7 @@ jobs:
   - put: bosh-s3cli
     params:
       repository: bosh-s3cli
+      rebase: true
       tag: version-semver/number
       tag_prefix: v
 
