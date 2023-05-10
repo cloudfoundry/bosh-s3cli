@@ -1,13 +1,14 @@
 FROM bosh/golang-release
 
-ENV DEBIAN_FRONTEND "noninteractive"
+ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update -y \
-    && apt-get -y install --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
         awscli \
         build-essential \
         curl \
         git \
         jq \
         wget \
-        zip
+        zip \
+    &&  apt-get clean

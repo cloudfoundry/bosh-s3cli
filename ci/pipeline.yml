@@ -6,7 +6,6 @@ jobs:
   - get: bosh-s3cli
     trigger: true
   - get: s3cli-docker-image
-    trigger: true
   - task: test
     file: bosh-s3cli/ci/tasks/run-unit.yml
 
@@ -17,7 +16,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-us-infrastructure-params
@@ -61,7 +59,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-us-public-read-infrastructure-params
@@ -88,7 +85,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-china-infrastructure-params
@@ -116,7 +112,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-frankfurt-infrastructure-params
@@ -144,7 +139,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: test
     file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
     image: s3cli-docker-image
@@ -162,7 +156,6 @@ jobs:
     passed: [ unit ]
     trigger: true
   - get: s3cli-docker-image
-    passed: [ unit ]
   - task: test
     image: s3cli-docker-image
     file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
@@ -186,13 +179,6 @@ jobs:
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
     - get: s3cli-docker-image
-      passed:
-      - aws-s3-us-integration
-      - aws-s3-china-integration
-      - aws-s3-frankfurt-integration
-      - s3-compatible-integration
-      - aws-s3-public-read-integration
-      - gcs-s3-compatible-integration
     - put: version-semver
       params:
         bump: patch
