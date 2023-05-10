@@ -47,13 +47,11 @@ func NewSDK(c config.S3Cli) (*s3.S3, error) {
 		return nil, err
 	}
 
-	var s3Client *s3.S3
 	if c.AssumeRoleArn != "" {
-		creds := stscreds.NewCredentials(s3Session, c.AssumeRoleArn)
-		s3Client = s3.New(s3Session, &aws.Config{Credentials: creds})
-	} else {
-		s3Client = s3.New(s3Session)
+		awsConfig = awsConfig.WithCredentials(stscreds.NewCredentials(s3Session, c.AssumeRoleArn))
 	}
+
+	s3Client := s3.New(s3Session, awsConfig)
 
 	if c.UseV2SigningMethod {
 		setv2Handlers(s3Client)
