@@ -1,7 +1,7 @@
 # code.cloudfoundry.org/tlsconfig v0.0.0-20230320190829-8f91c367795b
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.44.262 => github.com/aws/aws-sdk-go v1.30.15
+# github.com/aws/aws-sdk-go v1.44.266 => github.com/aws/aws-sdk-go v1.30.15
 ## explicit; go 1.11
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -47,7 +47,7 @@ github.com/aws/aws-sdk-go/service/s3/s3iface
 github.com/aws/aws-sdk-go/service/s3/s3manager
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.363
+# github.com/cloudfoundry/bosh-utils v0.0.364
 ## explicit; go 1.20
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -88,7 +88,7 @@ github.com/jpillora/backoff
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.9.4
+# github.com/onsi/ginkgo/v2 v2.9.5
 ## explicit; go 1.18
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -110,7 +110,7 @@ github.com/onsi/ginkgo/v2/internal/parallel_support
 github.com/onsi/ginkgo/v2/internal/testingtproxy
 github.com/onsi/ginkgo/v2/reporters
 github.com/onsi/ginkgo/v2/types
-# github.com/onsi/gomega v1.27.6
+# github.com/onsi/gomega v1.27.7
 ## explicit; go 1.18
 github.com/onsi/gomega
 github.com/onsi/gomega/format
