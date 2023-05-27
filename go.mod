@@ -3,8 +3,8 @@ module github.com/cloudfoundry/bosh-s3cli
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go v1.44.266
-	github.com/cloudfoundry/bosh-utils v0.0.364
+	github.com/aws/aws-sdk-go v1.44.271
+	github.com/cloudfoundry/bosh-utils v0.0.365
 	github.com/onsi/ginkgo/v2 v2.9.5
 	github.com/onsi/gomega v1.27.7
 )
