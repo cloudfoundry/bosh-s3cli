@@ -16,7 +16,20 @@ export PATH=${GOPATH}/bin:${PATH}
 
 export AWS_ACCESS_KEY_ID=${access_key_id}
 export AWS_SECRET_ACCESS_KEY=${secret_access_key}
+export AWS_ROLE_ARN=${role_arn}
 export AWS_DEFAULT_REGION=${region_name}
+
+if [ -n "${AWS_ROLE_ARN}" ]; then
+  aws configure --profile creds_account set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+  aws configure --profile creds_account set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+  aws configure --profile resource_account set source_profile "creds_account"
+  aws configure --profile resource_account set role_arn "${AWS_ROLE_ARN}"
+  aws configure --profile resource_account set region "${AWS_DEFAULT_REGION}"
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_DEFAULT_REGION
+  export AWS_PROFILE=resource_account
+fi
 
 cmd="aws cloudformation create-stack \
     --stack-name    ${stack_name} \

@@ -10,5 +10,6 @@ run:
 params:
   access_key_id:
   secret_access_key:
+  role_arn:
   region_name:
   stack_name:
