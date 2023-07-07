@@ -281,10 +281,3 @@ resources:
     start: 3:00 -0700
     stop: 4:30 -0700
     days: [ Saturday ]
-
-resource_types:
-- name: semver
-  type: docker-image
-  source:
-    repository: concourse/semver-resource
-    tag: 1.6
