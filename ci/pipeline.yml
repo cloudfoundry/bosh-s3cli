@@ -19,8 +19,8 @@ jobs:
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-us-infrastructure-params
-      access_key_id: ((s3cli-ci-user_aws_access_key.username))
-      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      access_key_id: ((bosh_s3cli_pipeline.username))
+      secret_access_key: ((bosh_s3cli_pipeline.password))
       region_name: us-east-1
       stack_name: s3cli-iam
 
@@ -36,9 +36,9 @@ jobs:
       image: s3cli-docker-image
       file: bosh-s3cli/ci/tasks/run-integration-aws-assume.yml
       params:
-        access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-        secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-        assume_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+        access_key_id: ((bosh_s3cli_pipeline.username))
+        secret_access_key: ((bosh_s3cli_pipeline.password))
+        assume_role_arn: ((assume_role_test_arn))
         focus_regex: "AWS ASSUME ROLE"
         s3_endpoint_host: s3.amazonaws.com
     - task: test-env-or-profile
@@ -62,8 +62,8 @@ jobs:
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-us-public-read-infrastructure-params
-      access_key_id: ((s3cli-ci-user_aws_access_key.username))
-      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      access_key_id: ((bosh_s3cli_pipeline.username))
+      secret_access_key: ((bosh_s3cli_pipeline.password))
       region_name: us-east-1
       stack_name: s3cli-public-bucket
 
@@ -88,8 +88,8 @@ jobs:
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-china-infrastructure-params
-      access_key_id: ((s3cli-ci-user_cn_aws_access_key.username))
-      secret_access_key: ((s3cli-ci-user_cn_aws_access_key.password))
+      access_key_id: ((bosh_s3cli_pipeline_china.username))
+      secret_access_key: ((bosh_s3cli_pipeline_china.password))
       region_name: cn-north-1
       stack_name: s3cli-private-bucket
 
@@ -115,8 +115,8 @@ jobs:
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
     params: &aws-frankfurt-infrastructure-params
-      access_key_id: ((s3cli-ci-user_aws_access_key.username))
-      secret_access_key: ((s3cli-ci-user_aws_access_key.password))
+      access_key_id: ((bosh_s3cli_pipeline.username))
+      secret_access_key: ((bosh_s3cli_pipeline.password))
       region_name: eu-central-1
       stack_name: s3cli-private-bucket
 
@@ -132,23 +132,6 @@ jobs:
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
       params: *aws-frankfurt-infrastructure-params
 
-- name: s3-compatible-integration
-  serial: true
-  plan:
-  - get: bosh-s3cli
-    passed: [ unit ]
-    trigger: true
-  - get: s3cli-docker-image
-  - task: test
-    file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
-    image: s3cli-docker-image
-    params:
-      access_key_id: ((dreamhost_blobstore_access_key.username))
-      secret_access_key: ((dreamhost_blobstore_access_key.password))
-      bucket_name: s3cli-pipeline
-      s3_endpoint_host: objects-us-east-1.dream.io
-      s3_endpoint_port: 443
-
 - name: gcs-s3-compatible-integration
   serial: true
   plan:
@@ -160,9 +143,9 @@ jobs:
     image: s3cli-docker-image
     file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
     params:
-      access_key_id: ((bosh_cpi_gcp_access_key.username))
-      secret_access_key: ((bosh_cpi_gcp_access_key.password))
-      bucket_name: s3cli-pipeline
+      access_key_id: ((bosh_s3cli_pipeline_gcp.username))
+      secret_access_key: ((bosh_s3cli_pipeline_gcp.password))
+      bucket_name: bosh-s3cli-pipeline
       s3_endpoint_host: storage.googleapis.com
       s3_endpoint_port: 443
 
@@ -175,7 +158,6 @@ jobs:
       - aws-s3-us-integration
       - aws-s3-china-integration
       - aws-s3-frankfurt-integration
-      - s3-compatible-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
     - get: s3cli-docker-image
@@ -259,42 +241,39 @@ resources:
   source:
     initial_version: 0.0.1
     key: current-version
-    bucket: s3cli-artifacts
-    access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-    secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-    assume_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+    bucket: bosh-s3cli-artifacts
+    access_key_id: ((bosh_s3cli_pipeline.username))
+    secret_access_key: ((bosh_s3cli_pipeline.password))
 
 - name: release-bucket-linux
   type: s3
   source:
     regexp: s3cli-(.*)-linux-amd64
-    bucket: s3cli-artifacts
-    access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-    secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-    aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+    bucket: bosh-s3cli-artifacts
+    access_key_id: ((bosh_s3cli_pipeline.username))
+    secret_access_key: ((bosh_s3cli_pipeline.password))
 
 - name: release-bucket-windows
   type: s3
   source:
     regexp: s3cli-(.*)-windows-amd64\.exe
-    bucket: s3cli-artifacts
-    access_key_id: ((s3-cli-artifact-writer_assume_aws_access_key.username))
-    secret_access_key: ((s3-cli-artifact-writer_assume_aws_access_key.password))
-    aws_role_arn: ((s3-cli-artifact-writer_assume_aws_access_key.role_arn))
+    bucket: bosh-s3cli-artifacts
+    access_key_id: ((bosh_s3cli_pipeline.username))
+    secret_access_key: ((bosh_s3cli_pipeline.password))
 
 - name: bosh-golang-release-image
   type: docker-image
   source:
     repository: bosh/golang-release
-    username: ((docker.username))
-    password: ((docker.password))
+    username: ((dockerhub_username))
+    password: ((dockerhub_password))
 
 - name: s3cli-docker-image
   type: docker-image
   source:
     repository: bosh/s3cli
-    username: ((docker.username))
-    password: ((docker.password))
+    username: ((dockerhub_username))
+    password: ((dockerhub_password))
 
 - name: weekly
   type: time

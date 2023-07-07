@@ -22,7 +22,7 @@ var _ = Describe("Testing AWS assume role ", func() {
 			assumeRoleArn := os.Getenv("ASSUME_ROLE_ARN")
 			Expect(assumeRoleArn).ToNot(BeEmpty(), "ASSUME_ROLE_ARN must be set")
 
-			bucketName := "bosh-s3cli-assume-integration-tests"
+			bucketName := "bosh-s3cli-assume-role-integration-test"
 			region := "us-west-1"
 
 			not_assumed_role_cfg := &config.S3Cli{
