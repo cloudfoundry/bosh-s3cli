@@ -30,5 +30,3 @@ require (
 	golang.org/x/tools v0.11.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/aws/aws-sdk-go => github.com/aws/aws-sdk-go v1.30.15
