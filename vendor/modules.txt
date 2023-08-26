@@ -1,7 +1,7 @@
 # code.cloudfoundry.org/tlsconfig v0.0.0-20230612153104-23c0622de227
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.44.327
+# github.com/aws/aws-sdk-go v1.44.332
 ## explicit; go 1.11
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -56,7 +56,7 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.385
+# github.com/cloudfoundry/bosh-utils v0.0.386
 ## explicit; go 1.20
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -83,7 +83,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20230817174616-7a8ec2ada47b
+# github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/jmespath/go-jmespath v0.4.0
@@ -97,7 +97,7 @@ github.com/jpillora/backoff
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/onsi/ginkgo/v2 v2.11.0
+# github.com/onsi/ginkgo/v2 v2.12.0
 ## explicit; go 1.18
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
