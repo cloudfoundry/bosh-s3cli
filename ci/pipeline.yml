@@ -215,6 +215,7 @@ jobs:
 - name: build-s3cli-docker-image
   plan:
   - get: bosh-s3cli
+    resource: bosh-s3cli-for-docker-image-creation
     trigger: true
   - get: bosh-golang-release-image
     trigger: true
@@ -253,6 +254,14 @@ resources:
     uri: git@github.com:cloudfoundry/bosh-s3cli.git
     branch: main
     private_key: ((github_deploy_key_bosh-s3cli.private_key))
+
+- name: bosh-s3cli-for-docker-image-creation
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/bosh-s3cli.git
+    branch: main
+    private_key: ((github_deploy_key_bosh-s3cli.private_key))
+    paths: ["ci/docker/*"]
 
 - name: golang-release
   type: git
