@@ -5,9 +5,9 @@ go 1.21
 toolchain go1.21.0
 
 require (
-	github.com/aws/aws-sdk-go v1.45.11
-	github.com/cloudfoundry/bosh-utils v0.0.394
-	github.com/onsi/ginkgo/v2 v2.12.0
+	github.com/aws/aws-sdk-go v1.45.15
+	github.com/cloudfoundry/bosh-utils v0.0.397
+	github.com/onsi/ginkgo/v2 v2.12.1
 	github.com/onsi/gomega v1.27.10
 )
 
