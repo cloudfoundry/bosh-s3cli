@@ -18,7 +18,6 @@ semver_dir="${workspace_dir}/version-semver"
 output_dir=${workspace_dir}/out
 
 semver="$(cat "${semver_dir}/number")"
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 binname="s3cli-${semver}-${GOOS}-amd64"
 if [ "${GOOS}" = "windows" ]; then
@@ -26,11 +25,8 @@ if [ "${GOOS}" = "windows" ]; then
 fi
 
 pushd "${release_dir}" > /dev/null
-  git_rev=$(git rev-parse --short HEAD)
-  version="${semver}-${git_rev}-${timestamp}"
-
   echo -e "\n building artifact with $(go version)..."
-  go build -ldflags "-X main.version=${version}" \
+  go build -ldflags "-X main.version=${semver}" \
     -o "out/${binname}"                          \
     github.com/cloudfoundry/bosh-s3cli
 
