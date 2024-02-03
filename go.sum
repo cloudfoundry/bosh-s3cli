@@ -4,10 +4,10 @@ code.cloudfoundry.org/tlsconfig v0.0.0-20240116140718-a2c58c2ff70c h1:LNGohhHxH6
 code.cloudfoundry.org/tlsconfig v0.0.0-20240116140718-a2c58c2ff70c/go.mod h1:C8SxvGRSutmgzV2FxH8Zwqz2Q8HsaAITQRQFKhlDzPw=
 filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmGfU=
 filippo.io/edwards25519 v1.0.0-rc.1/go.mod h1:N1IkdkCkiLB6tki+MYJoSx2JTY9NUlxZE7eHn5EwJns=
-github.com/aws/aws-sdk-go v1.50.5 h1:H2Aadcgwr7a2aqS6ZwcE+l1mA6ZrTseYCvjw2QLmxIA=
-github.com/aws/aws-sdk-go v1.50.5/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
-github.com/cloudfoundry/bosh-utils v0.0.426 h1:D6EjOp7vY/qENrEfEjCj3VyPHXoK+AOa/IrEbctIatY=
-github.com/cloudfoundry/bosh-utils v0.0.426/go.mod h1:noPqGVWWTofxkq9EEEl3gzkOgf1lhnCUh86Lw8tdVfs=
+github.com/aws/aws-sdk-go v1.50.10 h1:H3NQvqRUKG+9oysCKTIyylpkqfPA7MiBtzTnu/cIGqE=
+github.com/aws/aws-sdk-go v1.50.10/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
+github.com/cloudfoundry/bosh-utils v0.0.427 h1:SMy+jCPC5osnURz5vsOdRSTLz3NSnjVIAzrc93WweM8=
+github.com/cloudfoundry/bosh-utils v0.0.427/go.mod h1:+yFVnpqolqGhONbtnkQNihovXQs5OPsLXlo360SFCVI=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.108 h1:YlCS+j0Xgatwq5Kux2idwwzHmRZBheZD2nynEf4Jdr0=
@@ -26,8 +26,8 @@ github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-github.com/google/pprof v0.0.0-20240125082051-42cd04596328 h1:oI+lCI2DY1BsRrdzMJBhIMxBBdlZJl31YNQC11EiyvA=
-github.com/google/pprof v0.0.0-20240125082051-42cd04596328/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
+github.com/google/pprof v0.0.0-20240130152714-0ed6a68c8d9e h1:E+3PBMCXn0ma79O7iCrne0iUpKtZ7rIcZvoz+jNtNtw=
+github.com/google/pprof v0.0.0-20240130152714-0ed6a68c8d9e/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
