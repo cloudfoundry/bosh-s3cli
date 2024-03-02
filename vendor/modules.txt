@@ -1,7 +1,7 @@
-# code.cloudfoundry.org/tlsconfig v0.0.0-20240216143505-4f8d9b753d56
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240301143844-95036809ae27
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.50.25
+# github.com/aws/aws-sdk-go v1.50.30
 ## explicit; go 1.19
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -66,7 +66,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.113
+# github.com/cloudfoundry/socks5-proxy v0.2.114
 ## explicit; go 1.21.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/go-logr/logr v1.4.1
@@ -83,7 +83,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20240207164012-fb44976bdcd5
+# github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/jmespath/go-jmespath v0.4.0
@@ -138,7 +138,7 @@ github.com/onsi/gomega/types
 github.com/pivotal-cf/paraphernalia/secure/tlsconfig
 # github.com/rogpeppe/go-internal v1.8.0
 ## explicit; go 1.11
-# golang.org/x/crypto v0.19.0
+# golang.org/x/crypto v0.20.0
 ## explicit; go 1.18
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
