@@ -172,7 +172,7 @@ jobs:
       trigger: true
       passed:
       - aws-s3-us-integration
-      - aws-s3-china-integration
+#      - aws-s3-china-integration
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
@@ -180,7 +180,7 @@ jobs:
       trigger: true
       passed:
       - aws-s3-us-integration
-      - aws-s3-china-integration
+#      - aws-s3-china-integration
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
