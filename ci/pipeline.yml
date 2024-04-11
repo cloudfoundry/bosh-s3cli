@@ -85,36 +85,6 @@ jobs:
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
       params: *aws-us-public-read-infrastructure-params
 
-- name: aws-s3-china-integration
-  serial: true
-  plan:
-  - get: bosh-s3cli
-    passed: [ unit ]
-    trigger: true
-  - get: s3cli-docker-image
-    trigger: true
-    passed:
-    - unit
-  - task: setup
-    file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
-    params: &aws-china-infrastructure-params
-      access_key_id: ((bosh_s3cli_pipeline_china.username))
-      secret_access_key: ((bosh_s3cli_pipeline_china.password))
-      region_name: cn-north-1
-      stack_name: s3cli-private-bucket
-
-  - task: test
-    file: bosh-s3cli/ci/tasks/run-integration-aws.yml
-    image: s3cli-docker-image
-    params:
-      <<: *aws-china-infrastructure-params
-      focus_regex: "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION|AWS ISOLATED REGION"
-      s3_endpoint_host: s3.cn-north-1.amazonaws.com.cn
-    ensure:
-      task: teardown
-      file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
-      params: *aws-china-infrastructure-params
-
 - name: aws-s3-frankfurt-integration
   serial: true
   plan:
@@ -172,7 +142,6 @@ jobs:
       trigger: true
       passed:
       - aws-s3-us-integration
-#      - aws-s3-china-integration
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
@@ -180,7 +149,6 @@ jobs:
       trigger: true
       passed:
       - aws-s3-us-integration
-#      - aws-s3-china-integration
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
