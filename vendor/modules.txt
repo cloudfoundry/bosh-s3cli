@@ -1,7 +1,7 @@
-# code.cloudfoundry.org/tlsconfig v0.0.0-20240405144453-942277399864
+# code.cloudfoundry.org/tlsconfig v0.0.0-20240410162701-78a97c114f7f
 ## explicit; go 1.19
 code.cloudfoundry.org/tlsconfig
-# github.com/aws/aws-sdk-go v1.51.16
+# github.com/aws/aws-sdk-go v1.51.21
 ## explicit; go 1.19
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/arn
@@ -56,7 +56,7 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.455
+# github.com/cloudfoundry/bosh-utils v0.0.456
 ## explicit; go 1.21.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -83,7 +83,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20240402174815-29b9bb013b0f
+# github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/jmespath/go-jmespath v0.4.0
