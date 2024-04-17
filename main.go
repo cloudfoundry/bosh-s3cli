@@ -43,6 +43,11 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	signURLProvider, err := client.NewSignURLProvider(blobstoreClient, &s3Config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	nonFlagArgs := flag.Args()
 	if len(nonFlagArgs) < 2 {
 		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
@@ -114,7 +119,7 @@ func main() {
 			log.Fatalf("Expiration should be in the format of a duration i.e. 1h, 60m, 3600s. Got: %s", nonFlagArgs[3])
 		}
 
-		signedURL, err := blobstoreClient.Sign(objectID, action, expiration)
+		signedURL, err := signURLProvider.Sign(objectID, action, expiration)
 
 		if err != nil {
 			log.Fatalf("Failed to sign request: %s", err)
