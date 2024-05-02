@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/cloudfoundry/bosh-s3cli/config"
 	"time"
+
+	"github.com/cloudfoundry/bosh-s3cli/config"
 )
 
 type SignURLProvider interface {
