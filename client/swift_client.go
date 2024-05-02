@@ -40,7 +40,7 @@ func (client *SwiftBlobstore) SignedURL(action string, objectID string, expirati
 	h.Write([]byte(hmacBody))
 	signature := hex.EncodeToString(h.Sum(nil))
 
-	url := fmt.Sprintf("https://%s%s?temp_url_sig=%s&temp_url_expires=%d", client.s3cliConfig.Host, path, signature, expires)
+	url := fmt.Sprintf("https://%s%s?temp_url_sig=%s&temp_url_expires=%d\n", client.s3cliConfig.Host, path, signature, expires)
 
 	return url, nil
 }
