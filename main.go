@@ -33,20 +33,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	s3Client, err := client.NewSDK(s3Config)
+	s3Client, err := client.NewAwsS3Client(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	blobstoreClient, err := client.New(s3Client, &s3Config)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	signURLProvider, err := client.NewSignURLProvider(blobstoreClient, &s3Config)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	blobstoreClient := client.New(s3Client, &s3Config)
 
 	nonFlagArgs := flag.Args()
 	if len(nonFlagArgs) < 2 {
@@ -119,7 +111,7 @@ func main() {
 			log.Fatalf("Expiration should be in the format of a duration i.e. 1h, 60m, 3600s. Got: %s", nonFlagArgs[3])
 		}
 
-		signedURL, err := signURLProvider.Sign(objectID, action, expiration)
+		signedURL, err := blobstoreClient.Sign(objectID, action, expiration)
 
 		if err != nil {
 			log.Fatalf("Failed to sign request: %s", err)

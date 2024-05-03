@@ -89,7 +89,7 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewSDK(s3Config)
+	s3Client, err := client.NewAwsS3Client(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -106,8 +106,7 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 		}
 	})
 
-	blobstoreClient, err := client.New(s3Client, &s3Config)
-	Expect(err).ToNot(HaveOccurred())
+	blobstoreClient := client.New(s3Client, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
 	Expect(err).To(HaveOccurred())
@@ -134,8 +133,8 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	client, _ := client.NewSDK(s3Config)
-	resp, err := client.HeadObject(&s3.HeadObjectInput{
+	s3Client, _ := client.NewAwsS3Client(&s3Config)
+	resp, err := s3Client.HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(cfg.BucketName),
 		Key:    aws.String(s3Filename),
 	})
@@ -185,15 +184,14 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewSDK(s3Config)
+	s3Client, err := client.NewAwsS3Client(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	tracedS3, calls := traceS3(s3Client)
 
-	blobstoreClient, err := client.New(tracedS3, &s3Config)
-	Expect(err).ToNot(HaveOccurred())
+	blobstoreClient := client.New(tracedS3, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
 	Expect(err).ToNot(HaveOccurred())
@@ -219,15 +217,14 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewSDK(s3Config)
+	s3Client, err := client.NewAwsS3Client(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	tracedS3, _ := traceS3(s3Client)
 
-	blobstoreClient, err := client.New(tracedS3, &s3Config)
-	Expect(err).ToNot(HaveOccurred())
+	blobstoreClient := client.New(tracedS3, &s3Config)
 
 	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
