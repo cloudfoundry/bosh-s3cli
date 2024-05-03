@@ -20,8 +20,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// AssertLifecycleWorks tests the main blobstore object lifecycle from
-// creation to deletion
+// AssertLifecycleWorks tests the main blobstore object lifecycle from creation to deletion
 func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	expectedString := GenerateRandomString()
 	s3Filename := GenerateRandomString()
@@ -42,7 +41,8 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 		noFolderConfigPath := MakeConfigFile(cfg)
 		defer func() { _ = os.Remove(noFolderConfigPath) }()
 
-		s3CLISession, err := RunS3CLI(s3CLIPath, noFolderConfigPath, "exists", fmt.Sprintf("%s/%s", folderName, s3Filename))
+		s3CLISession, err :=
+			RunS3CLI(s3CLIPath, noFolderConfigPath, "exists", fmt.Sprintf("%s/%s", folderName, s3Filename))
 		Expect(err).ToNot(HaveOccurred())
 		Expect(s3CLISession.ExitCode()).To(BeZero())
 	}
@@ -113,8 +113,7 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	Expect(err.Error()).To(ContainSubstring(errorMessage))
 }
 
-// AssertPutOptionsApplied asserts that `s3cli put` uploads files with
-// the requested encryption options
+// AssertPutOptionsApplied asserts that `s3cli put` uploads files with the requested encryption options
 func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	expectedString := GenerateRandomString()
 	s3Filename := GenerateRandomString()
@@ -148,8 +147,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	}
 }
 
-// AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object
-// will fail
+// AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object will fail
 func AssertGetNonexistentFails(s3CLIPath string, cfg *config.S3Cli) {
 	configPath := MakeConfigFile(cfg)
 	defer func() { _ = os.Remove(configPath) }()
@@ -229,12 +227,12 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
 	// get
-	url, err := blobstoreClient.Sign(s3Filename, "get", time.Duration(1*time.Minute))
+	url, err := blobstoreClient.Sign(s3Filename, "get", 1*time.Minute)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(url).To(MatchRegexp(regex))
 
 	// put
-	url, err = blobstoreClient.Sign(s3Filename, "put", time.Duration(1*time.Minute))
+	url, err = blobstoreClient.Sign(s3Filename, "put", 1*time.Minute)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(url).To(MatchRegexp(regex))
 }

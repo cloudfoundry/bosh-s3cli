@@ -118,7 +118,6 @@ func (b *awsS3Client) Delete(dest string) error {
 
 // Exists checks if blob exists
 func (b *awsS3Client) Exists(dest string) (bool, error) {
-
 	existsParams := &s3.HeadObjectInput{
 		Bucket: aws.String(b.s3cliConfig.BucketName),
 		Key:    b.key(dest),

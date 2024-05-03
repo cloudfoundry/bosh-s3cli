@@ -12,9 +12,7 @@ import (
 )
 
 var _ = Describe("Testing for working signed URLs all Swift/OpenStack regions", func() {
-
 	Context("with GENERAL OpenStack/Swift (static creds) configurations", func() {
-
 		var configPath string
 		var contentFile string
 		var defaultConfig config.S3Cli
@@ -27,8 +25,6 @@ var _ = Describe("Testing for working signed URLs all Swift/OpenStack regions", 
 		swiftTempURLKey := os.Getenv("SWIFT_TEMPURL_KEY")
 		swiftAuthAccount := os.Getenv("SWIFT_AUTH_ACCOUNT")
 		s3CLIPath := os.Getenv("S3_CLI_PATH")
-
-		BeforeEach(func() {})
 
 		BeforeEach(func() {
 			if os.Getenv("SWIFT_AUTH_ACCOUNT") == "" {
@@ -57,9 +53,7 @@ var _ = Describe("Testing for working signed URLs all Swift/OpenStack regions", 
 		})
 
 		Describe("Invoking `sign`", func() {
-
 			It("returns 0 for an existing blob", func() {
-
 				cliSession, err := integration.RunS3CLI(s3CLIPath, configPath, "sign", "some-blob", "get", "60s")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cliSession.ExitCode()).To(BeZero())

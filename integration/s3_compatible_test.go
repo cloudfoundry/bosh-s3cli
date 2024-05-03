@@ -18,7 +18,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 		bucketName := os.Getenv("BUCKET_NAME")
 		s3Host := os.Getenv("S3_HOST")
 		s3PortString := os.Getenv("S3_PORT")
-		s3Port, atoiErr := strconv.Atoi(s3PortString)
+		s3Port, err := strconv.Atoi(s3PortString)
 
 		BeforeEach(func() {
 			Expect(accessKeyID).ToNot(BeEmpty(), "ACCESS_KEY_ID must be set")
@@ -26,7 +26,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			Expect(bucketName).ToNot(BeEmpty(), "BUCKET_NAME must be set")
 			Expect(s3Host).ToNot(BeEmpty(), "S3_HOST must be set")
 			Expect(s3PortString).ToNot(BeEmpty(), "S3_PORT must be set")
-			Expect(atoiErr).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		configurations := []TableEntry{
