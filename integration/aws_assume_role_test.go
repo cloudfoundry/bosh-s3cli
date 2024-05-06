@@ -25,7 +25,7 @@ var _ = Describe("Testing AWS assume role ", func() {
 			bucketName := "bosh-s3cli-assume-role-integration-test"
 			region := "us-east-1"
 
-			not_assumed_role_cfg := &config.S3Cli{
+			nonAssumedRoleCfg := &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
@@ -33,7 +33,7 @@ var _ = Describe("Testing AWS assume role ", func() {
 				UseSSL:          true,
 			}
 
-			assumed_role_cfg := &config.S3Cli{
+			assumedRoleCfg := &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
@@ -43,14 +43,14 @@ var _ = Describe("Testing AWS assume role ", func() {
 			}
 			s3Filename := "test-file"
 
-			notAssumeRoleConfigPath := integration.MakeConfigFile(not_assumed_role_cfg)
+			notAssumeRoleConfigPath := integration.MakeConfigFile(nonAssumedRoleCfg)
 			defer func() { _ = os.Remove(notAssumeRoleConfigPath) }()
 
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, notAssumeRoleConfigPath, "exists", s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
 
-			assumeRoleConfigPath := integration.MakeConfigFile(assumed_role_cfg)
+			assumeRoleConfigPath := integration.MakeConfigFile(assumedRoleCfg)
 			defer func() { _ = os.Remove(assumeRoleConfigPath) }()
 
 			s3CLISession, err = integration.RunS3CLI(s3CLIPath, assumeRoleConfigPath, "exists", s3Filename)

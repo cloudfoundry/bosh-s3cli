@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"github.com/cloudfoundry/bosh-s3cli/config"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -29,6 +30,6 @@ var _ = Describe("Endpoints", func() {
 		Entry("with internal and no number", "oss-sichuan-chengdu-internal.aliyuncs.com", "sichuan-chengdu"),
 		Entry("without internal and number", "oss-one-two-1.aliyuncs.com", "one-two-1"),
 		Entry("without internal and no number", "oss-country-zone.aliyuncs.com", "country-zone"),
-		Entry("not alicoud", "s3-us-east-2.amazonaws.com", ""),
+		Entry("not alicloud", "s3-us-east-2.amazonaws.com", ""),
 	)
 })

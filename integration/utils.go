@@ -14,7 +14,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-const alphanum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const alphaNum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // GenerateRandomString generates a random string of desired length (default: 25)
 func GenerateRandomString(params ...int) string {
@@ -25,7 +25,7 @@ func GenerateRandomString(params ...int) string {
 
 	randBytes := make([]byte, size)
 	for i := range randBytes {
-		randBytes[i] = alphanum[rand.Intn(len(alphanum))]
+		randBytes[i] = alphaNum[rand.Intn(len(alphaNum))]
 	}
 	return string(randBytes)
 }
@@ -63,10 +63,10 @@ func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...st
 	}
 	cmdArgs = append(cmdArgs, args...)
 	command := exec.Command(s3CLIPath, cmdArgs...)
-	gexecSession, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+	session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 	if err != nil {
 		return nil, err
 	}
-	gexecSession.Wait(1 * time.Minute)
-	return gexecSession, nil
+	session.Wait(1 * time.Minute)
+	return session, nil
 }
