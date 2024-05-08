@@ -46,7 +46,7 @@ var _ = Describe("S3CompatibleClient", func() {
 
 				urlRegexp = `https://some-bucket.s3.us-west-2.amazonaws.com/test-object-id` +
 					`\?X-Amz-Algorithm=AWS4-HMAC-SHA256` +
-					`&X-Amz-Credential=id%2F20240503%2Fus-west-2%2Fs3%2Faws4_request` +
+					`&X-Amz-Credential=id%2F([0-9]+)%2Fus-west-2%2Fs3%2Faws4_request` +
 					`&X-Amz-Date=([0-9]+)T([0-9]+)Z` +
 					`&X-Amz-Expires=100` +
 					`&X-Amz-SignedHeaders=host` +
