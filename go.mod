@@ -3,8 +3,8 @@ module github.com/cloudfoundry/bosh-s3cli
 go 1.21.0
 
 require (
-	github.com/aws/aws-sdk-go v1.54.6
-	github.com/cloudfoundry/bosh-utils v0.0.473
+	github.com/aws/aws-sdk-go v1.54.11
+	github.com/cloudfoundry/bosh-utils v0.0.474
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
 )
@@ -16,7 +16,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240618054019-d3b898a103f8 // indirect
+	github.com/google/pprof v0.0.0-20240625030939-27f56978b8b0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
