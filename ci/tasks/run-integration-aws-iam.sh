@@ -47,7 +47,17 @@ pushd "${release_dir}" > /dev/null
   --handler lambda_function.test_runner_handler \
   --runtime python3.9
 
-  sleep 2
+  set +e
+    tries=0
+    get_function_status_command="aws lambda get-function --region ${region_name} --function-name ${lambda_function_name}"
+    function_status=$(${get_function_status_command})
+    while [[ ( $(echo "${function_status}"  | jq -r ".Configuration.State") != "Active" ) && ( $tries -ne 5 ) ]] ; do
+      sleep 2
+      echo "Checking for function readiness; attempt: $tries"
+      tries=$((tries + 1))
+      function_status=$(${get_function_status_command})
+    done
+  set -e
 
   aws lambda invoke \
   --invocation-type RequestResponse \
