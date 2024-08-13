@@ -28,6 +28,7 @@ func (c *openstackSwiftS3Client) Sign(objectID string, action string, expiration
 }
 
 func (c *openstackSwiftS3Client) signedURL(action string, objectID string, expiration time.Duration) (string, error) {
+	var url string
 	path := fmt.Sprintf("/v1/%s/%s/%s", c.s3cliConfig.SwiftAuthAccount, c.s3cliConfig.BucketName, objectID)
 
 	expires := time.Now().Add(expiration).Unix()
@@ -37,7 +38,11 @@ func (c *openstackSwiftS3Client) signedURL(action string, objectID string, expir
 	h.Write([]byte(hmacBody))
 	signature := hex.EncodeToString(h.Sum(nil))
 
-	url := fmt.Sprintf("https://%s%s?temp_url_sig=%s&temp_url_expires=%d\n", c.s3cliConfig.Host, path, signature, expires)
+	if c.s3cliConfig.OpenStackBlobstoreType == "ceph" {
+		url = fmt.Sprintf("https://%s/swift%s?temp_url_sig=%s", c.s3cliConfig.Host, path, signature)
+	} else {
+		url = fmt.Sprintf("https://%s%s?temp_url_sig=%s&temp_url_expires=%d", c.s3cliConfig.Host, path, signature, expires)
+	}
 
 	return url, nil
 }

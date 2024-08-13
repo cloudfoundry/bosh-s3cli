@@ -24,6 +24,8 @@ var _ = Describe("S3CompatibleClient", func() {
 		var expiration = time.Duration(100) * time.Second
 		var action string
 		var urlRegexp string
+		var urlRegexpSwift string
+		var urlRegexpCeph string
 
 		Context("when SwiftAuthAccount is empty", func() {
 			BeforeEach(func() {
@@ -107,11 +109,14 @@ var _ = Describe("S3CompatibleClient", func() {
 
 				blobstoreClient = client.New(s3Client, s3Config)
 
-				urlRegexp =
+				urlRegexpSwift =
 					"https://host-name/v1/swift_account/some-bucket/test-object-id" +
 						`\?temp_url_sig=([a-f0-9]+)` +
-						`&temp_url_expires=([0-9]+)` +
-						"\n"
+						`&temp_url_expires=([0-9]+)`
+
+				urlRegexpCeph =
+					"https://host-name/swift/v1/swift_account/some-bucket/test-object-id" +
+						`\?temp_url_sig=([a-f0-9]+)`
 			})
 
 			Context("when the action is GET", func() {
@@ -119,11 +124,26 @@ var _ = Describe("S3CompatibleClient", func() {
 					action = "GET"
 				})
 
-				It("returns a signed URL", func() {
-					url, err := blobstoreClient.Sign(objectId, action, expiration)
-					Expect(err).NotTo(HaveOccurred())
+				Context("when OpenStackBlobstoreType is empty", func() {
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
 
-					Expect(url).To(MatchRegexp(urlRegexp))
+						Expect(url).To(MatchRegexp(urlRegexpSwift))
+					})
+				})
+
+				Context("when OpenStackBlobstoreType is ceph", func() {
+					BeforeEach(func() {
+						s3Config.OpenStackBlobstoreType = "ceph"
+					})
+
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexpCeph))
+					})
 				})
 			})
 
@@ -132,11 +152,26 @@ var _ = Describe("S3CompatibleClient", func() {
 					action = "PUT"
 				})
 
-				It("returns a signed URL", func() {
-					url, err := blobstoreClient.Sign(objectId, action, expiration)
-					Expect(err).NotTo(HaveOccurred())
+				Context("when OpenStackBlobstoreType is empty", func() {
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
 
-					Expect(url).To(MatchRegexp(urlRegexp))
+						Expect(url).To(MatchRegexp(urlRegexpSwift))
+					})
+				})
+
+				Context("when OpenStackBlobstoreType is ceph", func() {
+					BeforeEach(func() {
+						s3Config.OpenStackBlobstoreType = "ceph"
+					})
+
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexpCeph))
+					})
 				})
 			})
 
