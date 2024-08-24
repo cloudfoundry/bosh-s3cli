@@ -4,8 +4,8 @@ go 1.21.0
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/cloudfoundry/bosh-utils v0.0.483
-	github.com/onsi/ginkgo/v2 v2.20.0
+	github.com/cloudfoundry/bosh-utils v0.0.484
+	github.com/onsi/ginkgo/v2 v2.20.1
 	github.com/onsi/gomega v1.34.1
 )
 
@@ -24,7 +24,7 @@ require (
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
+	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
