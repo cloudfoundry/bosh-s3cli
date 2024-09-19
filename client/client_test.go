@@ -110,8 +110,7 @@ var _ = Describe("S3CompatibleClient", func() {
 				urlRegexp =
 					"https://host-name/v1/swift_account/some-bucket/test-object-id" +
 						`\?temp_url_sig=([a-f0-9]+)` +
-						`&temp_url_expires=([0-9]+)` +
-						"\n"
+						`&temp_url_expires=([0-9]+)`
 			})
 
 			Context("when the action is GET", func() {
