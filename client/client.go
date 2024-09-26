@@ -24,6 +24,9 @@ func New(s3Client *s3.S3, s3cliConfig *config.S3Cli) S3CompatibleClient {
 		openstackSwiftBlobstore: &openstackSwiftS3Client{
 			s3cliConfig: s3cliConfig,
 		},
+		openstackCephBlobstore: &openstackCephS3Client{
+			s3cliConfig: s3cliConfig,
+		},
 		awsS3BlobstoreClient: &awsS3Client{
 			s3Client:    s3Client,
 			s3cliConfig: s3cliConfig,
@@ -35,6 +38,7 @@ type s3CompatibleClient struct {
 	s3cliConfig             *config.S3Cli
 	awsS3BlobstoreClient    *awsS3Client
 	openstackSwiftBlobstore *openstackSwiftS3Client
+	openstackCephBlobstore  *openstackCephS3Client
 }
 
 func (c *s3CompatibleClient) Get(src string, dest io.WriterAt) error {
@@ -55,7 +59,11 @@ func (c *s3CompatibleClient) Exists(dest string) (bool, error) {
 
 func (c *s3CompatibleClient) Sign(objectID string, action string, expiration time.Duration) (string, error) {
 	if c.s3cliConfig.SwiftAuthAccount != "" {
-		return c.openstackSwiftBlobstore.Sign(objectID, action, expiration)
+		if c.s3cliConfig.OpenStackBlobstoreType == "ceph" {
+			return c.openstackCephBlobstore.Sign(objectID, action, expiration)
+		} else {
+			return c.openstackSwiftBlobstore.Sign(objectID, action, expiration)
+		}
 	}
 
 	return c.awsS3BlobstoreClient.Sign(objectID, action, expiration)

@@ -106,36 +106,77 @@ var _ = Describe("S3CompatibleClient", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				blobstoreClient = client.New(s3Client, s3Config)
-
-				urlRegexp =
-					"https://host-name/v1/swift_account/some-bucket/test-object-id" +
-						`\?temp_url_sig=([a-f0-9]+)` +
-						`&temp_url_expires=([0-9]+)`
 			})
 
-			Context("when the action is GET", func() {
+			Context("when openstack blobstore type is NOT ceph", func() {
 				BeforeEach(func() {
-					action = "GET"
+					urlRegexp =
+						"https://host-name/v1/swift_account/some-bucket/test-object-id" +
+							`\?temp_url_sig=([a-f0-9]+)` +
+							`&temp_url_expires=([0-9]+)`
 				})
 
-				It("returns a signed URL", func() {
-					url, err := blobstoreClient.Sign(objectId, action, expiration)
-					Expect(err).NotTo(HaveOccurred())
+				Context("when the action is GET", func() {
+					BeforeEach(func() {
+						action = "GET"
+					})
 
-					Expect(url).To(MatchRegexp(urlRegexp))
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexp))
+					})
+				})
+
+				Context("when the action is PUT", func() {
+					BeforeEach(func() {
+						action = "PUT"
+					})
+
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexp))
+					})
 				})
 			})
 
-			Context("when the action is PUT", func() {
+			Context("when openstack blobstore type is ceph", func() {
 				BeforeEach(func() {
-					action = "PUT"
+					s3Config.OpenStackBlobstoreType = "ceph"
+
+					urlRegexp =
+						"https://host-name/swift/v1/swift_account/some-bucket/test-object-id" +
+							`\?temp_url_sig=([a-f0-9]+)` +
+							`&temp_url_expires=([0-9]+)`
 				})
 
-				It("returns a signed URL", func() {
-					url, err := blobstoreClient.Sign(objectId, action, expiration)
-					Expect(err).NotTo(HaveOccurred())
+				Context("when the action is GET", func() {
+					BeforeEach(func() {
+						action = "GET"
+					})
 
-					Expect(url).To(MatchRegexp(urlRegexp))
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexp))
+					})
+				})
+
+				Context("when the action is PUT", func() {
+					BeforeEach(func() {
+						action = "PUT"
+					})
+
+					It("returns a signed URL", func() {
+						url, err := blobstoreClient.Sign(objectId, action, expiration)
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(url).To(MatchRegexp(urlRegexp))
+					})
 				})
 			})
 
