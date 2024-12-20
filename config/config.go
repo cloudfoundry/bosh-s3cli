@@ -10,25 +10,26 @@ import (
 
 // The S3Cli represents configuration for the s3cli
 type S3Cli struct {
-	AccessKeyID          string `json:"access_key_id"`
-	SecretAccessKey      string `json:"secret_access_key"`
-	BucketName           string `json:"bucket_name"`
-	FolderName           string `json:"folder_name"`
-	CredentialsSource    string `json:"credentials_source"`
-	Host                 string `json:"host"`
-	Port                 int    `json:"port"` // 0 means no custom port
-	Region               string `json:"region"`
-	SSLVerifyPeer        bool   `json:"ssl_verify_peer"`
-	UseSSL               bool   `json:"use_ssl"`
-	SignatureVersion     int    `json:"signature_version,string"`
-	ServerSideEncryption string `json:"server_side_encryption"`
-	SSEKMSKeyID          string `json:"sse_kms_key_id"`
-	AssumeRoleArn        string `json:"assume_role_arn"`
-	MultipartUpload      bool   `json:"multipart_upload"`
-	UseV2SigningMethod   bool
-	HostStyle            bool   `json:"host_style"`
-	SwiftAuthAccount     string `json:"swift_auth_account"`
-	SwiftTempURLKey      string `json:"swift_temp_url_key"`
+	AccessKeyID            string `json:"access_key_id"`
+	SecretAccessKey        string `json:"secret_access_key"`
+	BucketName             string `json:"bucket_name"`
+	FolderName             string `json:"folder_name"`
+	CredentialsSource      string `json:"credentials_source"`
+	Host                   string `json:"host"`
+	Port                   int    `json:"port"` // 0 means no custom port
+	Region                 string `json:"region"`
+	SSLVerifyPeer          bool   `json:"ssl_verify_peer"`
+	UseSSL                 bool   `json:"use_ssl"`
+	SignatureVersion       int    `json:"signature_version,string"`
+	ServerSideEncryption   string `json:"server_side_encryption"`
+	SSEKMSKeyID            string `json:"sse_kms_key_id"`
+	AssumeRoleArn          string `json:"assume_role_arn"`
+	MultipartUpload        bool   `json:"multipart_upload"`
+	UseV2SigningMethod     bool
+	HostStyle              bool   `json:"host_style"`
+	SwiftAuthAccount       string `json:"swift_auth_account"`
+	SwiftTempURLKey        string `json:"swift_temp_url_key"`
+	OpenStackBlobstoreType string `json:"openstack_blobstore_type"`
 }
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
