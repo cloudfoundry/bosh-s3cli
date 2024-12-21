@@ -1,4 +1,4 @@
-# code.cloudfoundry.org/tlsconfig v0.12.0
+# code.cloudfoundry.org/tlsconfig v0.13.0
 ## explicit; go 1.22
 code.cloudfoundry.org/tlsconfig
 # github.com/aws/aws-sdk-go v1.55.5
@@ -56,7 +56,7 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.513
+# github.com/cloudfoundry/bosh-utils v0.0.516
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -66,7 +66,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.135
+# github.com/cloudfoundry/socks5-proxy v0.2.136
 ## explicit; go 1.22.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/go-logr/logr v1.4.2
@@ -99,7 +99,7 @@ github.com/jpillora/backoff
 github.com/nu7hatch/gouuid
 # github.com/nxadm/tail v1.4.8
 ## explicit; go 1.13
-# github.com/onsi/ginkgo/v2 v2.22.0
+# github.com/onsi/ginkgo/v2 v2.22.1
 ## explicit; go 1.22.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -150,7 +150,7 @@ golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/net v0.32.0
+# golang.org/x/net v0.33.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
