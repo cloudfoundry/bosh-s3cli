@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
 jobs:
-  lint:
+  lint: # <- name
     strategy:
       matrix:
         os: [macos-latest, windows-2019, ubuntu-latest]
@@ -22,11 +22,14 @@ jobs:
         with:
           args: --enable goimports
 
-  test-unit:
-    runs-on: ubuntu-latest
+  test-unit: # <- name
+    strategy:
+      matrix:
+        os: [macos-latest, windows-2019, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
-    - run: scripts/ginkgo -r -race --skip-package=integration ./
+    - run: go run github.com/onsi/ginkgo/v2/ginkgo run -r --keep-going --skip-package integration
