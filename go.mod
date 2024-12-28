@@ -4,13 +4,13 @@ go 1.22.0
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/cloudfoundry/bosh-utils v0.0.516
+	github.com/cloudfoundry/bosh-utils v0.0.518
 	github.com/onsi/ginkgo/v2 v2.22.1
-	github.com/onsi/gomega v1.36.1
+	github.com/onsi/gomega v1.36.2
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.13.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.14.0 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee // indirect
 	github.com/cloudfoundry/socks5-proxy v0.2.136 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
