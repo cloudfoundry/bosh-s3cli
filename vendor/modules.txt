@@ -1,5 +1,5 @@
-# code.cloudfoundry.org/tlsconfig v0.18.0
-## explicit; go 1.22
+# code.cloudfoundry.org/tlsconfig v0.19.0
+## explicit; go 1.23.0
 code.cloudfoundry.org/tlsconfig
 # github.com/aws/aws-sdk-go v1.55.6
 ## explicit; go 1.19
@@ -56,7 +56,7 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/cloudfoundry/bosh-utils v0.0.531
+# github.com/cloudfoundry/bosh-utils v0.0.532
 ## explicit; go 1.23.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -66,7 +66,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.143
+# github.com/cloudfoundry/socks5-proxy v0.2.144
 ## explicit; go 1.23.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/go-logr/logr v1.4.2
@@ -141,7 +141,7 @@ github.com/onsi/gomega/types
 github.com/pivotal-cf/paraphernalia/secure/tlsconfig
 # github.com/rogpeppe/go-internal v1.8.0
 ## explicit; go 1.11
-# golang.org/x/crypto v0.34.0
+# golang.org/x/crypto v0.35.0
 ## explicit; go 1.23.0
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20

@@ -4,15 +4,15 @@ go 1.23.0
 
 require (
 	github.com/aws/aws-sdk-go v1.55.6
-	github.com/cloudfoundry/bosh-utils v0.0.531
+	github.com/cloudfoundry/bosh-utils v0.0.532
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.18.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.19.0 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee // indirect
-	github.com/cloudfoundry/socks5-proxy v0.2.143 // indirect
+	github.com/cloudfoundry/socks5-proxy v0.2.144 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
-	golang.org/x/crypto v0.34.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
