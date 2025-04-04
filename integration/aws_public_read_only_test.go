@@ -55,12 +55,12 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			}
 
 			configPath := integration.MakeConfigFile(cfg)
-			defer func() { _ = os.Remove(configPath) }()
+			defer os.Remove(configPath) //nolint:errcheck
 
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "get", s3Filename, "public-file")
 			Expect(err).ToNot(HaveOccurred())
 
-			defer func() { _ = os.Remove("public-file") }()
+			defer os.Remove("public-file") //nolint:errcheck
 			Expect(s3CLISession.ExitCode()).To(BeZero())
 
 			gottenBytes, err := os.ReadFile("public-file")

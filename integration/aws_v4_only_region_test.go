@@ -35,10 +35,10 @@ var _ = Describe("Testing in any AWS region that only supports v4 signature vers
 			s3Filename := integration.GenerateRandomString()
 
 			configPath := integration.MakeConfigFile(cfg)
-			defer func() { _ = os.Remove(configPath) }()
+			defer os.Remove(configPath) //nolint:errcheck
 
 			contentFile := integration.MakeContentFile("test")
-			defer func() { _ = os.Remove(contentFile) }()
+			defer os.Remove(contentFile) //nolint:errcheck
 
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 			Expect(err).ToNot(HaveOccurred())

@@ -48,8 +48,8 @@ var _ = Describe("Testing for working signed URLs all Swift/OpenStack regions", 
 		})
 
 		AfterEach(func() {
-			defer func() { _ = os.Remove(configPath) }()
-			defer func() { _ = os.Remove(contentFile) }()
+			defer os.Remove(configPath)  //nolint:errcheck
+			defer os.Remove(contentFile) //nolint:errcheck
 		})
 
 		Describe("Invoking `sign`", func() {
