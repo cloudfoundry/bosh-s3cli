@@ -37,10 +37,10 @@ var _ = Describe("Testing in any AWS region isolated from the US standard region
 			s3Filename := integration.GenerateRandomString()
 
 			configPath := integration.MakeConfigFile(cfg)
-			defer func() { _ = os.Remove(configPath) }()
+			defer os.Remove(configPath) //nolint:errcheck
 
 			contentFile := integration.MakeContentFile("test")
-			defer func() { _ = os.Remove(contentFile) }()
+			defer os.Remove(contentFile) //nolint:errcheck
 
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 			Expect(err).ToNot(HaveOccurred())

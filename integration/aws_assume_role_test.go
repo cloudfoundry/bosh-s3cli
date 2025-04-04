@@ -44,14 +44,14 @@ var _ = Describe("Testing AWS assume role ", func() {
 			s3Filename := "test-file"
 
 			notAssumeRoleConfigPath := integration.MakeConfigFile(nonAssumedRoleCfg)
-			defer func() { _ = os.Remove(notAssumeRoleConfigPath) }()
+			defer os.Remove(notAssumeRoleConfigPath) //nolint:errcheck
 
 			s3CLISession, err := integration.RunS3CLI(s3CLIPath, notAssumeRoleConfigPath, "exists", s3Filename)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).ToNot(BeZero())
 
 			assumeRoleConfigPath := integration.MakeConfigFile(assumedRoleCfg)
-			defer func() { _ = os.Remove(assumeRoleConfigPath) }()
+			defer os.Remove(assumeRoleConfigPath) //nolint:errcheck
 
 			s3CLISession, err = integration.RunS3CLI(s3CLIPath, assumeRoleConfigPath, "exists", s3Filename)
 			Expect(err).ToNot(HaveOccurred())

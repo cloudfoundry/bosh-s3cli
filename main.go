@@ -60,7 +60,7 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		defer sourceFile.Close()
+		defer sourceFile.Close() //nolint:errcheck
 		err = blobstoreClient.Put(sourceFile, dst)
 	case "get":
 		if len(nonFlagArgs) != 3 {
@@ -74,7 +74,7 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		defer dstFile.Close()
+		defer dstFile.Close() //nolint:errcheck
 		err = blobstoreClient.Get(src, dstFile)
 	case "delete":
 		if len(nonFlagArgs) != 2 {

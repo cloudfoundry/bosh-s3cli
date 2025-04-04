@@ -17,7 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega" //nolint:staticcheck
 )
 
 // AssertLifecycleWorks tests the main blobstore object lifecycle from creation to deletion
@@ -26,10 +26,10 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	s3Filename := GenerateRandomString()
 
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	contentFile := MakeContentFile(expectedString)
-	defer func() { _ = os.Remove(contentFile) }()
+	defer os.Remove(contentFile) //nolint:errcheck
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
 	Expect(err).ToNot(HaveOccurred())
@@ -39,7 +39,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 		folderName := cfg.FolderName
 		cfg.FolderName = ""
 		noFolderConfigPath := MakeConfigFile(cfg)
-		defer func() { _ = os.Remove(noFolderConfigPath) }()
+		defer os.Remove(noFolderConfigPath) //nolint:errcheck
 
 		s3CLISession, err :=
 			RunS3CLI(s3CLIPath, noFolderConfigPath, "exists", fmt.Sprintf("%s/%s", folderName, s3Filename))
@@ -56,7 +56,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(err).ToNot(HaveOccurred())
 	err = tmpLocalFile.Close()
 	Expect(err).ToNot(HaveOccurred())
-	defer func() { _ = os.Remove(tmpLocalFile.Name()) }()
+	defer os.Remove(tmpLocalFile.Name()) //nolint:errcheck
 
 	s3CLISession, err = RunS3CLI(s3CLIPath, configPath, "get", s3Filename, tmpLocalFile.Name())
 	Expect(err).ToNot(HaveOccurred())
@@ -81,7 +81,7 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	sourceContent := strings.NewReader(content)
 
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	configFile, err := os.Open(configPath)
 	Expect(err).ToNot(HaveOccurred())
@@ -119,10 +119,10 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Filename := GenerateRandomString()
 
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	contentFile := MakeContentFile(expectedString)
-	defer func() { _ = os.Remove(contentFile) }()
+	defer os.Remove(contentFile) //nolint:errcheck
 
 	configFile, err := os.Open(configPath)
 	Expect(err).ToNot(HaveOccurred())
@@ -132,7 +132,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, _ := client.NewAwsS3Client(&s3Config)
+	s3Client, _ := client.NewAwsS3Client(&s3Config) //nolint:errcheck
 	resp, err := s3Client.HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(cfg.BucketName),
 		Key:    aws.String(s3Filename),
@@ -150,7 +150,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 // AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object will fail
 func AssertGetNonexistentFails(s3CLIPath string, cfg *config.S3Cli) {
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "get", "non-existent-file", "/dev/null")
 	Expect(err).ToNot(HaveOccurred())
@@ -162,7 +162,7 @@ func AssertGetNonexistentFails(s3CLIPath string, cfg *config.S3Cli) {
 // object exits with status 0 (tests idempotency)
 func AssertDeleteNonexistentWorks(s3CLIPath string, cfg *config.S3Cli) {
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "delete", "non-existent-file")
 	Expect(err).ToNot(HaveOccurred())
@@ -174,7 +174,7 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	sourceContent := strings.NewReader(content)
 
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	configFile, err := os.Open(configPath)
 	Expect(err).ToNot(HaveOccurred())
@@ -207,7 +207,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Filename := GenerateRandomString()
 
 	configPath := MakeConfigFile(cfg)
-	defer func() { _ = os.Remove(configPath) }()
+	defer os.Remove(configPath) //nolint:errcheck
 
 	configFile, err := os.Open(configPath)
 	Expect(err).ToNot(HaveOccurred())

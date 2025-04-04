@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
-	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/ginkgo/v2" //nolint:staticcheck
 	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 )
