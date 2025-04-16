@@ -15,9 +15,9 @@ pushd "${release_dir}" > /dev/null
   if ! command -v golangci-lint &> /dev/null; then
     go_bin="$(go env GOPATH)/bin"
     export PATH=${go_bin}:${PATH}
-    go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    go install -v github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
   fi
-  golangci-lint run --enable goimports ./...
+  golangci-lint run ./...
 
   echo -e "\n Unit testing packages..."
   scripts/ginkgo -r -race --skip-package=integration ./
