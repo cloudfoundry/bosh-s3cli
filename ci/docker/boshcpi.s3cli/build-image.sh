@@ -4,7 +4,7 @@ set -e
 
 my_dir="$( cd "$( dirname "$0" )" && pwd )"
 
-DOCKER_IMAGE=${DOCKER_IMAGE:-bosh/s3cli}
+DOCKER_IMAGE=${DOCKER_IMAGE:-ghcr.io/cloudfoundry/bosh-s3cli}
 
 docker login
 

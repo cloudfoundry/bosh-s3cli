@@ -264,16 +264,16 @@ resources:
 - name: bosh-golang-release-image
   type: docker-image
   source:
-    repository: bosh/golang-release
-    username: ((dockerhub_username))
-    password: ((dockerhub_password))
+    repository: ghcr.io/cloudfoundry/golang-release
+    username: ((github_read_write_packages.username))
+    password: ((github_read_write_packages.password))
 
 - name: s3cli-docker-image
   type: docker-image
   source:
-    repository: bosh/s3cli
-    username: ((dockerhub_username))
-    password: ((dockerhub_password))
+    repository: ghcr.io/cloudfoundry/bosh-s3cli
+    username: ((github_read_write_packages.username))
+    password: ((github_read_write_packages.password))
 
 - name: weekly
   type: time
