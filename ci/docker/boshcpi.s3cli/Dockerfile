@@ -1,4 +1,4 @@
-FROM ghcr.io/cloudfoundry/golang-release
+FROM ghcr.io/cloudfoundry/bosh/golang-release
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
