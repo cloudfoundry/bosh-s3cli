@@ -190,6 +190,8 @@ jobs:
   - put: s3cli-docker-image
     params:
       build: "bosh-s3cli/ci/docker/boshcpi.s3cli"
+      labels:
+        org.opencontainers.image.source: https://github.com/cloudfoundry/bosh-s3cli
     get_params:
       skip_download: true
 
