@@ -87,6 +87,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      image: s3cli-docker-image
       params: *aws-us-public-read-infrastructure-params
 
 - name: aws-s3-frankfurt-integration
@@ -118,6 +119,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      image: s3cli-docker-image
       params: *aws-frankfurt-infrastructure-params
 
 - name: gcs-s3-compatible-integration
