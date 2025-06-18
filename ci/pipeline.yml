@@ -9,6 +9,7 @@ jobs:
     trigger: true
   - task: test
     file: bosh-s3cli/ci/tasks/run-unit.yml
+    image: s3cli-docker-image
 
 - name: aws-s3-us-integration
   serial: true
@@ -22,6 +23,7 @@ jobs:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    image: s3cli-docker-image
     params: &aws-us-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -54,6 +56,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
+      image: s3cli-docker-image
       params: *aws-us-infrastructure-params
 
 - name: aws-s3-public-read-integration
@@ -68,6 +71,7 @@ jobs:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    image: s3cli-docker-image
     params: &aws-us-public-read-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -97,6 +101,7 @@ jobs:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
+    image: s3cli-docker-image
     params: &aws-frankfurt-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -200,6 +205,7 @@ jobs:
   - in_parallel:
     - get: bosh-s3cli
     - get: golang-release
+    - get: s3cli-docker-image
     - get: weekly
       trigger: true
   - task: bump-deps
@@ -210,6 +216,7 @@ jobs:
       output_repo: bumped-bosh-s3cli
   - task: test
     file: bosh-s3cli/ci/tasks/run-unit.yml
+    image: s3cli-docker-image
     input_mapping:
       bosh-s3cli: bumped-bosh-s3cli
   - put: bosh-s3cli
