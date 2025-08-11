@@ -3,17 +3,20 @@ package client
 import (
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 
-	"github.com/cloudfoundry/bosh-s3cli/config"
+	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-func NewAwsS3Client(c *config.S3Cli) (*s3.S3, error) {
+func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -22,40 +25,43 @@ func NewAwsS3Client(c *config.S3Cli) (*s3.S3, error) {
 		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
 	}
 
-	awsConfig := aws.NewConfig().
-		WithLogLevel(aws.LogOff).
-		WithS3ForcePathStyle(!c.HostStyle).
-		WithDisableSSL(!c.UseSSL).
-		WithHTTPClient(httpClient)
+	options := []func(*config.LoadOptions) error{
+		config.WithHTTPClient(httpClient),
+	}
 
 	if c.UseRegion() {
-		awsConfig = awsConfig.WithRegion(c.Region).WithEndpoint(c.S3Endpoint())
+		options = append(options, config.WithRegion(c.Region))
 	} else {
-		awsConfig = awsConfig.WithRegion(config.EmptyRegion).WithEndpoint(c.S3Endpoint())
+		options = append(options, config.WithRegion(s3cli_config.EmptyRegion))
 	}
 
-	if c.CredentialsSource == config.StaticCredentialsSource {
-		awsConfig = awsConfig.WithCredentials(credentials.NewStaticCredentials(c.AccessKeyID, c.SecretAccessKey, ""))
+	if c.CredentialsSource == s3cli_config.StaticCredentialsSource {
+		options = append(options, config.WithCredentialsProvider(
+			credentials.NewStaticCredentialsProvider(c.AccessKeyID, c.SecretAccessKey, ""),
+		))
 	}
 
-	if c.CredentialsSource == config.NoneCredentialsSource {
-		awsConfig = awsConfig.WithCredentials(credentials.AnonymousCredentials)
+	if c.CredentialsSource == s3cli_config.NoneCredentialsSource {
+		options = append(options, config.WithCredentialsProvider(aws.AnonymousCredentials{}))
 	}
 
-	s3Session, err := session.NewSession(awsConfig)
+	awsConfig, err := config.LoadDefaultConfig(context.TODO(), options...)
 	if err != nil {
 		return nil, err
 	}
 
 	if c.AssumeRoleArn != "" {
-		awsConfig = awsConfig.WithCredentials(stscreds.NewCredentials(s3Session, c.AssumeRoleArn))
+		stsClient := sts.NewFromConfig(awsConfig)
+		provider := stscreds.NewAssumeRoleProvider(stsClient, c.AssumeRoleArn)
+		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
-	s3Client := s3.New(s3Session, awsConfig)
-
-	if c.UseV2SigningMethod {
-		setv2Handlers(s3Client)
-	}
+	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
+		o.UsePathStyle = !c.HostStyle
+		if c.S3Endpoint() != "" {
+			o.BaseEndpoint = aws.String(c.S3Endpoint())
+		}
+	})
 
 	return s3Client, nil
 }
