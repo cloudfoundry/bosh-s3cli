@@ -1,16 +1,17 @@
 package integration_test
 
 import (
+	"context"
 	"os"
 	"strings"
 
 	"github.com/cloudfoundry/bosh-s3cli/config"
 	"github.com/cloudfoundry/bosh-s3cli/integration"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -33,19 +34,18 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			s3Filename := integration.GenerateRandomString()
 			s3FileContents := integration.GenerateRandomString()
 
-			awsSession, err := session.NewSession(
-				aws.NewConfig().
-					WithCredentials(credentials.NewStaticCredentials(accessKeyID, secretAccessKey, "")).
-					WithRegion(region),
+			awsConfig, err := awsconfig.LoadDefaultConfig(context.TODO(),
+				awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")),
+				awsconfig.WithRegion(region),
 			)
 			Expect(err).ToNot(HaveOccurred())
-			s3Client := s3.New(awsSession)
+			s3Client := s3.NewFromConfig(awsConfig)
 
-			_, err = s3Client.PutObject(&s3.PutObjectInput{
+			_, err = s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
 				Body:   strings.NewReader(s3FileContents),
 				Bucket: &bucketName,
 				Key:    &s3Filename,
-				ACL:    aws.String(s3.ObjectCannedACLPublicRead),
+				ACL:    types.ObjectCannedACLPublicRead,
 			})
 			Expect(err).ToNot(HaveOccurred())
 
