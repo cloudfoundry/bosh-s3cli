@@ -1,22 +1,19 @@
 package integration
 
 import (
-	"bytes"
+	"context"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	. "github.com/onsi/gomega" //nolint:staticcheck
 )
 
@@ -89,26 +86,41 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config)
+	/*
+	   AWS SDK v2 Migration: Failure Injection for Multipart Uploads - IMPLEMENTED
+
+	   The original AWS SDK v1 implementation used Handlers.Build.PushBack() to inject failures:
+
+	   s3Client.Handlers.Build.PushBack(func(r *request.Request) {
+	       if r.Operation.Name == "UploadPart" {
+	           if part%2 == 0 {
+	               r.HTTPRequest.Header.Set("X-Amz-Content-Sha256", "000")
+	           }
+	           part++
+	       }
+	   })
+
+	   AWS SDK v2 implementation: Custom Middleware
+
+	   We now use smithy-go middleware to achieve the same functionality:
+	   1. Initialize middleware tracks UploadPart operations and marks even parts for failure
+	   2. Finalize middleware corrupts the SHA256 header for marked requests
+
+	   This reproduces the original behavior: even-numbered upload parts will fail with
+	   SHA256 checksum mismatches, triggering retry logic in multipart uploads.
+	*/
+
+	s3Client, err := CreateS3ClientWithFailureInjection(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// Here we cause every other "part" to fail by way of SHA mismatch,
-	// thereby triggering the MultiUploadFailure which causes retries.
-	part := 0
-	s3Client.Handlers.Build.PushBack(func(r *request.Request) {
-		if r.Operation.Name == "UploadPart" {
-			if part%2 == 0 {
-				r.HTTPRequest.Header.Set("X-Amz-Content-Sha256", "000")
-			}
-			part++
-		}
-	})
-
 	blobstoreClient := client.New(s3Client, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
+	// Now that we have implemented proper failure injection middleware for AWS SDK v2,
+	// we can test that multipart upload failures are handled correctly.
+	// The middleware will inject SHA256 checksum failures on even-numbered upload parts
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(ContainSubstring(errorMessage))
 }
@@ -133,7 +145,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(err).ToNot(HaveOccurred())
 
 	s3Client, _ := client.NewAwsS3Client(&s3Config) //nolint:errcheck
-	resp, err := s3Client.HeadObject(&s3.HeadObjectInput{
+	resp, err := s3Client.HeadObject(context.TODO(), &s3.HeadObjectInput{
 		Bucket: aws.String(cfg.BucketName),
 		Key:    aws.String(s3Filename),
 	})
@@ -141,9 +153,9 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	if cfg.ServerSideEncryption == "" {
-		Expect(resp.ServerSideEncryption).To(Or(BeNil(), HaveValue(Equal("AES256"))))
+		Expect(resp.ServerSideEncryption).To(Or(BeNil(), HaveValue(Equal(types.ServerSideEncryptionAes256))))
 	} else {
-		Expect(*resp.ServerSideEncryption).To(Equal(cfg.ServerSideEncryption))
+		Expect(string(resp.ServerSideEncryption)).To(Equal(cfg.ServerSideEncryption))
 	}
 }
 
@@ -182,23 +194,23 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config)
+	// Create S3 client with tracing middleware
+	calls := []string{}
+	s3Client, err := CreateTracingS3Client(&s3Config, &calls)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	tracedS3, calls := traceS3(s3Client)
-
-	blobstoreClient := client.New(tracedS3, &s3Config)
+	blobstoreClient := client.New(s3Client, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
 	Expect(err).ToNot(HaveOccurred())
 
 	switch cfg.Host {
 	case "storage.googleapis.com":
-		Expect(*calls).To(Equal([]string{"PutObject"}))
+		Expect(calls).To(Equal([]string{"PutObject"}))
 	default:
-		Expect(*calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
+		Expect(calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
 	}
 }
 
@@ -215,14 +227,14 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config)
+	// Create S3 client with tracing middleware (though signing operations don't need tracing for this test)
+	calls := []string{}
+	s3Client, err := CreateTracingS3Client(&s3Config, &calls)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	tracedS3, _ := traceS3(s3Client)
-
-	blobstoreClient := client.New(tracedS3, &s3Config)
+	blobstoreClient := client.New(s3Client, &s3Config)
 
 	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
@@ -235,40 +247,4 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	url, err = blobstoreClient.Sign(s3Filename, "put", 1*time.Minute)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(url).To(MatchRegexp(regex))
-}
-
-func traceS3(svc *s3.S3) (*s3.S3, *[]string) {
-	var m sync.Mutex
-	calls := []string{}
-	partNum := 0
-
-	svc.Handlers.Send.Clear()
-	svc.Handlers.Send.PushBack(func(r *request.Request) {
-		m.Lock()
-		defer m.Unlock()
-
-		r.HTTPResponse = &http.Response{
-			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewReader([]byte{})),
-		}
-
-		switch data := r.Data.(type) {
-		case *s3.CreateMultipartUploadOutput:
-			calls = append(calls, "CreateMultipart")
-			data.UploadId = aws.String("UPLOAD-ID")
-		case *s3.UploadPartOutput:
-			calls = append(calls, "UploadPart")
-			partNum++
-			data.ETag = aws.String(fmt.Sprintf("ETAG%d", partNum))
-		case *s3.CompleteMultipartUploadOutput:
-			calls = append(calls, "CompleteMultipart")
-			data.Location = aws.String("https://location")
-			data.VersionId = aws.String("VERSION-ID")
-		case *s3.PutObjectOutput:
-			calls = append(calls, "PutObject")
-			data.VersionId = aws.String("VERSION-ID")
-		}
-	})
-
-	return svc, &calls
 }
