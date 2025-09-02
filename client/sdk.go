@@ -2,6 +2,7 @@ package client
 
 import (
 	"net/http"
+	"strings"
 
 	"context"
 
@@ -59,7 +60,16 @@ func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.UsePathStyle = !c.HostStyle
 		if c.S3Endpoint() != "" {
-			o.BaseEndpoint = aws.String(c.S3Endpoint())
+			endpoint := c.S3Endpoint()
+			// AWS SDK v2 requires full URI with protocol
+			if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+				if c.UseSSL {
+					endpoint = "https://" + endpoint
+				} else {
+					endpoint = "http://" + endpoint
+				}
+			}
+			o.BaseEndpoint = aws.String(endpoint)
 		}
 	})
 
