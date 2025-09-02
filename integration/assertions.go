@@ -118,9 +118,6 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	blobstoreClient := client.New(s3Client, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
-	// Now that we have implemented proper failure injection middleware for AWS SDK v2,
-	// we can test that multipart upload failures are handled correctly.
-	// The middleware will inject SHA256 checksum failures on even-numbered upload parts
 	Expect(err).To(HaveOccurred())
 	Expect(err.Error()).To(ContainSubstring(errorMessage))
 }

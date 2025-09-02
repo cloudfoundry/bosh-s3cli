@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"sync/atomic"
 
@@ -18,9 +17,6 @@ import (
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 )
 
-// Shared state for failure injection
-var shouldInjectFailure int64
-
 // CreateUploadPartTracker creates an Initialize middleware that tracks upload parts
 func CreateUploadPartTracker() middleware.InitializeMiddleware {
 	var partCounter int64
@@ -30,53 +26,39 @@ func CreateUploadPartTracker() middleware.InitializeMiddleware {
 	) (
 		out middleware.InitializeOutput, metadata middleware.Metadata, err error,
 	) {
-		// Reset the failure flag for all operations first
-		atomic.StoreInt64(&shouldInjectFailure, 0)
-
 		// Type switch to check if the input is s3.UploadPartInput
+		injectFailure := false
 		switch in.Parameters.(type) {
 		case *s3.UploadPartInput:
 			// Increment counter and mark even-numbered parts for failure
 			count := atomic.AddInt64(&partCounter, 1)
-			fmt.Printf("UploadPart #%d detected\n", count)
-			if count%2 == 0 { // Mark even-numbered parts (2nd, 4th, etc.) for failure
-				fmt.Printf("Marking UploadPart #%d for failure injection\n", count)
-				atomic.StoreInt64(&shouldInjectFailure, 1)
-			} else {
-				fmt.Printf("UploadPart #%d proceeding normally\n", count)
+			if count%2 == 0 {
+				injectFailure = true
 			}
 		}
+
+		// Store the injectFailure flag in the context for this request
+		ctx = context.WithValue(ctx, failureInjectionKey{}, injectFailure)
 
 		// Continue to next middleware
 		return next.HandleInitialize(ctx, in)
 	})
 }
 
+// Context key for failure injection flag
+type failureInjectionKey struct{}
+
 // CreateSHACorruptionMiddleware creates a Finalize middleware that corrupts headers
 func CreateSHACorruptionMiddleware() middleware.FinalizeMiddleware {
 	return middleware.FinalizeMiddlewareFunc("SHACorruptionMiddleware", func(
 		ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler,
 	) (middleware.FinalizeOutput, middleware.Metadata, error) {
-		// Always log when this middleware is called
-		fmt.Printf("SHACorruptionMiddleware called\n")
-
-		// Check if we should inject a failure based on shared state
-		if atomic.LoadInt64(&shouldInjectFailure) == 1 {
-			fmt.Printf("Found failure injection marker in shared state!\n")
-			fmt.Printf("Request type: %T\n", in.Request)
-			fmt.Printf("Request value: %+v\n", in.Request)
-			// Reset the flag immediately to avoid affecting other operations
-			atomic.StoreInt64(&shouldInjectFailure, 0)
+		// Check if we should inject a failure based on context value
+		if inject, ok := ctx.Value(failureInjectionKey{}).(bool); ok && inject {
 			if req, ok := in.Request.(*smithyhttp.Request); ok {
-				fmt.Printf("Request headers before corruption: %v\n", req.Header)
 				// Corrupt the SHA256 header to cause upload failure
 				req.Header.Set("X-Amz-Content-Sha256", "000")
-				fmt.Printf("Request headers after corruption: %v\n", req.Header)
-			} else {
-				fmt.Printf("Could not extract *http.Request from in.Request, type: %T\n", in.Request)
 			}
-		} else {
-			fmt.Printf("No failure injection marker found in shared state\n")
 		}
 		return next.HandleFinalize(ctx, in)
 	})
