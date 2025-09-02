@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sync/atomic"
 
@@ -12,35 +13,37 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go/middleware"
+	smithyhttp "github.com/aws/smithy-go/transport/http"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 )
 
-// contextKey is a custom type for context keys to avoid collisions
-type contextKey string
+// Shared state for failure injection
+var shouldInjectFailure int64
 
-const (
-	// injectFailureKey is the context key for marking requests that should fail
-	injectFailureKey contextKey = "inject-failure"
-)
-
-// CreateFailureInjectionMiddleware creates a middleware that will inject SHA mismatches on even-numbered upload parts
-func CreateFailureInjectionMiddleware() middleware.InitializeMiddleware {
+// CreateUploadPartTracker creates an Initialize middleware that tracks upload parts
+func CreateUploadPartTracker() middleware.InitializeMiddleware {
 	var partCounter int64
 
-	return middleware.InitializeMiddlewareFunc("FailureInjectionMiddleware", func(
+	return middleware.InitializeMiddlewareFunc("UploadPartTracker", func(
 		ctx context.Context, in middleware.InitializeInput, next middleware.InitializeHandler,
 	) (
 		out middleware.InitializeOutput, metadata middleware.Metadata, err error,
 	) {
+		// Reset the failure flag for all operations first
+		atomic.StoreInt64(&shouldInjectFailure, 0)
+
 		// Type switch to check if the input is s3.UploadPartInput
 		switch in.Parameters.(type) {
 		case *s3.UploadPartInput:
-			// Increment counter and fail every other request (even numbers)
+			// Increment counter and mark even-numbered parts for failure
 			count := atomic.AddInt64(&partCounter, 1)
-			if count%2 == 0 { // Fail even-numbered parts (2nd, 4th, etc.)
-				// Add a marker to the context that the Finalize step can check
-				ctx = context.WithValue(ctx, injectFailureKey, true)
+			fmt.Printf("UploadPart #%d detected\n", count)
+			if count%2 == 0 { // Mark even-numbered parts (2nd, 4th, etc.) for failure
+				fmt.Printf("Marking UploadPart #%d for failure injection\n", count)
+				atomic.StoreInt64(&shouldInjectFailure, 1)
+			} else {
+				fmt.Printf("UploadPart #%d proceeding normally\n", count)
 			}
 		}
 
@@ -49,18 +52,31 @@ func CreateFailureInjectionMiddleware() middleware.InitializeMiddleware {
 	})
 }
 
-// CreateSHACorruptionMiddleware creates a finalize middleware that corrupts SHA headers
+// CreateSHACorruptionMiddleware creates a Finalize middleware that corrupts headers
 func CreateSHACorruptionMiddleware() middleware.FinalizeMiddleware {
 	return middleware.FinalizeMiddlewareFunc("SHACorruptionMiddleware", func(
 		ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler,
 	) (middleware.FinalizeOutput, middleware.Metadata, error) {
-		// Check if we should inject a failure based on context
-		if shouldInject, ok := ctx.Value(injectFailureKey).(bool); ok && shouldInject {
-			// Check if this is an HTTP request
-			if req, ok := in.Request.(*http.Request); ok {
-				// Modify the request to have an invalid SHA256 checksum
-				req.Header.Set("X-Amz-Content-Sha256", "invalid-checksum-to-cause-failure")
+		// Always log when this middleware is called
+		fmt.Printf("SHACorruptionMiddleware called\n")
+
+		// Check if we should inject a failure based on shared state
+		if atomic.LoadInt64(&shouldInjectFailure) == 1 {
+			fmt.Printf("Found failure injection marker in shared state!\n")
+			fmt.Printf("Request type: %T\n", in.Request)
+			fmt.Printf("Request value: %+v\n", in.Request)
+			// Reset the flag immediately to avoid affecting other operations
+			atomic.StoreInt64(&shouldInjectFailure, 0)
+			if req, ok := in.Request.(*smithyhttp.Request); ok {
+				fmt.Printf("Request headers before corruption: %v\n", req.Header)
+				// Corrupt the SHA256 header to cause upload failure
+				req.Header.Set("X-Amz-Content-Sha256", "000")
+				fmt.Printf("Request headers after corruption: %v\n", req.Header)
+			} else {
+				fmt.Printf("Could not extract *http.Request from in.Request, type: %T\n", in.Request)
 			}
+		} else {
+			fmt.Printf("No failure injection marker found in shared state\n")
 		}
 		return next.HandleFinalize(ctx, in)
 	})
@@ -111,8 +127,8 @@ func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, err
 	}
 
 	// Create failure injection middlewares
-	initializeMiddleware := CreateFailureInjectionMiddleware()
-	finalizeMiddleware := CreateSHACorruptionMiddleware()
+	trackingMiddleware := CreateUploadPartTracker()
+	corruptionMiddleware := CreateSHACorruptionMiddleware()
 
 	// Create S3 client with custom middleware and options
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
@@ -124,11 +140,11 @@ func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, err
 		// Add the failure injection middlewares
 		o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
 			// Add initialize middleware to track UploadPart operations
-			if err := stack.Initialize.Add(initializeMiddleware, middleware.Before); err != nil {
+			if err := stack.Initialize.Add(trackingMiddleware, middleware.Before); err != nil {
 				return err
 			}
-			// Add finalize middleware to corrupt SHA headers when needed
-			return stack.Finalize.Add(finalizeMiddleware, middleware.After)
+			// Add finalize middleware to corrupt headers after signing
+			return stack.Finalize.Add(corruptionMiddleware, middleware.After)
 		})
 	})
 
