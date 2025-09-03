@@ -98,7 +98,7 @@ To run the integration tests, export the following variables into your environme
 export access_key_id=YOUR_AWS_ACCESS_KEY
 export focus_regex="GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
 export region_name=us-east-1
-export s3_endpoint_host=s3.amazonaws.com
+export s3_endpoint_host=https://s3.amazonaws.com
 export secret_access_key=YOUR_SECRET_ACCESS_KEY
 export stack_name=s3cli-iam
 export bucket_name=s3cli-pipeline
