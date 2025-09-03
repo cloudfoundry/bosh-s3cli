@@ -97,7 +97,7 @@ var _ = Describe("General testing for all AWS regions", func() {
 					AccessKeyID:     accessKeyID,
 					SecretAccessKey: secretAccessKey,
 					BucketName:      bucketName,
-					Host:            "localhost",
+					Host:            "http://localhost",
 				}
 				msg := "upload failure"
 				integration.AssertOnPutFailures(s3CLIPath, cfg, largeContent, msg)
