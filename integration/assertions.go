@@ -86,35 +86,10 @@ func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMess
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	/*
-	   AWS SDK v2 Migration: Failure Injection for Multipart Uploads - IMPLEMENTED
-
-	   The original AWS SDK v1 implementation used Handlers.Build.PushBack() to inject failures:
-
-	   s3Client.Handlers.Build.PushBack(func(r *request.Request) {
-	       if r.Operation.Name == "UploadPart" {
-	           if part%2 == 0 {
-	               r.HTTPRequest.Header.Set("X-Amz-Content-Sha256", "000")
-	           }
-	           part++
-	       }
-	   })
-
-	   AWS SDK v2 implementation: Custom Middleware
-
-	   We now use smithy-go middleware to achieve the same functionality:
-	   1. Initialize middleware tracks UploadPart operations and marks even parts for failure
-	   2. Finalize middleware corrupts the SHA256 header for marked requests
-
-	   This reproduces the original behavior: even-numbered upload parts will fail with
-	   SHA256 checksum mismatches, triggering retry logic in multipart uploads.
-	*/
-
 	s3Client, err := CreateS3ClientWithFailureInjection(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	blobstoreClient := client.New(s3Client, &s3Config)
 
 	err = blobstoreClient.Put(sourceContent, s3Filename)
@@ -137,17 +112,23 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(err).ToNot(HaveOccurred())
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename) //nolint:ineffassign,staticcheck
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, _ := client.NewAwsS3Client(&s3Config) //nolint:errcheck
-	resp, err := s3Client.HeadObject(context.TODO(), &s3.HeadObjectInput{
+	s3Client, err := client.NewAwsS3Client(&s3Config) 
+	Expect(err).ToNot(HaveOccurred())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	resp, err := s3Client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: aws.String(cfg.BucketName),
 		Key:    aws.String(s3Filename),
 	})
 	Expect(err).ToNot(HaveOccurred())
-	Expect(s3CLISession.ExitCode()).To(BeZero())
 
 	if cfg.ServerSideEncryption == "" {
 		Expect(resp.ServerSideEncryption).To(Or(BeNil(), HaveValue(Equal(types.ServerSideEncryptionAes256))))
