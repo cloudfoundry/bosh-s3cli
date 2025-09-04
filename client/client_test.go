@@ -3,10 +3,9 @@ package client_test
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
@@ -33,14 +32,16 @@ var _ = Describe("S3CompatibleClient", func() {
 					BucketName:      "some-bucket",
 					Host:            "host-name",
 				}
-				awsCfg :=
-					aws.NewConfig().
-						WithRegion("us-west-2").
-						WithCredentials(
-							credentials.NewStaticCredentials(s3Config.AccessKeyID, s3Config.SecretAccessKey, ""),
-						)
+				awsCfg := aws.Config{
+					Region: "us-west-2",
+					Credentials: credentials.NewStaticCredentialsProvider(
+						s3Config.AccessKeyID,
+						s3Config.SecretAccessKey,
+						"",
+					),
+				}
 
-				s3Client := s3.New(session.Must(session.NewSession(awsCfg)))
+				s3Client := s3.NewFromConfig(awsCfg)
 
 				blobstoreClient = client.New(s3Client, s3Config)
 
@@ -50,6 +51,7 @@ var _ = Describe("S3CompatibleClient", func() {
 					`&X-Amz-Date=([0-9]+)T([0-9]+)Z` +
 					`&X-Amz-Expires=100` +
 					`&X-Amz-SignedHeaders=host` +
+					`&x-id=[A-Za-z]+` +
 					`&X-Amz-Signature=([a-f0-9]+)`
 			})
 
