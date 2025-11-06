@@ -37,7 +37,7 @@ jobs:
       params:
         <<: *aws-us-infrastructure-params
         focus_regex: "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
-        s3_endpoint_host: s3.amazonaws.com
+        s3_endpoint_host: &main_s3_host_with_protocol https://s3.amazonaws.com
     - task: test-assume-roles
       image: s3cli-docker-image
       file: bosh-s3cli/ci/tasks/run-integration-aws-assume.yml
@@ -46,13 +46,13 @@ jobs:
         secret_access_key: ((bosh_s3cli_pipeline.password))
         assume_role_arn: ((assume_role_test_arn))
         focus_regex: "AWS ASSUME ROLE"
-        s3_endpoint_host: s3.amazonaws.com
+        s3_endpoint_host: *main_s3_host_with_protocol
     - task: test-env-or-profile
       image: s3cli-docker-image
       file: bosh-s3cli/ci/tasks/run-integration-aws-iam.yml
       params:
         <<: *aws-us-infrastructure-params
-        s3_endpoint_host: s3.amazonaws.com
+        s3_endpoint_host: *main_s3_host_with_protocol
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
@@ -115,7 +115,7 @@ jobs:
     params:
       <<: *aws-frankfurt-infrastructure-params
       focus_regex: "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
-      s3_endpoint_host: s3.eu-central-1.amazonaws.com
+      s3_endpoint_host: https://s3.eu-central-1.amazonaws.com
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
@@ -139,7 +139,7 @@ jobs:
       access_key_id: ((bosh_s3cli_pipeline_gcp.username))
       secret_access_key: ((bosh_s3cli_pipeline_gcp.password))
       bucket_name: bosh-s3cli-pipeline
-      s3_endpoint_host: storage.googleapis.com
+      s3_endpoint_host: https://storage.googleapis.com
       s3_endpoint_port: 443
 
 - name: publish-and-tag
