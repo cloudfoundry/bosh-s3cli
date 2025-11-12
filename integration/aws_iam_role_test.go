@@ -28,13 +28,11 @@ var _ = Describe("Testing inside an AWS compute resource with an IAM role", func
 				BucketName:        bucketName,
 			}),
 			Entry("with region and without host, signature version 4", &config.S3Cli{
-				SignatureVersion:  4,
 				CredentialsSource: "env_or_profile",
 				BucketName:        bucketName,
 				Region:            region,
 			}),
 			Entry("with maximal config, signature version 4", &config.S3Cli{
-				SignatureVersion:  4,
 				CredentialsSource: "env_or_profile",
 				BucketName:        bucketName,
 				Host:              s3Host,
