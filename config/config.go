@@ -20,12 +20,10 @@ type S3Cli struct {
 	Region               string `json:"region"`
 	SSLVerifyPeer        bool   `json:"ssl_verify_peer"`
 	UseSSL               bool   `json:"use_ssl"`
-	SignatureVersion     int    `json:"signature_version,string"`
 	ServerSideEncryption string `json:"server_side_encryption"`
 	SSEKMSKeyID          string `json:"sse_kms_key_id"`
 	AssumeRoleArn        string `json:"assume_role_arn"`
 	MultipartUpload      bool   `json:"multipart_upload"`
-	UseV2SigningMethod   bool
 	HostStyle            bool   `json:"host_style"`
 	SwiftAuthAccount     string `json:"swift_auth_account"`
 	SwiftTempURLKey      string `json:"swift_temp_url_key"`
@@ -145,20 +143,10 @@ func (c *S3Cli) configureAWS() {
 	if c.Region == "" {
 		c.Region = AWSHostToRegion(c.Host)
 	}
-
-	switch c.SignatureVersion {
-	case 2:
-		c.UseV2SigningMethod = true
-	case 4:
-		c.UseV2SigningMethod = false
-	default:
-		c.UseV2SigningMethod = false
-	}
 }
 
 func (c *S3Cli) configureAlicloud() {
 	c.MultipartUpload = true
-	c.configureDefaultSigningMethod()
 	c.HostStyle = true
 
 	c.Host = strings.Split(c.Host, ":")[0]
@@ -169,22 +157,10 @@ func (c *S3Cli) configureAlicloud() {
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
-	c.configureDefaultSigningMethod()
 }
 
 func (c *S3Cli) configureDefault() {
-	c.configureDefaultSigningMethod()
-}
-
-func (c *S3Cli) configureDefaultSigningMethod() {
-	switch c.SignatureVersion {
-	case 2:
-		c.UseV2SigningMethod = true
-	case 4:
-		c.UseV2SigningMethod = false
-	default:
-		c.UseV2SigningMethod = true
-	}
+	// No specific configuration needed for default/unknown providers
 }
 
 // UseRegion signals to users of the S3Cli whether to use Region information

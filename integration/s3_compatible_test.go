@@ -54,7 +54,6 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				MultipartUpload: true,
 			}),
 			Entry("with the maximal configuration", &config.S3Cli{
-				SignatureVersion:  2,
 				CredentialsSource: "static",
 				AccessKeyID:       accessKeyID,
 				SecretAccessKey:   secretAccessKey,

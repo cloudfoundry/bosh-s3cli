@@ -28,12 +28,6 @@ var _ = Describe("Testing only in us-east-1", func() {
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
 			}),
-			Entry("with signature version 2", &config.S3Cli{
-				SignatureVersion: 2,
-				AccessKeyID:      accessKeyID,
-				SecretAccessKey:  secretAccessKey,
-				BucketName:       bucketName,
-			}),
 			Entry("with alternate host", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
