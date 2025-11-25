@@ -31,11 +31,9 @@ type S3Cli struct {
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
 // the concept of a region
-const EmptyRegion = " "
+const EmptyRegion = ""
 
-const (
-	defaultRegion = "us-east-1" //nolint:unused
-)
+const defaultRegion = "us-east-1" //nolint:unused
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
@@ -157,10 +155,15 @@ func (c *S3Cli) configureAlicloud() {
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
+	if len(c.Region) == 0 {
+		c.Region = EmptyRegion
+	}
 }
 
 func (c *S3Cli) configureDefault() {
-	// No specific configuration needed for default/unknown providers
+	if len(c.Region) == 0 {
+		c.Region = defaultRegion
+	}
 }
 
 // UseRegion signals to users of the S3Cli whether to use Region information
