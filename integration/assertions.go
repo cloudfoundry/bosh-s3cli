@@ -203,6 +203,10 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	default:
 		Expect(calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
 	}
+
+	// Clean up the uploaded file
+	_, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
+	Expect(err).ToNot(HaveOccurred())
 }
 
 // AssertOnSignedURLs asserts on using signed URLs for upload and download
