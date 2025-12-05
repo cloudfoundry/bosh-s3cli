@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 )
@@ -17,6 +18,13 @@ func main() {
 	configPath := flag.String("c", "", "configuration path")
 	showVer := flag.Bool("v", false, "version")
 	flag.Parse()
+
+	nonFlagArgs := flag.Args()
+	if len(nonFlagArgs) < 2 {
+		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
+	}
+
+	cmd := nonFlagArgs[0]
 
 	if *showVer {
 		fmt.Printf("version %s\n", version)
@@ -33,19 +41,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	s3Client, err := client.NewAwsS3Client(&s3Config)
+	var s3Client *s3.Client
+	if cmd != "sign" {
+		s3Client, err = client.NewAwsS3Client(&s3Config)
+	} else {
+		s3Client, err = client.NewAwsS3ClientWithoutAcceptEncodingMiddleware(&s3Config)
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	blobstoreClient := client.New(s3Client, &s3Config)
-
-	nonFlagArgs := flag.Args()
-	if len(nonFlagArgs) < 2 {
-		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
-	}
-
-	cmd := nonFlagArgs[0]
 
 	switch cmd {
 	case "put":
