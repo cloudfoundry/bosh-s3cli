@@ -162,14 +162,7 @@ func AssertDeleteNonexistentWorks(s3CLIPath string, cfg *config.S3Cli) {
 
 	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "delete", "non-existent-file")
 	Expect(err).ToNot(HaveOccurred())
-
-	// GCP return 404 when trying to delete a non-existent file, others return 204
-	switch config.Provider(cfg.Host) {
-	case "google":
-		Expect(s3CLISession.ExitCode()).ToNot(BeZero())
-	default:
-		Expect(s3CLISession.ExitCode()).To(BeZero())
-	}
+	Expect(s3CLISession.ExitCode()).To(BeZero())
 }
 
 func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content string) {
