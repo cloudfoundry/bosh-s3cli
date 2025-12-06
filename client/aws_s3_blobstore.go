@@ -112,7 +112,7 @@ func (b *awsS3Client) Delete(dest string) error {
 	}
 
 	var apiErr smithy.APIError
-	if errors.As(err, &apiErr) && apiErr.ErrorCode() == "NotFound" {
+	if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "NotFound" || apiErr.ErrorCode() == "NoSuchKey") {
 		return nil
 	}
 	return err

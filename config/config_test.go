@@ -13,7 +13,7 @@ import (
 var _ = Describe("BlobstoreClient configuration", func() {
 	Describe("empty region configuration", func() {
 		It("allows for the S3 SDK to be configured with empty region information", func() {
-			Expect(config.EmptyRegion).To(Equal(" "))
+			Expect(config.EmptyRegion).To(Equal(""))
 		})
 	})
 
@@ -47,16 +47,29 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				})
 			})
 
-			Context("when non-AWS endpoint has been set but not region", func() {
-				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "some-host"}`)
+			Context("when Google endpoint has been set but not region", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "storage.googleapis.com"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
-				It("reports that region should not be used for SDK configuration", func() {
+				It("stubs the region used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.UseRegion()).To(BeFalse())
-					Expect(c.Host).To(Equal("some-host"))
+					Expect(c.Host).To(Equal("storage.googleapis.com"))
 					Expect(c.Region).To(Equal(""))
+				})
+			})
+
+			Context("when Ali endpoint with region has been set but without explicit region", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "oss-some-region-internal.aliyuncs.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				It("parses region from host for SDK configuration", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.UseRegion()).To(BeTrue())
+					Expect(c.Host).To(Equal("oss-some-region-internal.aliyuncs.com"))
+					Expect(c.Region).To(Equal("some-region"))
 				})
 			})
 

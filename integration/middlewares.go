@@ -2,10 +2,13 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
@@ -16,6 +19,42 @@ import (
 	"github.com/cloudfoundry/bosh-s3cli/config"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 )
+
+type RecalculateV4Signature struct {
+	next   http.RoundTripper
+	signer *v4.Signer
+	cfg    aws.Config
+}
+
+func (lt *RecalculateV4Signature) RoundTrip(req *http.Request) (*http.Response, error) {
+	// store for later use
+	val := req.Header.Get("Accept-Encoding")
+
+	// delete the header so the header doesn't account for in the signature
+	req.Header.Del("Accept-Encoding")
+
+	// sign with the same date
+	timeString := req.Header.Get("X-Amz-Date")
+	timeDate, err := time.Parse("20060102T150405Z", timeString)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse X-Amz-Date header: %w", err)
+	}
+
+	creds, err := lt.cfg.Credentials.Retrieve(req.Context())
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve credentials: %w", err)
+	}
+
+	err = lt.signer.SignHTTP(req.Context(), creds, req, v4.GetPayloadHash(req.Context()), "s3", lt.cfg.Region, timeDate)
+	if err != nil {
+		return nil, err
+	}
+	// Reset Accept-Encoding if desired
+	req.Header.Set("Accept-Encoding", val)
+
+	// follows up the original round tripper
+	return lt.next.RoundTrip(req)
+}
 
 // CreateUploadPartTracker creates an Initialize middleware that tracks upload parts
 func CreateUploadPartTracker() middleware.InitializeMiddleware {
@@ -236,6 +275,9 @@ func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string) (*s3.Client,
 		provider := stscreds.NewAssumeRoleProvider(stsClient, s3Config.AssumeRoleArn)
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
+
+	awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
+	awsConfig.HTTPClient = &http.Client{Transport: &RecalculateV4Signature{http.DefaultTransport, v4.NewSigner(), awsConfig}}
 
 	// Create tracing middleware
 	tracingMiddleware := CreateS3TracingMiddleware(calls)

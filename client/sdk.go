@@ -1,23 +1,78 @@
 package client
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"context"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/smithy-go/middleware"
+	smithyhttp "github.com/aws/smithy-go/transport/http"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 
 	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
+const acceptEncodingHeader = "Accept-Encoding"
+
+type acceptEncodingKey struct{}
+
+func GetAcceptEncodingKey(ctx context.Context) (v string) {
+	v, _ = middleware.GetStackValue(ctx, acceptEncodingKey{}).(string)
+	return v
+}
+
+func SetAcceptEncodingKey(ctx context.Context, value string) context.Context {
+	return middleware.WithStackValue(ctx, acceptEncodingKey{}, value)
+}
+
+var dropAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("DropAcceptEncodingHeader",
+	func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (out middleware.FinalizeOutput, metadata middleware.Metadata, err error) {
+		req, ok := in.Request.(*smithyhttp.Request)
+		if !ok {
+			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
+		}
+
+		ae := req.Header.Get(acceptEncodingHeader)
+		ctx = SetAcceptEncodingKey(ctx, ae)
+		req.Header.Del(acceptEncodingHeader)
+		in.Request = req
+
+		return next.HandleFinalize(ctx, in)
+	},
+)
+
+var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcceptEncodingHeader",
+	func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (out middleware.FinalizeOutput, metadata middleware.Metadata, err error) {
+		req, ok := in.Request.(*smithyhttp.Request)
+		if !ok {
+			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
+		}
+
+		ae := GetAcceptEncodingKey(ctx)
+		req.Header.Set(acceptEncodingHeader, ae)
+		in.Request = req
+
+		return next.HandleFinalize(ctx, in)
+	},
+)
+
 func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
+	return newAwsS3ClientWithMiddleware(c, true)
+}
+
+func NewAwsS3ClientWithoutAcceptEncodingMiddleware(c *s3cli_config.S3Cli) (*s3.Client, error) {
+	return newAwsS3ClientWithMiddleware(c, false)
+}
+
+func newAwsS3ClientWithMiddleware(c *s3cli_config.S3Cli, useAcceptEncodingMiddleware bool) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -57,6 +112,8 @@ func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
+	awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
+
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.UsePathStyle = !c.HostStyle
 		if c.S3Endpoint() != "" {
@@ -70,6 +127,18 @@ func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 				}
 			}
 			o.BaseEndpoint = aws.String(endpoint)
+		}
+		if useAcceptEncodingMiddleware {
+			o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
+				if err := stack.Finalize.Insert(dropAcceptEncodingHeader, "Signing", middleware.Before); err != nil {
+					return err
+				}
+
+				if err := stack.Finalize.Insert(replaceAcceptEncodingHeader, "Signing", middleware.After); err != nil {
+					return err
+				}
+				return nil
+			})
 		}
 	})
 

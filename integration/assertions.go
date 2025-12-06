@@ -3,7 +3,9 @@ package integration
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -135,6 +137,10 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	} else {
 		Expect(string(resp.ServerSideEncryption)).To(Equal(cfg.ServerSideEncryption))
 	}
+
+	// Clean up the uploaded file
+	_, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
+	Expect(err).ToNot(HaveOccurred())
 }
 
 // AssertGetNonexistentFails asserts that `s3cli get` on a non-existent object will fail
@@ -185,16 +191,21 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	Expect(err).ToNot(HaveOccurred())
 
 	switch cfg.Host {
-	case "storage.googleapis.com":
+	case "https://storage.googleapis.com":
 		Expect(calls).To(Equal([]string{"PutObject"}))
 	default:
 		Expect(calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
 	}
+
+	// Clean up the uploaded file
+	_, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
+	Expect(err).ToNot(HaveOccurred())
 }
 
 // AssertOnSignedURLs asserts on using signed URLs for upload and download
 func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Filename := GenerateRandomString()
+	expectedContent := GenerateRandomString()
 
 	configPath := MakeConfigFile(cfg)
 	defer os.Remove(configPath) //nolint:errcheck
@@ -214,15 +225,49 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 
 	blobstoreClient := client.New(s3Client, &s3Config)
 
+	// First upload a test file using regular put operation
+	contentFile := MakeContentFile(expectedContent)
+	defer os.Remove(contentFile) //nolint:errcheck
+
+	s3CLISession, err := RunS3CLI(s3CLIPath, configPath, "put", contentFile, s3Filename)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(s3CLISession.ExitCode()).To(BeZero())
+
 	regex := `(?m)((([A-Za-z]{3,9}:(?:\/\/?)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)`
 
-	// get
-	url, err := blobstoreClient.Sign(s3Filename, "get", 1*time.Minute)
+	// Test GET signed URL
+	getURL, err := blobstoreClient.Sign(s3Filename, "get", 1*time.Minute)
 	Expect(err).ToNot(HaveOccurred())
-	Expect(url).To(MatchRegexp(regex))
+	Expect(getURL).To(MatchRegexp(regex))
 
-	// put
-	url, err = blobstoreClient.Sign(s3Filename, "put", 1*time.Minute)
+	// Actually try to download from the GET signed URL
+	httpClient := &http.Client{Timeout: 30 * time.Second}
+	resp, err := httpClient.Get(getURL)
 	Expect(err).ToNot(HaveOccurred())
-	Expect(url).To(MatchRegexp(regex))
+
+	body, err := io.ReadAll(resp.Body)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(string(body)).To(Equal(expectedContent))
+
+	// Test PUT signed URL
+	putURL, err := blobstoreClient.Sign(s3Filename+"_put_test", "put", 1*time.Minute)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(putURL).To(MatchRegexp(regex))
+
+	// Actually try to upload to the PUT signed URL
+	testUploadContent := "Test upload content via signed URL"
+	putReq, err := http.NewRequest("PUT", putURL, strings.NewReader(testUploadContent))
+	Expect(err).ToNot(HaveOccurred())
+
+	putReq.Header.Set("Content-Type", "text/plain")
+	putResp, err := httpClient.Do(putReq)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(putResp.StatusCode).To(Equal(200))
+
+	// Clean up the test files
+	_, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename)
+	Expect(err).ToNot(HaveOccurred())
+
+	_, err = RunS3CLI(s3CLIPath, configPath, "delete", s3Filename+"_put_test")
+	Expect(err).ToNot(HaveOccurred())
 }

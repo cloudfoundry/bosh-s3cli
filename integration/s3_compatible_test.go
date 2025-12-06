@@ -79,7 +79,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 			func(cfg *config.S3Cli) { integration.AssertDeleteNonexistentWorks(s3CLIPath, cfg) },
 			configurations,
 		)
-		DescribeTable("Invoking `s3cli put` handling of mulitpart uploads",
+		DescribeTable("Invoking `s3cli put` handling of multipart uploads",
 			func(cfg *config.S3Cli) { integration.AssertOnMultipartUploads(s3CLIPath, cfg, largeContent) },
 			configurations,
 		)
