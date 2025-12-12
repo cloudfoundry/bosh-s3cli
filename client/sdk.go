@@ -64,15 +64,7 @@ var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcce
 	},
 )
 
-func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
-	return newAwsS3ClientWithMiddleware(c, true)
-}
-
-func NewAwsS3ClientWithoutAcceptEncodingMiddleware(c *s3cli_config.S3Cli) (*s3.Client, error) {
-	return newAwsS3ClientWithMiddleware(c, false)
-}
-
-func newAwsS3ClientWithMiddleware(c *s3cli_config.S3Cli, useAcceptEncodingMiddleware bool) (*s3.Client, error) {
+func NewAwsS3Client(c *s3cli_config.S3Cli, useFixSigningMiddleware bool) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -128,7 +120,7 @@ func newAwsS3ClientWithMiddleware(c *s3cli_config.S3Cli, useAcceptEncodingMiddle
 			}
 			o.BaseEndpoint = aws.String(endpoint)
 		}
-		if useAcceptEncodingMiddleware {
+		if useFixSigningMiddleware {
 			o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
 				if err := stack.Finalize.Insert(dropAcceptEncodingHeader, "Signing", middleware.Before); err != nil {
 					return err

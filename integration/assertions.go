@@ -120,7 +120,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config)
+	s3Client, err := client.NewAwsS3Client(&s3Config, false)
 	Expect(err).ToNot(HaveOccurred())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

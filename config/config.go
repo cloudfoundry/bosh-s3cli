@@ -187,3 +187,7 @@ func (c *S3Cli) S3Endpoint() string {
 	}
 	return c.Host
 }
+
+func (c *S3Cli) IsGoogle() bool {
+	return Provider(c.Host) == "google"
+}

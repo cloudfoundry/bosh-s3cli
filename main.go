@@ -42,11 +42,13 @@ func main() {
 	}
 
 	var s3Client *s3.Client
-	if cmd != "sign" {
-		s3Client, err = client.NewAwsS3Client(&s3Config)
+	var useFixSigningMiddleware bool
+	if cmd != "sign" && s3Config.IsGoogle() {
+		useFixSigningMiddleware = true
 	} else {
-		s3Client, err = client.NewAwsS3ClientWithoutAcceptEncodingMiddleware(&s3Config)
+		useFixSigningMiddleware = false
 	}
+	s3Client, err = client.NewAwsS3Client(&s3Config, useFixSigningMiddleware)
 	if err != nil {
 		log.Fatalln(err)
 	}
