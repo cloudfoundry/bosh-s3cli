@@ -64,7 +64,17 @@ var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcce
 	},
 )
 
+// MiddlewareConfig holds configuration for custom middlewares
+type MiddlewareConfig struct {
+	APIOptions []func(*middleware.Stack) error
+}
+
 func NewAwsS3Client(c *s3cli_config.S3Cli, useFixSigningMiddleware bool) (*s3.Client, error) {
+	return NewAwsS3ClientWithMiddlewares(c, useFixSigningMiddleware, nil)
+}
+
+// NewAwsS3ClientWithMiddlewares creates an AWS S3 client with custom middlewares
+func NewAwsS3ClientWithMiddlewares(c *s3cli_config.S3Cli, useFixSigningMiddleware bool, middlewareConfig *MiddlewareConfig) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -131,6 +141,11 @@ func NewAwsS3Client(c *s3cli_config.S3Cli, useFixSigningMiddleware bool) (*s3.Cl
 				}
 				return nil
 			})
+		}
+
+		// Apply custom middlewares if provided
+		if middlewareConfig != nil && len(middlewareConfig.APIOptions) > 0 {
+			o.APIOptions = append(o.APIOptions, middlewareConfig.APIOptions...)
 		}
 	})
 

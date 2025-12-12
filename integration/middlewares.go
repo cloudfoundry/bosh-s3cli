@@ -9,15 +9,11 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
+	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
-	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 )
 
 type RecalculateV4Signature struct {
@@ -105,71 +101,25 @@ func CreateSHACorruptionMiddleware() middleware.FinalizeMiddleware {
 
 // CreateS3ClientWithFailureInjection creates an S3 client with failure injection middleware
 func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, error) {
-	// Create HTTP client based on SSL verification settings
-	var httpClient *http.Client
-	if s3Config.SSLVerifyPeer {
-		httpClient = boshhttp.CreateDefaultClient(nil)
-	} else {
-		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
-	}
-
-	// Set up AWS config options
-	options := []func(*awsconfig.LoadOptions) error{
-		awsconfig.WithHTTPClient(httpClient),
-	}
-
-	if s3Config.UseRegion() {
-		options = append(options, awsconfig.WithRegion(s3Config.Region))
-	} else {
-		options = append(options, awsconfig.WithRegion(config.EmptyRegion))
-	}
-
-	if s3Config.CredentialsSource == config.StaticCredentialsSource {
-		options = append(options, awsconfig.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(s3Config.AccessKeyID, s3Config.SecretAccessKey, ""),
-		))
-	}
-
-	if s3Config.CredentialsSource == config.NoneCredentialsSource {
-		options = append(options, awsconfig.WithCredentialsProvider(aws.AnonymousCredentials{}))
-	}
-
-	// Load AWS config
-	awsConfig, err := awsconfig.LoadDefaultConfig(context.TODO(), options...)
-	if err != nil {
-		return nil, err
-	}
-
-	// Handle STS assume role if configured
-	if s3Config.AssumeRoleArn != "" {
-		stsClient := sts.NewFromConfig(awsConfig)
-		provider := stscreds.NewAssumeRoleProvider(stsClient, s3Config.AssumeRoleArn)
-		awsConfig.Credentials = aws.NewCredentialsCache(provider)
-	}
-
 	// Create failure injection middlewares
 	trackingMiddleware := CreateUploadPartTracker()
 	corruptionMiddleware := CreateSHACorruptionMiddleware()
 
-	// Create S3 client with custom middleware and options
-	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
-		o.UsePathStyle = !s3Config.HostStyle
-		if s3Config.S3Endpoint() != "" {
-			o.BaseEndpoint = aws.String(s3Config.S3Endpoint())
-		}
+	// Use the centralized client creation logic with custom middlewares
+	middlewareConfig := &client.MiddlewareConfig{
+		APIOptions: []func(stack *middleware.Stack) error{
+			func(stack *middleware.Stack) error {
+				// Add initialize middleware to track UploadPart operations
+				if err := stack.Initialize.Add(trackingMiddleware, middleware.Before); err != nil {
+					return err
+				}
+				// Add finalize middleware to corrupt headers after signing
+				return stack.Finalize.Add(corruptionMiddleware, middleware.After)
+			},
+		},
+	}
 
-		// Add the failure injection middlewares
-		o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
-			// Add initialize middleware to track UploadPart operations
-			if err := stack.Initialize.Add(trackingMiddleware, middleware.Before); err != nil {
-				return err
-			}
-			// Add finalize middleware to corrupt headers after signing
-			return stack.Finalize.Add(corruptionMiddleware, middleware.After)
-		})
-	})
-
-	return s3Client, nil
+	return client.NewAwsS3ClientWithMiddlewares(s3Config, false, middlewareConfig)
 }
 
 // S3TracingMiddleware captures S3 operation names for testing
@@ -233,67 +183,20 @@ func CreateS3ClientWithTracing(baseClient *s3.Client, tracingMiddleware *S3Traci
 }
 
 // CreateTracingS3Client creates an S3 client with tracing middleware from config
-func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string) (*s3.Client, error) {
-	// Create HTTP client based on SSL verification settings
-	var httpClient *http.Client
-	if s3Config.SSLVerifyPeer {
-		httpClient = boshhttp.CreateDefaultClient(nil)
-	} else {
-		httpClient = boshhttp.CreateDefaultClientInsecureSkipVerify()
-	}
-
-	// Set up AWS config options
-	options := []func(*awsconfig.LoadOptions) error{
-		awsconfig.WithHTTPClient(httpClient),
-	}
-
-	if s3Config.UseRegion() {
-		options = append(options, awsconfig.WithRegion(s3Config.Region))
-	} else {
-		options = append(options, awsconfig.WithRegion(config.EmptyRegion))
-	}
-
-	if s3Config.CredentialsSource == config.StaticCredentialsSource {
-		options = append(options, awsconfig.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(s3Config.AccessKeyID, s3Config.SecretAccessKey, ""),
-		))
-	}
-
-	if s3Config.CredentialsSource == config.NoneCredentialsSource {
-		options = append(options, awsconfig.WithCredentialsProvider(aws.AnonymousCredentials{}))
-	}
-
-	// Load AWS config
-	awsConfig, err := awsconfig.LoadDefaultConfig(context.TODO(), options...)
-	if err != nil {
-		return nil, err
-	}
-
-	// Handle STS assume role if configured
-	if s3Config.AssumeRoleArn != "" {
-		stsClient := sts.NewFromConfig(awsConfig)
-		provider := stscreds.NewAssumeRoleProvider(stsClient, s3Config.AssumeRoleArn)
-		awsConfig.Credentials = aws.NewCredentialsCache(provider)
-	}
-
-	awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
-	awsConfig.HTTPClient = &http.Client{Transport: &RecalculateV4Signature{http.DefaultTransport, v4.NewSigner(), awsConfig}}
-
+// Note: This function uses a custom HTTP client with RecalculateV4Signature, so it cannot
+// use the centralized NewAwsS3ClientWithMiddlewares function directly
+func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string, useFixSigningMiddleware bool) (*s3.Client, error) {
 	// Create tracing middleware
 	tracingMiddleware := CreateS3TracingMiddleware(calls)
 
-	// Create S3 client with tracing middleware
-	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
-		o.UsePathStyle = !s3Config.HostStyle
-		if s3Config.S3Endpoint() != "" {
-			o.BaseEndpoint = aws.String(s3Config.S3Endpoint())
-		}
+	// Use the centralized client creation logic with custom middlewares
+	middlewareConfig := &client.MiddlewareConfig{
+		APIOptions: []func(stack *middleware.Stack) error{
+			func(stack *middleware.Stack) error {
+				return stack.Initialize.Add(tracingMiddleware, middleware.Before)
+			},
+		},
+	}
 
-		// Add the tracing middleware
-		o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
-			return stack.Initialize.Add(tracingMiddleware, middleware.Before)
-		})
-	})
-
-	return s3Client, nil
+	return client.NewAwsS3ClientWithMiddlewares(s3Config, useFixSigningMiddleware, middlewareConfig)
 }

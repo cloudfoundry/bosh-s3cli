@@ -180,7 +180,7 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 
 	// Create S3 client with tracing middleware
 	calls := []string{}
-	s3Client, err := CreateTracingS3Client(&s3Config, &calls)
+	s3Client, err := CreateTracingS3Client(&s3Config, &calls, true)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -218,7 +218,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 
 	// Create S3 client with tracing middleware (though signing operations don't need tracing for this test)
 	calls := []string{}
-	s3Client, err := CreateTracingS3Client(&s3Config, &calls)
+	s3Client, err := CreateTracingS3Client(&s3Config, &calls, false)
 	if err != nil {
 		log.Fatalln(err)
 	}
