@@ -2,79 +2,22 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 	boshhttp "github.com/cloudfoundry/bosh-utils/httpclient"
 
 	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-const acceptEncodingHeader = "Accept-Encoding"
-
-type acceptEncodingKey struct{}
-
-func GetAcceptEncodingKey(ctx context.Context) (v string) {
-	v, _ = middleware.GetStackValue(ctx, acceptEncodingKey{}).(string)
-	return v
-}
-
-func SetAcceptEncodingKey(ctx context.Context, value string) context.Context {
-	return middleware.WithStackValue(ctx, acceptEncodingKey{}, value)
-}
-
-var dropAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("DropAcceptEncodingHeader",
-	func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (out middleware.FinalizeOutput, metadata middleware.Metadata, err error) {
-		req, ok := in.Request.(*smithyhttp.Request)
-		if !ok {
-			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
-		}
-
-		ae := req.Header.Get(acceptEncodingHeader)
-		ctx = SetAcceptEncodingKey(ctx, ae)
-		req.Header.Del(acceptEncodingHeader)
-		in.Request = req
-
-		return next.HandleFinalize(ctx, in)
-	},
-)
-
-var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcceptEncodingHeader",
-	func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (out middleware.FinalizeOutput, metadata middleware.Metadata, err error) {
-		req, ok := in.Request.(*smithyhttp.Request)
-		if !ok {
-			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
-		}
-
-		ae := GetAcceptEncodingKey(ctx)
-		req.Header.Set(acceptEncodingHeader, ae)
-		in.Request = req
-
-		return next.HandleFinalize(ctx, in)
-	},
-)
-
-// MiddlewareConfig holds configuration for custom middlewares
-type MiddlewareConfig struct {
-	APIOptions []func(*middleware.Stack) error
-}
-
-func NewAwsS3Client(c *s3cli_config.S3Cli, useFixSigningMiddleware bool) (*s3.Client, error) {
-	return NewAwsS3ClientWithMiddlewares(c, useFixSigningMiddleware, nil)
-}
-
-// NewAwsS3ClientWithMiddlewares creates an AWS S3 client with custom middlewares
-func NewAwsS3ClientWithMiddlewares(c *s3cli_config.S3Cli, useFixSigningMiddleware bool, middlewareConfig *MiddlewareConfig) (*s3.Client, error) {
+func NewAwsS3Client(c *s3cli_config.S3Cli, apiOptions []func(stack *middleware.Stack) error) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -130,23 +73,8 @@ func NewAwsS3ClientWithMiddlewares(c *s3cli_config.S3Cli, useFixSigningMiddlewar
 			}
 			o.BaseEndpoint = aws.String(endpoint)
 		}
-		if useFixSigningMiddleware {
-			o.APIOptions = append(o.APIOptions, func(stack *middleware.Stack) error {
-				if err := stack.Finalize.Insert(dropAcceptEncodingHeader, "Signing", middleware.Before); err != nil {
-					return err
-				}
-
-				if err := stack.Finalize.Insert(replaceAcceptEncodingHeader, "Signing", middleware.After); err != nil {
-					return err
-				}
-				return nil
-			})
-		}
-
 		// Apply custom middlewares if provided
-		if middlewareConfig != nil && len(middlewareConfig.APIOptions) > 0 {
-			o.APIOptions = append(o.APIOptions, middlewareConfig.APIOptions...)
-		}
+		o.APIOptions = append(o.APIOptions, apiOptions...)
 	})
 
 	return s3Client, nil

@@ -75,7 +75,7 @@ func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' does not exist in bucket '.*'"))
 }
 
-func AssertOnPutFailures(s3CLIPath string, cfg *config.S3Cli, content, errorMessage string) {
+func AssertOnPutFailures(cfg *config.S3Cli, content, errorMessage string) {
 	s3Filename := GenerateRandomString()
 	sourceContent := strings.NewReader(content)
 
@@ -120,7 +120,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config, false)
+	s3Client, err := client.NewAwsS3Client(&s3Config, nil)
 	Expect(err).ToNot(HaveOccurred())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -180,7 +180,7 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 
 	// Create S3 client with tracing middleware
 	calls := []string{}
-	s3Client, err := CreateTracingS3Client(&s3Config, &calls, true)
+	s3Client, err := CreateTracingS3Client(&s3Config, &calls)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -216,9 +216,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	// Create S3 client with tracing middleware (though signing operations don't need tracing for this test)
-	calls := []string{}
-	s3Client, err := CreateTracingS3Client(&s3Config, &calls, false)
+	s3Client, err := client.NewAwsS3Client(&s3Config, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}

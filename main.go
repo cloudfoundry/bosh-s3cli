@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go/middleware"
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 )
@@ -42,13 +43,14 @@ func main() {
 	}
 
 	var s3Client *s3.Client
-	var useFixSigningMiddleware bool
+	var apiOptions []func(stack *middleware.Stack) error
 	if cmd != "sign" && s3Config.IsGoogle() {
-		useFixSigningMiddleware = true
-	} else {
-		useFixSigningMiddleware = false
+		// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
+		// to not be included in the signature of the request. Not needed for "sign" commands
+		// since they only generate pre-signed URLs without making actual HTTP requests.
+		apiOptions = append(apiOptions, client.AddFixAcceptEncodingMiddleware)
 	}
-	s3Client, err = client.NewAwsS3Client(&s3Config, useFixSigningMiddleware)
+	s3Client, err = client.NewAwsS3Client(&s3Config, apiOptions)
 	if err != nil {
 		log.Fatalln(err)
 	}

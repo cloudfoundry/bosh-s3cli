@@ -2,58 +2,15 @@ package integration
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"sync/atomic"
-	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
-	"github.com/cloudfoundry/bosh-s3cli/client"
-	"github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-type RecalculateV4Signature struct {
-	next   http.RoundTripper
-	signer *v4.Signer
-	cfg    aws.Config
-}
-
-func (lt *RecalculateV4Signature) RoundTrip(req *http.Request) (*http.Response, error) {
-	// store for later use
-	val := req.Header.Get("Accept-Encoding")
-
-	// delete the header so the header doesn't account for in the signature
-	req.Header.Del("Accept-Encoding")
-
-	// sign with the same date
-	timeString := req.Header.Get("X-Amz-Date")
-	timeDate, err := time.Parse("20060102T150405Z", timeString)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse X-Amz-Date header: %w", err)
-	}
-
-	creds, err := lt.cfg.Credentials.Retrieve(req.Context())
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve credentials: %w", err)
-	}
-
-	err = lt.signer.SignHTTP(req.Context(), creds, req, v4.GetPayloadHash(req.Context()), "s3", lt.cfg.Region, timeDate)
-	if err != nil {
-		return nil, err
-	}
-	// Reset Accept-Encoding if desired
-	req.Header.Set("Accept-Encoding", val)
-
-	// follows up the original round tripper
-	return lt.next.RoundTrip(req)
-}
-
 // CreateUploadPartTracker creates an Initialize middleware that tracks upload parts
-func CreateUploadPartTracker() middleware.InitializeMiddleware {
+func createUploadPartTracker() middleware.InitializeMiddleware {
 	var partCounter int64
 
 	return middleware.InitializeMiddlewareFunc("UploadPartTracker", func(
@@ -84,7 +41,7 @@ func CreateUploadPartTracker() middleware.InitializeMiddleware {
 type failureInjectionKey struct{}
 
 // CreateSHACorruptionMiddleware creates a Finalize middleware that corrupts headers
-func CreateSHACorruptionMiddleware() middleware.FinalizeMiddleware {
+func createSHACorruptionMiddleware() middleware.FinalizeMiddleware {
 	return middleware.FinalizeMiddlewareFunc("SHACorruptionMiddleware", func(
 		ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler,
 	) (middleware.FinalizeOutput, middleware.Metadata, error) {
@@ -99,36 +56,13 @@ func CreateSHACorruptionMiddleware() middleware.FinalizeMiddleware {
 	})
 }
 
-// CreateS3ClientWithFailureInjection creates an S3 client with failure injection middleware
-func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, error) {
-	// Create failure injection middlewares
-	trackingMiddleware := CreateUploadPartTracker()
-	corruptionMiddleware := CreateSHACorruptionMiddleware()
-
-	// Use the centralized client creation logic with custom middlewares
-	middlewareConfig := &client.MiddlewareConfig{
-		APIOptions: []func(stack *middleware.Stack) error{
-			func(stack *middleware.Stack) error {
-				// Add initialize middleware to track UploadPart operations
-				if err := stack.Initialize.Add(trackingMiddleware, middleware.Before); err != nil {
-					return err
-				}
-				// Add finalize middleware to corrupt headers after signing
-				return stack.Finalize.Add(corruptionMiddleware, middleware.After)
-			},
-		},
-	}
-
-	return client.NewAwsS3ClientWithMiddlewares(s3Config, false, middlewareConfig)
-}
-
 // S3TracingMiddleware captures S3 operation names for testing
 type S3TracingMiddleware struct {
 	calls *[]string
 }
 
 // CreateS3TracingMiddleware creates a middleware that tracks S3 operation calls
-func CreateS3TracingMiddleware(calls *[]string) *S3TracingMiddleware {
+func createS3TracingMiddleware(calls *[]string) *S3TracingMiddleware {
 	return &S3TracingMiddleware{calls: calls}
 }
 
@@ -167,36 +101,4 @@ func (m *S3TracingMiddleware) HandleInitialize(
 	}
 
 	return next.HandleInitialize(ctx, in)
-}
-
-// CreateS3ClientWithTracing creates a new S3 client with tracing middleware
-func CreateS3ClientWithTracing(baseClient *s3.Client, tracingMiddleware *S3TracingMiddleware) *s3.Client {
-	// Create a wrapper that captures calls and delegates to the base client
-	// Since AWS SDK v2 makes it difficult to extract config from existing clients,
-	// we'll use a different approach: modify the traceS3 function to work differently
-
-	// For the tracing functionality, we'll need to intercept at a higher level
-	// The current implementation will track operations through the middleware
-	// that inspects the input parameters
-
-	return baseClient
-}
-
-// CreateTracingS3Client creates an S3 client with tracing middleware from config
-// Note: This function uses a custom HTTP client with RecalculateV4Signature, so it cannot
-// use the centralized NewAwsS3ClientWithMiddlewares function directly
-func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string, useFixSigningMiddleware bool) (*s3.Client, error) {
-	// Create tracing middleware
-	tracingMiddleware := CreateS3TracingMiddleware(calls)
-
-	// Use the centralized client creation logic with custom middlewares
-	middlewareConfig := &client.MiddlewareConfig{
-		APIOptions: []func(stack *middleware.Stack) error{
-			func(stack *middleware.Stack) error {
-				return stack.Initialize.Add(tracingMiddleware, middleware.Before)
-			},
-		},
-	}
-
-	return client.NewAwsS3ClientWithMiddlewares(s3Config, useFixSigningMiddleware, middlewareConfig)
 }
