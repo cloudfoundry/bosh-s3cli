@@ -93,7 +93,7 @@ func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, err
 		return stack.Finalize.Add(createSHACorruptionMiddleware(), middleware.After)
 	})
 
-	return client.NewAwsS3Client(s3Config, apiOptions)
+	return client.NewAwsS3Client(s3Config, apiOptions, true)
 }
 
 // CreateTracingS3Client creates an S3 client with tracing middleware
@@ -109,5 +109,5 @@ func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string) (*s3.Client,
 		return stack.Initialize.Add(createS3TracingMiddleware(calls), middleware.Before)
 	})
 
-	return client.NewAwsS3Client(s3Config, apiOptions)
+	return client.NewAwsS3Client(s3Config, apiOptions, false)
 }

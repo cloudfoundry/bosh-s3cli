@@ -17,7 +17,11 @@ import (
 	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-func NewAwsS3Client(c *s3cli_config.S3Cli, apiOptions []func(stack *middleware.Stack) error) (*s3.Client, error) {
+func NewAwsS3Client(
+	c *s3cli_config.S3Cli,
+	apiOptions []func(stack *middleware.Stack) error,
+	requestChecksumCalculationEnabled bool,
+) (*s3.Client, error) {
 	var httpClient *http.Client
 
 	if c.SSLVerifyPeer {
@@ -57,7 +61,9 @@ func NewAwsS3Client(c *s3cli_config.S3Cli, apiOptions []func(stack *middleware.S
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
-	awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
+	if !requestChecksumCalculationEnabled {
+		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
+	}
 
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.UsePathStyle = !c.HostStyle

@@ -44,13 +44,16 @@ func main() {
 
 	var s3Client *s3.Client
 	var apiOptions []func(stack *middleware.Stack) error
+	var requestChecksumCalculationEnabled bool
 	if cmd != "sign" && s3Config.IsGoogle() {
 		// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
 		// to not be included in the signature of the request. Not needed for "sign" commands
 		// since they only generate pre-signed URLs without making actual HTTP requests.
 		apiOptions = append(apiOptions, client.AddFixAcceptEncodingMiddleware)
+		// Not supported by Google
+		requestChecksumCalculationEnabled = false
 	}
-	s3Client, err = client.NewAwsS3Client(&s3Config, apiOptions)
+	s3Client, err = client.NewAwsS3Client(&s3Config, apiOptions, requestChecksumCalculationEnabled)
 	if err != nil {
 		log.Fatalln(err)
 	}

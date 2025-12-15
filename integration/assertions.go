@@ -120,7 +120,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config, nil)
+	s3Client, err := client.NewAwsS3Client(&s3Config, nil, true)
 	Expect(err).ToNot(HaveOccurred())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -190,8 +190,8 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	err = blobstoreClient.Put(sourceContent, s3Filename)
 	Expect(err).ToNot(HaveOccurred())
 
-	switch cfg.Host {
-	case "https://storage.googleapis.com":
+	switch config.Provider(cfg.Host) {
+	case "google":
 		Expect(calls).To(Equal([]string{"PutObject"}))
 	default:
 		Expect(calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
@@ -216,7 +216,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config, nil)
+	s3Client, err := client.NewAwsS3Client(&s3Config, nil, true)
 	if err != nil {
 		log.Fatalln(err)
 	}
