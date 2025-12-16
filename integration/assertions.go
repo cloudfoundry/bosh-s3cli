@@ -19,6 +19,13 @@ import (
 	. "github.com/onsi/gomega" //nolint:staticcheck
 )
 
+var (
+	// expectedPutUploadCalls represents the expected API calls for put requests
+	expectedPutUploadCalls = []string{"PutObject"}
+	// expectedMultipartUploadCalls represents the expected API calls for standard S3 multipart uploads
+	expectedMultipartUploadCalls = []string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}
+)
+
 // AssertLifecycleWorks tests the main blobstore object lifecycle from creation to deletion
 func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
 	expectedString := GenerateRandomString()
@@ -191,10 +198,11 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	Expect(err).ToNot(HaveOccurred())
 
 	switch config.Provider(cfg.Host) {
+	// Google doesn't support multipart uploads as we use a normal put request instead when targeted host is Google.
 	case "google":
-		Expect(calls).To(Equal([]string{"PutObject"}))
+		Expect(calls).To(Equal(expectedPutUploadCalls))
 	default:
-		Expect(calls).To(Equal([]string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}))
+		Expect(calls).To(Equal(expectedMultipartUploadCalls))
 	}
 
 	// Clean up the uploaded file
