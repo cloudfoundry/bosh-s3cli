@@ -127,7 +127,7 @@ func AssertPutOptionsApplied(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config, nil, true)
+	s3Client, err := client.NewAwsS3ClientWithApiOptions(&s3Config, nil, true)
 	Expect(err).ToNot(HaveOccurred())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -224,7 +224,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	s3Config, err := config.NewFromReader(configFile)
 	Expect(err).ToNot(HaveOccurred())
 
-	s3Client, err := client.NewAwsS3Client(&s3Config, nil, true)
+	s3Client, err := client.NewAwsS3ClientWithApiOptions(&s3Config, nil, true)
 	if err != nil {
 		log.Fatalln(err)
 	}

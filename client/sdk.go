@@ -17,7 +17,21 @@ import (
 	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-func NewAwsS3Client(
+func NewAwsS3Client(c *s3cli_config.S3Cli, cmd string) (*s3.Client, error) {
+	var apiOptions []func(stack *middleware.Stack) error
+	var requestChecksumCalculationEnabled bool
+	if cmd != "sign" && c.IsGoogle() {
+		// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
+		// to not be included in the signature of the request. Not needed for "sign" commands
+		// since they only generate pre-signed URLs without making actual HTTP requests.
+		apiOptions = append(apiOptions, AddFixAcceptEncodingMiddleware)
+		// Not supported by Google
+		requestChecksumCalculationEnabled = false
+	}
+	return NewAwsS3ClientWithApiOptions(c, apiOptions, requestChecksumCalculationEnabled)
+}
+
+func NewAwsS3ClientWithApiOptions(
 	c *s3cli_config.S3Cli,
 	apiOptions []func(stack *middleware.Stack) error,
 	requestChecksumCalculationEnabled bool,
