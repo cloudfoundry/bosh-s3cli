@@ -27,6 +27,15 @@ type S3Cli struct {
 	HostStyle            bool   `json:"host_style"`
 	SwiftAuthAccount     string `json:"swift_auth_account"`
 	SwiftTempURLKey      string `json:"swift_temp_url_key"`
+
+	// Optional knobs to tune transfer performance.
+	// If zero, the client will apply sensible defaults (handled by the S3 client layer).
+	// Part size values are provided in bytes.
+	DownloadConcurrency int   `json:"download_concurrency"`
+	DownloadPartSize    int64 `json:"download_part_size"`
+
+	UploadConcurrency int   `json:"upload_concurrency"`
+	UploadPartSize    int64 `json:"upload_part_size"`
 }
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
@@ -81,8 +90,14 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		return S3Cli{}, err
 	}
 
+	// Validate bucket presence
 	if c.BucketName == "" {
 		return S3Cli{}, errors.New("bucket_name must be set")
+	}
+
+	// Validate numeric fields: disallow negative values (zero means "use defaults")
+	if c.DownloadConcurrency < 0 || c.UploadConcurrency < 0 || c.DownloadPartSize < 0 || c.UploadPartSize < 0 {
+		return S3Cli{}, errors.New("download/upload concurrency and part sizes must be non-negative")
 	}
 
 	switch c.CredentialsSource {

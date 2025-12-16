@@ -34,7 +34,12 @@ Given a JSON config file (`config.json`)...
   "signature_version":      "<string> (optional)",
   "server_side_encryption": "<string> (optional)",
   "sse_kms_key_id":         "<string> (optional)",
-  "multipart_upload":       <bool> (optional - default: true)
+  "multipart_upload":       <bool> (optional - default: true),
+
+  "download_concurrency":   "<string> (optional)",
+  "download_part_size":     "<string> (optional)",
+  "upload_concurrency":     "<string> (optional)",
+  "upload_part_size":       "<string> (optional)"
 }
 ```
 
