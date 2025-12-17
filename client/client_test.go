@@ -104,7 +104,7 @@ var _ = Describe("S3CompatibleClient", func() {
 					SwiftTempURLKey:  "temp_key",
 				}
 
-				s3Client, err := client.NewAwsS3ClientWithApiOptions(s3Config, nil, true)
+				s3Client, err := client.NewAwsS3Client(s3Config, "sign")
 				Expect(err).NotTo(HaveOccurred())
 
 				blobstoreClient = client.New(s3Client, s3Config)
