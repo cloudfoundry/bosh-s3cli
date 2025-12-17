@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 )
@@ -39,11 +38,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	var s3Client *s3.Client
-
 	cmd := nonFlagArgs[0]
 
-	s3Client, err = client.NewAwsS3Client(&s3Config, cmd)
+	s3Client, err := client.NewAwsS3Client(&s3Config, cmd)
 	if err != nil {
 		log.Fatalln(err)
 	}
