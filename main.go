@@ -121,7 +121,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Println(signedURL)
+		fmt.Print(signedURL)
 		os.Exit(0)
 	default:
 		log.Fatalf("unknown command: '%s'\n", cmd)
