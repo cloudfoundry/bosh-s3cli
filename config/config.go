@@ -33,7 +33,7 @@ type S3Cli struct {
 // the concept of a region
 const EmptyRegion = ""
 
-const defaultRegion = "us-east-1" //nolint:unused
+const defaultAWSRegion = "us-east-1" //nolint:unused
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
@@ -162,7 +162,7 @@ func (c *S3Cli) configureGoogle() {
 
 func (c *S3Cli) configureDefault() {
 	if len(c.Region) == 0 {
-		c.Region = defaultRegion
+		c.Region = defaultAWSRegion
 	}
 }
 

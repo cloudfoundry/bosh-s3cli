@@ -15,7 +15,7 @@ var (
 func AWSHostToRegion(host string) string {
 	regexMatches := providerRegex["aws"].FindStringSubmatch(host)
 
-	region := defaultRegion
+	region := defaultAWSRegion
 
 	if len(regexMatches) == 4 && regexMatches[2] != "" && regexMatches[2] != "external-1" {
 		region = regexMatches[2]
