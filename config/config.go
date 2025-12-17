@@ -29,10 +29,6 @@ type S3Cli struct {
 	SwiftTempURLKey      string `json:"swift_temp_url_key"`
 }
 
-// EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
-// the concept of a region
-const EmptyRegion = ""
-
 const defaultAWSRegion = "us-east-1" //nolint:unused
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
@@ -165,11 +161,6 @@ func (c *S3Cli) configureDefault() {
 	if len(c.Region) == 0 {
 		c.Region = defaultAWSRegion
 	}
-}
-
-// UseRegion signals to users of the S3Cli whether to use Region information
-func (c *S3Cli) UseRegion() bool {
-	return c.Region != ""
 }
 
 // S3Endpoint returns the S3 URI to use if custom host information has been provided

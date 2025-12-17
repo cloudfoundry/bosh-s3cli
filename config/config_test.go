@@ -11,12 +11,6 @@ import (
 )
 
 var _ = Describe("BlobstoreClient configuration", func() {
-	Describe("empty region configuration", func() {
-		It("allows for the S3 SDK to be configured with empty region information", func() {
-			Expect(config.EmptyRegion).To(Equal(""))
-		})
-	})
-
 	DescribeTable("Provider",
 		func(host, provider string) {
 			Expect(config.Provider(host)).To(Equal(provider))
@@ -41,7 +35,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeTrue(), "Expected UseRegion to be true")
 					Expect(c.Host).To(Equal("s3.amazonaws.com"))
 					Expect(c.Region).To(Equal("us-east-1"))
 				})
@@ -54,7 +47,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				It("stubs the region used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeFalse())
 					Expect(c.Host).To(Equal("storage.googleapis.com"))
 					Expect(c.Region).To(Equal(""))
 				})
@@ -67,7 +59,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				It("parses region from host for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeTrue())
 					Expect(c.Host).To(Equal("oss-some-region-internal.aliyuncs.com"))
 					Expect(c.Region).To(Equal("some-region"))
 				})
@@ -80,7 +71,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				It("reports that region should be used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeTrue())
 					Expect(c.Host).To(Equal(""))
 					Expect(c.Region).To(Equal("some-region"))
 				})
@@ -93,7 +83,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				It("sets region and endpoint to user-specified values", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeTrue())
 					Expect(c.Host).To(Equal("some-host"))
 					Expect(c.Region).To(Equal("some-region"))
 				})
@@ -106,7 +95,6 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				It("does not override the user-specified region based on the hostname", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(c.UseRegion()).To(BeTrue())
 					Expect(c.Host).To(Equal("s3.amazonaws.com"))
 					Expect(c.Region).To(Equal("us-west-1"))
 				})

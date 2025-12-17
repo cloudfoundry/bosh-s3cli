@@ -48,11 +48,7 @@ func NewAwsS3ClientWithApiOptions(
 		config.WithHTTPClient(httpClient),
 	}
 
-	if c.UseRegion() {
-		options = append(options, config.WithRegion(c.Region))
-	} else {
-		options = append(options, config.WithRegion(s3cli_config.EmptyRegion))
-	}
+	options = append(options, config.WithRegion(c.Region))
 
 	if c.CredentialsSource == s3cli_config.StaticCredentialsSource {
 		options = append(options, config.WithCredentialsProvider(
