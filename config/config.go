@@ -158,9 +158,7 @@ func (c *S3Cli) configureGoogle() {
 }
 
 func (c *S3Cli) configureDefault() {
-	if len(c.Region) == 0 {
-		c.Region = defaultAWSRegion
-	}
+	// No specific configuration needed for default/unknown providers
 }
 
 // S3Endpoint returns the S3 URI to use if custom host information has been provided
