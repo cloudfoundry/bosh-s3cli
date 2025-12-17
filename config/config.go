@@ -139,7 +139,11 @@ func (c *S3Cli) configureAWS() {
 	c.MultipartUpload = true
 
 	if c.Region == "" {
-		c.Region = AWSHostToRegion(c.Host)
+		if region := AWSHostToRegion(c.Host); region != "" {
+			c.Region = region
+		} else {
+			c.Region = defaultAWSRegion
+		}
 	}
 }
 
@@ -155,9 +159,6 @@ func (c *S3Cli) configureAlicloud() {
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
-	if len(c.Region) == 0 {
-		c.Region = EmptyRegion
-	}
 }
 
 func (c *S3Cli) configureDefault() {
