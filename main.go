@@ -19,16 +19,14 @@ func main() {
 	showVer := flag.Bool("v", false, "version")
 	flag.Parse()
 
-	nonFlagArgs := flag.Args()
-	if len(nonFlagArgs) < 2 {
-		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
-	}
-
-	cmd := nonFlagArgs[0]
-
 	if *showVer {
 		fmt.Printf("version %s\n", version)
 		os.Exit(0)
+	}
+
+	nonFlagArgs := flag.Args()
+	if len(nonFlagArgs) < 2 {
+		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
 	}
 
 	configFile, err := os.Open(*configPath)
@@ -42,6 +40,8 @@ func main() {
 	}
 
 	var s3Client *s3.Client
+
+	cmd := nonFlagArgs[0]
 
 	s3Client, err = client.NewAwsS3Client(&s3Config, cmd)
 	if err != nil {
