@@ -6,9 +6,9 @@ import (
 
 var (
 	providerRegex = map[string]*regexp.Regexp{
-		"aws":      regexp.MustCompile(`^$|(https?://)?s3[-.]?(.*)\.amazonaws\.com(\.cn)?$`),
-		"alicloud": regexp.MustCompile(`^(https?://)?oss-([a-z]+-[a-z]+(-[1-9])?)(-internal)?.aliyuncs.com$`),
-		"google":   regexp.MustCompile(`^(https?://)?storage.googleapis.com$`),
+		"aws":      regexp.MustCompile(`^$|s3[-.]?(.*)\.amazonaws\.com(\.cn)?$`),
+		"alicloud": regexp.MustCompile(`^oss-([a-z]+-[a-z]+(-[1-9])?)(-internal)?.aliyuncs.com$`),
+		"google":   regexp.MustCompile(`^storage.googleapis.com$`),
 	}
 )
 
