@@ -6,7 +6,7 @@ import (
 
 var (
 	providerRegex = map[string]*regexp.Regexp{
-		"aws":      regexp.MustCompile(`^$|s3[-.]?(.*)\.amazonaws\.com(\.cn)?$`),
+		"aws":      regexp.MustCompile(`(^$|s3[-.]?(.*)\.amazonaws\.com(\.cn)?$)`),
 		"alicloud": regexp.MustCompile(`^oss-([a-z]+-[a-z]+(-[1-9])?)(-internal)?.aliyuncs.com$`),
 		"google":   regexp.MustCompile(`^storage.googleapis.com$`),
 	}
@@ -26,8 +26,8 @@ func AWSHostToRegion(host string) string {
 
 func AlicloudHostToRegion(host string) string {
 	regexMatches := providerRegex["alicloud"].FindStringSubmatch(host)
-	if len(regexMatches) == 5 {
-		return regexMatches[2]
+	if len(regexMatches) == 4 {
+		return regexMatches[1]
 	}
 
 	return ""

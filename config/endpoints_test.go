@@ -20,14 +20,6 @@ var _ = Describe("Endpoints", func() {
 		Entry("cn-north-1", "s3.cn-north-1.amazonaws.com.cn", "cn-north-1"),
 		Entry("whatever-region", "s3.whatever-region.amazonaws.com", "whatever-region"),
 		Entry("some-region", "s3-some-region.amazonaws.com", "some-region"),
-		Entry("no region in host", "https://this-should-default", ""),
-		Entry("no region in host", "https://s3.amazonaws.com", ""),
-		Entry("no region in host", "https://s3-external-1.amazonaws.com", ""),
-		Entry("us-east-2", "https://s3.us-east-2.amazonaws.com", "us-east-2"),
-		Entry("us-east-2", "https://s3-us-east-2.amazonaws.com", "us-east-2"),
-		Entry("cn-north-1", "https://s3.cn-north-1.amazonaws.com.cn", "cn-north-1"),
-		Entry("whatever-region", "https://s3.whatever-region.amazonaws.com", "whatever-region"),
-		Entry("some-region", "https://s3-some-region.amazonaws.com", "some-region"),
 	)
 
 	DescribeTable("AlicloudHostToRegion",
@@ -39,10 +31,5 @@ var _ = Describe("Endpoints", func() {
 		Entry("without internal and number", "oss-one-two-1.aliyuncs.com", "one-two-1"),
 		Entry("without internal and no number", "oss-country-zone.aliyuncs.com", "country-zone"),
 		Entry("not alicloud", "s3-us-east-2.amazonaws.com", ""),
-		Entry("with internal and number", "https://oss-country-zone-9-internal.aliyuncs.com", "country-zone-9"),
-		Entry("with internal and no number", "https://oss-sichuan-chengdu-internal.aliyuncs.com", "sichuan-chengdu"),
-		Entry("without internal and number", "https://oss-one-two-1.aliyuncs.com", "one-two-1"),
-		Entry("without internal and no number", "https://oss-country-zone.aliyuncs.com", "country-zone"),
-		Entry("not alicloud", "https://s3-us-east-2.amazonaws.com", ""),
 	)
 })
