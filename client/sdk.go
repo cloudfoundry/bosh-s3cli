@@ -19,7 +19,7 @@ import (
 
 func NewAwsS3Client(c *s3cli_config.S3Cli, cmd string) (*s3.Client, error) {
 	var apiOptions []func(stack *middleware.Stack) error
-	var requestChecksumCalculationEnabled bool
+	var requestChecksumCalculationEnabled = true
 	if cmd != "sign" && c.IsGoogle() {
 		// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
 		// to not be included in the signature of the request. Not needed for "sign" commands
