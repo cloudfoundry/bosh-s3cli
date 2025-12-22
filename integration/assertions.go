@@ -250,7 +250,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	httpClient := &http.Client{Timeout: 30 * time.Second}
 	resp, err := httpClient.Get(getURL)
 	Expect(err).ToNot(HaveOccurred())
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	body, err := io.ReadAll(resp.Body)
 	Expect(err).ToNot(HaveOccurred())
@@ -269,7 +269,7 @@ func AssertOnSignedURLs(s3CLIPath string, cfg *config.S3Cli) {
 	putReq.Header.Set("Content-Type", "text/plain")
 	putResp, err := httpClient.Do(putReq)
 	Expect(err).ToNot(HaveOccurred())
-	defer putResp.Body.Close()
+	defer putResp.Body.Close() //nolint:errcheck
 	Expect(putResp.StatusCode).To(Equal(200))
 
 	// Clean up the test files
