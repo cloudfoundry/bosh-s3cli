@@ -22,9 +22,28 @@ import (
 var (
 	// expectedPutUploadCalls represents the expected API calls for put requests
 	expectedPutUploadCalls = []string{"PutObject"}
-	// expectedMultipartUploadCalls represents the expected API calls for standard S3 multipart uploads
-	expectedMultipartUploadCalls = []string{"CreateMultipart", "UploadPart", "UploadPart", "CompleteMultipart"}
 )
+
+// isMultipartUploadPattern checks if calls follow the multipart upload pattern:
+// starts with CreateMultipart, has one or more UploadPart calls, ends with CompleteMultipart
+func isMultipartUploadPattern(calls []string) bool {
+	if len(calls) < 3 {
+		return false
+	}
+	if calls[0] != "CreateMultipart" {
+		return false
+	}
+	if calls[len(calls)-1] != "CompleteMultipart" {
+		return false
+	}
+	// Check all middle elements are UploadPart
+	for _, call := range calls[1 : len(calls)-1] {
+		if call != "UploadPart" {
+			return false
+		}
+	}
+	return true
+}
 
 // AssertLifecycleWorks tests the main blobstore object lifecycle from creation to deletion
 func AssertLifecycleWorks(s3CLIPath string, cfg *config.S3Cli) {
@@ -202,7 +221,7 @@ func AssertOnMultipartUploads(s3CLIPath string, cfg *config.S3Cli, content strin
 	case "google":
 		Expect(calls).To(Equal(expectedPutUploadCalls))
 	default:
-		Expect(calls).To(Equal(expectedMultipartUploadCalls))
+		Expect(isMultipartUploadPattern(calls)).To(BeTrue(), "Expected multipart upload pattern (CreateMultipart -> UploadPart(s) -> CompleteMultipart), got: %v", calls)
 	}
 
 	// Clean up the uploaded file

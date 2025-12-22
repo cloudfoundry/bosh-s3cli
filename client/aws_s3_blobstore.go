@@ -58,6 +58,12 @@ func (b *awsS3Client) Put(src io.ReadSeeker, dest string) error {
 			// disable multipart uploads by way of large PartSize configuration
 			u.PartSize = oneTB
 		}
+
+		// Disable checksum calculation for Alicloud OSS (Object Storage Service)
+		// Alicloud doesn't support AWS chunked encoding with checksum calculation
+		if cfg.IsAlicloud() {
+			u.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
+		}
 	})
 	uploadInput := &s3.PutObjectInput{
 		Body:   src,

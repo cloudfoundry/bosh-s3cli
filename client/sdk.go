@@ -28,6 +28,10 @@ func NewAwsS3Client(c *s3cli_config.S3Cli, cmd string) (*s3.Client, error) {
 		// Not supported by Google
 		requestChecksumCalculationEnabled = false
 	}
+	if c.IsAlicloud() {
+		// Alicloud OSS doesn't support AWS chunked encoding with checksum calculation
+		requestChecksumCalculationEnabled = false
+	}
 	return NewAwsS3ClientWithApiOptions(c, apiOptions, requestChecksumCalculationEnabled)
 }
 
@@ -72,7 +76,7 @@ func NewAwsS3ClientWithApiOptions(
 	}
 
 	if !requestChecksumCalculationEnabled {
-		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationUnset
+		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	}
 
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
