@@ -29,10 +29,11 @@ var dropAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("DropAcceptEnco
 			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
 		}
 
-		ae := req.Header.Get(acceptEncodingHeader)
-		ctx = setAcceptEncodingKey(ctx, ae)
-		req.Header.Del(acceptEncodingHeader)
-		in.Request = req
+		if ae := req.Header.Get(acceptEncodingHeader); len(ae) > 0 {
+			ctx = setAcceptEncodingKey(ctx, ae)
+			req.Header.Del(acceptEncodingHeader)
+			in.Request = req
+		}
 
 		return next.HandleFinalize(ctx, in)
 	},
@@ -45,9 +46,10 @@ var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcce
 			return out, metadata, &v4.SigningError{Err: fmt.Errorf("unexpected request middleware type %T", in.Request)}
 		}
 
-		ae := getAcceptEncodingKey(ctx)
-		req.Header.Set(acceptEncodingHeader, ae)
-		in.Request = req
+		if ae := getAcceptEncodingKey(ctx); len(ae) > 0 {
+			req.Header.Set(acceptEncodingHeader, ae)
+			in.Request = req
+		}
 
 		return next.HandleFinalize(ctx, in)
 	},
