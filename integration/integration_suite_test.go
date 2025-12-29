@@ -1,6 +1,8 @@
 package integration_test
 
 import (
+	"io"
+	"log"
 	"os"
 	"testing"
 
@@ -20,6 +22,9 @@ var s3CLIPath string
 var largeContent string
 
 var _ = BeforeSuite(func() {
+	// Suppress logs during integration tests
+	log.SetOutput(io.Discard)
+
 	// Running the IAM tests within an AWS Lambda environment
 	// require a pre-compiled binary
 	s3CLIPath = os.Getenv("S3_CLI_PATH")
