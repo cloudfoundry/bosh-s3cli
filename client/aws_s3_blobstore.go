@@ -59,9 +59,9 @@ func (b *awsS3Client) Put(src io.ReadSeeker, dest string) error {
 			u.PartSize = oneTB
 		}
 
-		// Disable checksum calculation for Alicloud OSS (Object Storage Service)
-		// Alicloud doesn't support AWS chunked encoding with checksum calculation
-		if cfg.IsAlicloud() {
+		if !cfg.UploaderRequestChecksumCalculationEnabled {
+			// Disable checksum calculation for Alicloud OSS (Object Storage Service)
+			// Alicloud doesn't support AWS chunked encoding with checksum calculation
 			u.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 		}
 	})

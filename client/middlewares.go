@@ -56,6 +56,10 @@ var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcce
 )
 
 func AddFixAcceptEncodingMiddleware(stack *middleware.Stack) error {
+	if _, ok := stack.Finalize.Get("Signing"); !ok {
+		return nil
+	}
+
 	if err := stack.Finalize.Insert(dropAcceptEncodingHeader, "Signing", middleware.Before); err != nil {
 		return err
 	}

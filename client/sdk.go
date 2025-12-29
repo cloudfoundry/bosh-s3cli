@@ -17,28 +17,20 @@ import (
 	s3cli_config "github.com/cloudfoundry/bosh-s3cli/config"
 )
 
-func NewAwsS3Client(c *s3cli_config.S3Cli, cmd string) (*s3.Client, error) {
+func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 	var apiOptions []func(stack *middleware.Stack) error
-	var requestChecksumCalculationEnabled = true
-	if cmd != "sign" && c.IsGoogle() {
+	if c.IsGoogle() {
 		// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
 		// to not be included in the signature of the request. Not needed for "sign" commands
 		// since they only generate pre-signed URLs without making actual HTTP requests.
 		apiOptions = append(apiOptions, AddFixAcceptEncodingMiddleware)
-		// Not supported by Google
-		requestChecksumCalculationEnabled = false
 	}
-	if c.IsAlicloud() {
-		// Alicloud OSS doesn't support AWS chunked encoding with checksum calculation
-		requestChecksumCalculationEnabled = false
-	}
-	return NewAwsS3ClientWithApiOptions(c, apiOptions, requestChecksumCalculationEnabled)
+	return NewAwsS3ClientWithApiOptions(c, apiOptions)
 }
 
 func NewAwsS3ClientWithApiOptions(
 	c *s3cli_config.S3Cli,
 	apiOptions []func(stack *middleware.Stack) error,
-	requestChecksumCalculationEnabled bool,
 ) (*s3.Client, error) {
 	var httpClient *http.Client
 
@@ -75,14 +67,13 @@ func NewAwsS3ClientWithApiOptions(
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
-	if !requestChecksumCalculationEnabled {
+	if !c.RequestChecksumCalculationEnabled {
 		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	}
 
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.UsePathStyle = !c.HostStyle
-		if c.S3Endpoint() != "" {
-			endpoint := c.S3Endpoint()
+		if endpoint := c.S3Endpoint(); endpoint != "" {
 			// AWS SDK v2 requires full URI with protocol
 			if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
 				if c.UseSSL {

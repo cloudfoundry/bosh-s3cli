@@ -38,14 +38,14 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	cmd := nonFlagArgs[0]
-
-	s3Client, err := client.NewAwsS3Client(&s3Config, cmd)
+	s3Client, err := client.NewAwsS3Client(&s3Config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	blobstoreClient := client.New(s3Client, &s3Config)
+
+	cmd := nonFlagArgs[0]
 
 	switch cmd {
 	case "put":

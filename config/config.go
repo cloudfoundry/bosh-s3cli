@@ -10,23 +10,25 @@ import (
 
 // The S3Cli represents configuration for the s3cli
 type S3Cli struct {
-	AccessKeyID          string `json:"access_key_id"`
-	SecretAccessKey      string `json:"secret_access_key"`
-	BucketName           string `json:"bucket_name"`
-	FolderName           string `json:"folder_name"`
-	CredentialsSource    string `json:"credentials_source"`
-	Host                 string `json:"host"`
-	Port                 int    `json:"port"` // 0 means no custom port
-	Region               string `json:"region"`
-	SSLVerifyPeer        bool   `json:"ssl_verify_peer"`
-	UseSSL               bool   `json:"use_ssl"`
-	ServerSideEncryption string `json:"server_side_encryption"`
-	SSEKMSKeyID          string `json:"sse_kms_key_id"`
-	AssumeRoleArn        string `json:"assume_role_arn"`
-	MultipartUpload      bool   `json:"multipart_upload"`
-	HostStyle            bool   `json:"host_style"`
-	SwiftAuthAccount     string `json:"swift_auth_account"`
-	SwiftTempURLKey      string `json:"swift_temp_url_key"`
+	AccessKeyID                               string `json:"access_key_id"`
+	SecretAccessKey                           string `json:"secret_access_key"`
+	BucketName                                string `json:"bucket_name"`
+	FolderName                                string `json:"folder_name"`
+	CredentialsSource                         string `json:"credentials_source"`
+	Host                                      string `json:"host"`
+	Port                                      int    `json:"port"` // 0 means no custom port
+	Region                                    string `json:"region"`
+	SSLVerifyPeer                             bool   `json:"ssl_verify_peer"`
+	UseSSL                                    bool   `json:"use_ssl"`
+	ServerSideEncryption                      string `json:"server_side_encryption"`
+	SSEKMSKeyID                               string `json:"sse_kms_key_id"`
+	AssumeRoleArn                             string `json:"assume_role_arn"`
+	MultipartUpload                           bool   `json:"multipart_upload"`
+	HostStyle                                 bool   `json:"host_style"`
+	SwiftAuthAccount                          string `json:"swift_auth_account"`
+	SwiftTempURLKey                           string `json:"swift_temp_url_key"`
+	RequestChecksumCalculationEnabled         bool   `json:"request_checksum_calculation_enabled"`
+	UploaderRequestChecksumCalculationEnabled bool   `json:"uploader_checksum_calculation_enabled"`
 }
 
 const defaultAWSRegion = "us-east-1" //nolint:unused
@@ -65,9 +67,11 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	}
 
 	c := S3Cli{
-		SSLVerifyPeer:   true,
-		UseSSL:          true,
-		MultipartUpload: true,
+		SSLVerifyPeer:                     true,
+		UseSSL:                            true,
+		MultipartUpload:                   true,
+		RequestChecksumCalculationEnabled: true,
+		UploaderRequestChecksumCalculationEnabled: true,
 	}
 
 	err = json.Unmarshal(bytes, &c)
@@ -151,10 +155,13 @@ func (c *S3Cli) configureAlicloud() {
 	if c.Region == "" {
 		c.Region = AlicloudHostToRegion(c.Host)
 	}
+	c.RequestChecksumCalculationEnabled = false
+	c.UploaderRequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
+	c.RequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureDefault() {
@@ -180,8 +187,4 @@ func (c *S3Cli) S3Endpoint() string {
 
 func (c *S3Cli) IsGoogle() bool {
 	return Provider(c.Host) == "google"
-}
-
-func (c *S3Cli) IsAlicloud() bool {
-	return Provider(c.Host) == "alicloud"
 }
