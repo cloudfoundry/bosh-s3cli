@@ -23,6 +23,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	nonFlagArgs := flag.Args()
+	if len(nonFlagArgs) < 2 {
+		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
+	}
+
 	configFile, err := os.Open(*configPath)
 	if err != nil {
 		log.Fatalln(err)
@@ -39,11 +44,6 @@ func main() {
 	}
 
 	blobstoreClient := client.New(s3Client, &s3Config)
-
-	nonFlagArgs := flag.Args()
-	if len(nonFlagArgs) < 2 {
-		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
-	}
 
 	cmd := nonFlagArgs[0]
 
