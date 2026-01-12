@@ -35,8 +35,6 @@ Given a JSON config file (`config.json`)...
   "server_side_encryption":                "<string> (optional)",
   "sse_kms_key_id":                        "<string> (optional)",
   "multipart_upload":                      "<bool> (optional - default: true)",
-  "request_checksum_calculation_enabled":  "<bool> (optional - default: true)"
-  "uploader_checksum_calculation_enabled": "<bool> (optional - default: true)"
 }
 ```
 > Note: Provider specific configuration (automatically set to false by parsing the provided 'host') :
