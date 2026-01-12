@@ -39,7 +39,7 @@ var dropAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("DropAcceptEnco
 	},
 )
 
-var replaceAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("ReplaceAcceptEncodingHeader",
+var setAcceptEncodingHeader = middleware.FinalizeMiddlewareFunc("SetAcceptEncodingHeader",
 	func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (out middleware.FinalizeOutput, metadata middleware.Metadata, err error) {
 		req, ok := in.Request.(*smithyhttp.Request)
 		if !ok {
@@ -64,7 +64,7 @@ func AddFixAcceptEncodingMiddleware(stack *middleware.Stack) error {
 		return err
 	}
 
-	if err := stack.Finalize.Insert(replaceAcceptEncodingHeader, "Signing", middleware.After); err != nil {
+	if err := stack.Finalize.Insert(setAcceptEncodingHeader, "Signing", middleware.After); err != nil {
 		return err
 	}
 	return nil
