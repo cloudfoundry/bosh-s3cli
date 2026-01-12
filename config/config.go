@@ -27,8 +27,8 @@ type S3Cli struct {
 	HostStyle                                 bool   `json:"host_style"`
 	SwiftAuthAccount                          string `json:"swift_auth_account"`
 	SwiftTempURLKey                           string `json:"swift_temp_url_key"`
-	RequestChecksumCalculationEnabled         bool   `json:"request_checksum_calculation_enabled"`
-	UploaderRequestChecksumCalculationEnabled bool   `json:"uploader_checksum_calculation_enabled"`
+	requestChecksumCalculationEnabled         bool
+	uploaderRequestChecksumCalculationEnabled bool
 }
 
 const defaultAWSRegion = "us-east-1" //nolint:unused
@@ -70,8 +70,8 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		SSLVerifyPeer:                     true,
 		UseSSL:                            true,
 		MultipartUpload:                   true,
-		RequestChecksumCalculationEnabled: true,
-		UploaderRequestChecksumCalculationEnabled: true,
+		requestChecksumCalculationEnabled: true,
+		uploaderRequestChecksumCalculationEnabled: true,
 	}
 
 	err = json.Unmarshal(bytes, &c)
@@ -155,13 +155,13 @@ func (c *S3Cli) configureAlicloud() {
 	if c.Region == "" {
 		c.Region = AlicloudHostToRegion(c.Host)
 	}
-	c.RequestChecksumCalculationEnabled = false
-	c.UploaderRequestChecksumCalculationEnabled = false
+	c.requestChecksumCalculationEnabled = false
+	c.uploaderRequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
-	c.RequestChecksumCalculationEnabled = false
+	c.requestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureDefault() {
@@ -187,4 +187,12 @@ func (c *S3Cli) S3Endpoint() string {
 
 func (c *S3Cli) IsGoogle() bool {
 	return Provider(c.Host) == "google"
+}
+
+func (c *S3Cli) ShouldDisableRequestChecksumCalculation() bool {
+	return !c.requestChecksumCalculationEnabled
+}
+
+func (c *S3Cli) ShouldDisableUploaderRequestChecksumCalculation() bool {
+	return !c.uploaderRequestChecksumCalculationEnabled
 }

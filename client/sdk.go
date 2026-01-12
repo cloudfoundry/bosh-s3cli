@@ -67,7 +67,7 @@ func NewAwsS3ClientWithApiOptions(
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
-	if !c.RequestChecksumCalculationEnabled {
+	if c.ShouldDisableRequestChecksumCalculation() {
 		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
 	}
 
