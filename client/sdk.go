@@ -71,6 +71,9 @@ func NewAwsS3Client(c *s3cli_config.S3Cli) (*s3.Client, error) {
 			}
 			o.BaseEndpoint = aws.String(endpoint)
 		}
+		if c.Debug {
+			o.ClientLogMode = aws.LogResponse | aws.LogRequest
+		}
 	})
 
 	return s3Client, nil

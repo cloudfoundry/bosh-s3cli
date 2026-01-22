@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -23,7 +24,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	configFile, err := os.Open(*configPath)
+	var configFile io.Reader
+	var err error
+	if *configPath == "" {
+		configFile, err = config.ConfigFromEnv()
+	} else {
+		configFile, err = os.Open(*configPath)
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}

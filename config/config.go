@@ -1,10 +1,13 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -27,6 +30,7 @@ type S3Cli struct {
 	HostStyle            bool   `json:"host_style"`
 	SwiftAuthAccount     string `json:"swift_auth_account"`
 	SwiftTempURLKey      string `json:"swift_temp_url_key"`
+	Debug                bool   `json:"debug"`
 }
 
 // EmptyRegion is required to allow us to use the AWS SDK against S3 compatible blobstores which do not have
@@ -60,6 +64,41 @@ func (e errorStaticCredentialsPresent) Error() string {
 
 func newStaticCredentialsPresentError(desiredSource string) error {
 	return errorStaticCredentialsPresent{credentialsSource: desiredSource}
+}
+
+// ConfigFromEnv pulls in config from environment variables instead of config.json.
+// It returns a io.Reader to enable NewFromReader() to do regular validation as done for files.
+func ConfigFromEnv() (io.Reader, error) {
+	port := 443
+	if altPort, isset := os.LookupEnv("S3_PORT"); isset {
+		var err error
+		port, err = strconv.Atoi(altPort)
+		if err != nil {
+			return nil, err
+		}
+	}
+	c := S3Cli{
+		AccessKeyID: os.Getenv("S3_ACCESS_KEY_ID"),
+		BucketName:  os.Getenv("S3_BUCKET"),
+		// Fixate CredentialSource to StaticCredentialsSource, making S3_ACCESS_KEY_ID & S3_SECRET_ACCESS_KEY required
+		CredentialsSource: StaticCredentialsSource,
+		Host:              os.Getenv("S3_HOST"),
+		Port:              port,
+		Region:            os.Getenv("S3_REGION"),
+		SecretAccessKey:   os.Getenv("S3_SECRET_ACCESS_KEY"),
+		SSLVerifyPeer:     !(os.Getenv("S3_INSECURE_SSL") != ""),
+		// Use SSL/TLS/https:// unless S3_DISABLE_SSL is set
+		UseSSL: !(os.Getenv("S3_DISABLE_SSL") != ""),
+		// Use PathStyle=true by default (endpoint/bucket instead of DNS bucket.endpoint), if S3_USE_HOSTSTYLE unset. See client/sdk.go
+		HostStyle: os.Getenv("S3_USE_HOSTSTYLE") != "",
+		// Enable HTTP(S) request debugging if S3_DEBUG has non-empty value
+		Debug: os.Getenv("S3_DEBUG") != "",
+	}
+	json, err := json.Marshal(c)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(json), nil
 }
 
 // NewFromReader returns a new s3cli configuration struct from the contents of reader.
