@@ -12,9 +12,9 @@ var _ = Describe("Endpoints", func() {
 		func(host, region string) {
 			Expect(config.AWSHostToRegion(host)).To(Equal(region))
 		},
-		Entry("us-east-1", "this-should-default", "us-east-1"),
-		Entry("us-east-1", "s3.amazonaws.com", "us-east-1"),
-		Entry("us-east-1", "s3-external-1.amazonaws.com", "us-east-1"),
+		Entry("no region in host", "this-should-default", ""),
+		Entry("no region in host", "s3.amazonaws.com", ""),
+		Entry("no region in host", "s3-external-1.amazonaws.com", ""),
 		Entry("us-east-2", "s3.us-east-2.amazonaws.com", "us-east-2"),
 		Entry("us-east-2", "s3-us-east-2.amazonaws.com", "us-east-2"),
 		Entry("cn-north-1", "s3.cn-north-1.amazonaws.com.cn", "cn-north-1"),
