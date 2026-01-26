@@ -58,6 +58,12 @@ func (b *awsS3Client) Put(src io.ReadSeeker, dest string) error {
 			// disable multipart uploads by way of large PartSize configuration
 			u.PartSize = oneTB
 		}
+
+		if cfg.ShouldDisableUploaderRequestChecksumCalculation() {
+			// Disable checksum calculation for Alicloud OSS (Object Storage Service)
+			// Alicloud doesn't support AWS chunked encoding with checksum calculation
+			u.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
+		}
 	})
 	uploadInput := &s3.PutObjectInput{
 		Body:   src,
@@ -112,7 +118,7 @@ func (b *awsS3Client) Delete(dest string) error {
 	}
 
 	var apiErr smithy.APIError
-	if errors.As(err, &apiErr) && apiErr.ErrorCode() == "NotFound" {
+	if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "NotFound" || apiErr.ErrorCode() == "NoSuchKey") {
 		return nil
 	}
 	return err

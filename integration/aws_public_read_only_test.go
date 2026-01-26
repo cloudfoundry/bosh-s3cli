@@ -71,6 +71,13 @@ var _ = Describe("Testing gets against a public AWS S3 bucket", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(s3CLISession.ExitCode()).To(BeZero())
 			Expect(s3CLISession.Err.Contents()).To(MatchRegexp("File '.*' exists in bucket '.*'"))
+
+			// Clean up the uploaded file
+			_, err = s3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+				Bucket: &bucketName,
+				Key:    &s3Filename,
+			})
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })
