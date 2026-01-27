@@ -37,10 +37,7 @@ Given a JSON config file (`config.json`)...
   "multipart_upload":                      "<bool> (optional - default: true)",
 }
 ```
-> Note: Provider specific configuration (automatically set to false by parsing the provided 'host') :
-> 1. **multipart_upload** - not supported by Google
-> 1. **request_checksum_calculation_enabled** - not supported by Google and AliCloud
-> 2. **uploader_checksum_calculation_enabled** - not supported by AliCloud
+> Note: **multipart_upload** is not supported by Google - it's automatically set to false by parsing the provided 'host'
 
 ``` bash
 # Usage

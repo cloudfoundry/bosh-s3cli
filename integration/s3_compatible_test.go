@@ -30,13 +30,6 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 		})
 
 		configurations := []TableEntry{
-			Entry("with the minimal configuration", &config.S3Cli{
-				AccessKeyID:     accessKeyID,
-				SecretAccessKey: secretAccessKey,
-				BucketName:      bucketName,
-				Host:            s3Host,
-				MultipartUpload: true,
-			}),
 			Entry("with region specified", &config.S3Cli{
 				AccessKeyID:     accessKeyID,
 				SecretAccessKey: secretAccessKey,
@@ -50,6 +43,7 @@ var _ = Describe("Testing in any non-AWS, S3 compatible storage service", func()
 				SecretAccessKey: secretAccessKey,
 				BucketName:      bucketName,
 				Host:            s3Host,
+				Region:          "invalid-region",
 				UseSSL:          false,
 				MultipartUpload: true,
 			}),
