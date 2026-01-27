@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -28,7 +29,13 @@ func main() {
 		log.Fatalf("Expected at least two arguments got %d\n", len(nonFlagArgs))
 	}
 
-	configFile, err := os.Open(*configPath)
+	var configFile io.Reader
+	var err error
+	if *configPath == "" {
+		configFile, err = config.ConfigFromEnv()
+	} else {
+		configFile, err = os.Open(*configPath)
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}
