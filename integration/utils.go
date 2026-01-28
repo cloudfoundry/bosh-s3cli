@@ -7,6 +7,9 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go/middleware"
+	"github.com/cloudfoundry/bosh-s3cli/client"
 	"github.com/cloudfoundry/bosh-s3cli/config"
 
 	. "github.com/onsi/ginkgo/v2" //nolint:staticcheck
@@ -69,4 +72,35 @@ func RunS3CLI(s3CLIPath string, configPath string, subcommand string, args ...st
 	}
 	session.Wait(1 * time.Minute)
 	return session, nil
+}
+
+// CreateS3ClientWithFailureInjection creates an S3 client with failure injection middleware
+func CreateS3ClientWithFailureInjection(s3Config *config.S3Cli) (*s3.Client, error) {
+	var apiOptions []func(stack *middleware.Stack) error
+	// Create tracker once so the middleware shares a single counter across requests.
+	uploadPartTracker := createUploadPartTracker()
+	apiOptions = append(apiOptions, func(stack *middleware.Stack) error {
+		// Add initialize middleware to track UploadPart operations
+		if err := stack.Initialize.Add(uploadPartTracker, middleware.Before); err != nil {
+			return err
+		}
+		// Add finalize middleware to corrupt headers after signing
+		return stack.Finalize.Add(createSHACorruptionMiddleware(), middleware.After)
+	})
+
+	return client.NewAwsS3ClientWithApiOptions(s3Config, apiOptions)
+}
+
+// CreateTracingS3Client creates an S3 client with tracing middleware
+func CreateTracingS3Client(s3Config *config.S3Cli, calls *[]string) (*s3.Client, error) {
+	var apiOptions []func(stack *middleware.Stack) error
+	// Setup middleware fixing request to Google - they expect the 'accept-encoding' header
+	// to not be included in the signature of the request.
+	apiOptions = append(apiOptions, client.AddFixAcceptEncodingMiddleware)
+	// Use the centralized client creation logic with a custom middleware
+	apiOptions = append(apiOptions, func(stack *middleware.Stack) error {
+		return stack.Initialize.Add(createS3TracingMiddleware(calls), middleware.Before)
+	})
+
+	return client.NewAwsS3ClientWithApiOptions(s3Config, apiOptions)
 }
