@@ -39,9 +39,10 @@ Given a JSON config file (`config.json`)...
   "download_part_size":                    "<string> (optional - default: '5242880')", # 5 MB
   "upload_concurrency":                    "<string> (optional - default: '5')",
   "upload_part_size":                      "<string> (optional - default: '5242880')" # 5 MB
-  
+  "disable_checksums":                     "<bool> (optional - default: false)"
 }
 ```
+
 > Note: **multipart_upload** is not supported by Google - it's automatically set to false by parsing the provided 'host'
 
 ``` bash

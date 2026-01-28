@@ -27,15 +27,16 @@ type S3Cli struct {
 	HostStyle                                 bool   `json:"host_style"`
 	SwiftAuthAccount                          string `json:"swift_auth_account"`
 	SwiftTempURLKey                           string `json:"swift_temp_url_key"`
-	requestChecksumCalculationEnabled         bool
-	uploaderRequestChecksumCalculationEnabled bool 
+	RequestChecksumCalculationEnabled         bool
+	UploaderRequestChecksumCalculationEnabled bool
 	// Optional knobs to tune transfer performance.
 	// If zero, the client will apply sensible defaults (handled by the S3 client layer).
 	// Part size values are provided in bytes.
 	DownloadConcurrency int   `json:"download_concurrency"`
 	DownloadPartSize    int64 `json:"download_part_size"`
-	UploadConcurrency int   `json:"upload_concurrency"`
-	UploadPartSize    int64 `json:"upload_part_size"`
+	UploadConcurrency   int   `json:"upload_concurrency"`
+	UploadPartSize      int64 `json:"upload_part_size"`
+	DisableChecksums    bool  `json:"disable_checksums"`
 }
 
 const defaultAWSRegion = "us-east-1" //nolint:unused
@@ -77,8 +78,8 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		SSLVerifyPeer:                     true,
 		UseSSL:                            true,
 		MultipartUpload:                   true,
-		requestChecksumCalculationEnabled: true,
-		uploaderRequestChecksumCalculationEnabled: true,
+		RequestChecksumCalculationEnabled: true,
+		UploaderRequestChecksumCalculationEnabled: true,
 	}
 
 	err = json.Unmarshal(bytes, &c)
@@ -168,13 +169,13 @@ func (c *S3Cli) configureAlicloud() {
 	if c.Region == "" {
 		c.Region = AlicloudHostToRegion(c.Host)
 	}
-	c.requestChecksumCalculationEnabled = false
-	c.uploaderRequestChecksumCalculationEnabled = false
+	c.RequestChecksumCalculationEnabled = false
+	c.UploaderRequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
-	c.requestChecksumCalculationEnabled = false
+	c.RequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureDefault() {
@@ -203,9 +204,9 @@ func (c *S3Cli) IsGoogle() bool {
 }
 
 func (c *S3Cli) ShouldDisableRequestChecksumCalculation() bool {
-	return !c.requestChecksumCalculationEnabled
+	return !c.RequestChecksumCalculationEnabled || c.DisableChecksums
 }
 
 func (c *S3Cli) ShouldDisableUploaderRequestChecksumCalculation() bool {
-	return !c.uploaderRequestChecksumCalculationEnabled
+	return !c.UploaderRequestChecksumCalculationEnabled || c.DisableChecksums
 }
