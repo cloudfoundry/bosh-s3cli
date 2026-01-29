@@ -28,6 +28,7 @@ type S3Cli struct {
 	SwiftAuthAccount                          string `json:"swift_auth_account"`
 	SwiftTempURLKey                           string `json:"swift_temp_url_key"`
 	RequestChecksumCalculationEnabled         bool
+	ResponseChecksumCalculationEnabled        bool
 	UploaderRequestChecksumCalculationEnabled bool
 	// Optional knobs to tune transfer performance.
 	// If zero, the client will apply sensible defaults (handled by the S3 client layer).
@@ -36,7 +37,6 @@ type S3Cli struct {
 	DownloadPartSize    int64 `json:"download_part_size"`
 	UploadConcurrency   int   `json:"upload_concurrency"`
 	UploadPartSize      int64 `json:"upload_part_size"`
-	DisableChecksums    bool  `json:"disable_checksums"`
 }
 
 const defaultAWSRegion = "us-east-1" //nolint:unused
@@ -75,10 +75,11 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	}
 
 	c := S3Cli{
-		SSLVerifyPeer:                     true,
-		UseSSL:                            true,
-		MultipartUpload:                   true,
-		RequestChecksumCalculationEnabled: true,
+		SSLVerifyPeer:                             true,
+		UseSSL:                                    true,
+		MultipartUpload:                           true,
+		RequestChecksumCalculationEnabled:         true,
+		ResponseChecksumCalculationEnabled:        true,
 		UploaderRequestChecksumCalculationEnabled: true,
 	}
 
@@ -130,6 +131,8 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		c.configureAlicloud()
 	case "google":
 		c.configureGoogle()
+	case "gdch":
+		c.configureGDCH()
 	default:
 		c.configureDefault()
 	}
@@ -178,6 +181,12 @@ func (c *S3Cli) configureGoogle() {
 	c.RequestChecksumCalculationEnabled = false
 }
 
+func (c *S3Cli) configureGDCH() {
+	c.RequestChecksumCalculationEnabled = false
+	c.ResponseChecksumCalculationEnabled = false
+	c.UploaderRequestChecksumCalculationEnabled = false
+}
+
 func (c *S3Cli) configureDefault() {
 	// No specific configuration needed for default/unknown providers
 }
@@ -204,9 +213,13 @@ func (c *S3Cli) IsGoogle() bool {
 }
 
 func (c *S3Cli) ShouldDisableRequestChecksumCalculation() bool {
-	return !c.RequestChecksumCalculationEnabled || c.DisableChecksums
+	return !c.RequestChecksumCalculationEnabled
+}
+
+func (c *S3Cli) ShouldDisableResponseChecksumCalculation() bool {
+	return !c.ResponseChecksumCalculationEnabled
 }
 
 func (c *S3Cli) ShouldDisableUploaderRequestChecksumCalculation() bool {
-	return !c.UploaderRequestChecksumCalculationEnabled || c.DisableChecksums
+	return !c.UploaderRequestChecksumCalculationEnabled
 }
