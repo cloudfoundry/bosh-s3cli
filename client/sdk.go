@@ -86,6 +86,9 @@ func NewAwsS3ClientWithApiOptions(
 		}
 		// Apply custom middlewares if provided
 		o.APIOptions = append(o.APIOptions, apiOptions...)
+		if c.Debug {
+			o.ClientLogMode = aws.LogResponse | aws.LogRequest
+		}
 	})
 
 	return s3Client, nil
