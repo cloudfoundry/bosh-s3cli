@@ -41,16 +41,14 @@ func (b *awsS3Client) Get(src string, dest io.WriterAt) error {
 	cfg := b.s3cliConfig
 
 	downloader := manager.NewDownloader(b.s3Client, func(d *manager.Downloader) {
+		d.Concurrency = defaultTransferConcurrency
 		if cfg.DownloadConcurrency > 0 {
 			d.Concurrency = cfg.DownloadConcurrency
-		} else {
-			d.Concurrency = defaultTransferConcurrency
 		}
 
+		d.PartSize = defaultTransferPartSize
 		if cfg.DownloadPartSize > 0 {
 			d.PartSize = cfg.DownloadPartSize
-		} else {
-			d.PartSize = defaultTransferPartSize
 		}
 	})
 
@@ -76,10 +74,9 @@ func (b *awsS3Client) Put(src io.ReadSeeker, dest string) error {
 	uploader := manager.NewUploader(b.s3Client, func(u *manager.Uploader) {
 		u.LeavePartsOnError = false
 
+		u.Concurrency = defaultTransferConcurrency
 		if cfg.UploadConcurrency > 0 {
 			u.Concurrency = cfg.UploadConcurrency
-		} else {
-			u.Concurrency = defaultTransferConcurrency
 		}
 
 		// PartSize: if multipart uploads disabled, force a very large part to avoid multipart.
