@@ -270,6 +270,65 @@ var _ = Describe("BlobstoreClient configuration", func() {
 		})
 	})
 
+	Describe("transfer tuning fields (concurrency / part size)", func() {
+		It("accepts zero as 'use defaults' and preserves zeros when not set", func() {
+			dummyJSONBytes := []byte(`{"access_key_id":"id","secret_access_key":"key","bucket_name":"some-bucket"}`)
+			dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+			c, err := config.NewFromReader(dummyJSONReader)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.DownloadConcurrency).To(Equal(0))
+			Expect(c.UploadConcurrency).To(Equal(0))
+			Expect(c.DownloadPartSize).To(Equal(int64(0)))
+			Expect(c.UploadPartSize).To(Equal(int64(0)))
+		})
+
+		It("preserves positive tuning values from config", func() {
+			dummyJSONBytes := []byte(`{
+				"access_key_id":"id",
+				"secret_access_key":"key",
+				"bucket_name":"some-bucket",
+				"download_concurrency": 10,
+				"download_part_size": 10485760,
+				"upload_concurrency": 8,
+				"upload_part_size": 5242880
+			}`)
+			dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+			c, err := config.NewFromReader(dummyJSONReader)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.DownloadConcurrency).To(Equal(10))
+			Expect(c.DownloadPartSize).To(Equal(int64(10485760)))
+			Expect(c.UploadConcurrency).To(Equal(8))
+			Expect(c.UploadPartSize).To(Equal(int64(5242880)))
+		})
+
+		It("rejects negative tuning values", func() {
+			dummyJSONBytes := []byte(`{
+				"access_key_id":"id",
+				"secret_access_key":"key",
+				"bucket_name":"some-bucket",
+				"download_concurrency": -1
+			}`)
+			dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+			_, err := config.NewFromReader(dummyJSONReader)
+			Expect(err).To(MatchError("download/upload concurrency and part sizes must be non-negative"))
+
+			// negative part size
+			dummyJSONBytes = []byte(`{
+				"access_key_id":"id",
+				"secret_access_key":"key",
+				"bucket_name":"some-bucket",
+				"upload_part_size": -1024
+			}`)
+			dummyJSONReader = bytes.NewReader(dummyJSONBytes)
+
+			_, err = config.NewFromReader(dummyJSONReader)
+			Expect(err).To(MatchError("download/upload concurrency and part sizes must be non-negative"))
+		})
+	})
+
 	Describe("returning the S3 endpoint", func() {
 		Context("when port is provided", func() {
 			It("returns a URI in the form `host:port`", func() {
