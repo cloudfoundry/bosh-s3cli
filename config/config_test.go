@@ -44,11 +44,11 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "storage.googleapis.com"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
 
-				It("stubs the region used for SDK configuration", func() {
+				It("sets the default region used for SDK configuration", func() {
 					c, err := config.NewFromReader(dummyJSONReader)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(c.Host).To(Equal("storage.googleapis.com"))
-					Expect(c.Region).To(Equal(""))
+					Expect(c.Region).To(Equal("us-east-1"))
 				})
 			})
 
