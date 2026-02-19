@@ -5,7 +5,8 @@ blobstore.
 
 Continuous integration: <https://bosh-cpi.ci.cf-app.com/pipelines/s3cli>
 
-Releases can be found in `https://s3.amazonaws.com/bosh-s3cli-artifacts`. The Linux binaries follow the regex `s3cli-(\d+\.\d+\.\d+)-linux-amd64` and the windows binaries `s3cli-(\d+\.\d+\.\d+)-windows-amd64`.
+Releases can be found in `https://s3.amazonaws.com/bosh-s3cli-artifacts`. The Linux binaries follow the regex
+`s3cli-(\d+\.\d+\.\d+)-linux-amd64` and the windows binaries `s3cli-(\d+\.\d+\.\d+)-windows-amd64`.
 
 ## Installation
 
@@ -19,26 +20,30 @@ Given a JSON config file (`config.json`)...
 
 ``` json
 {
-  "bucket_name":                           "<string> (required)",
+  "bucket_name":                                    "<string> (required)",
 
-  "credentials_source":                    "<string> [static|env_or_profile|none]",
-  "access_key_id":                         "<string> (required if credentials_source = 'static')",
-  "secret_access_key":                     "<string> (required if credentials_source = 'static')",
+  "credentials_source":                             "<string> [static|env_or_profile|none]",
+  "access_key_id":                                  "<string> (required if credentials_source = 'static')",
+  "secret_access_key":                              "<string> (required if credentials_source = 'static')",
 
-  "region":                                "<string> (optional - default: 'us-east-1')",
-  "host":                                  "<string> (optional)",
-  "port":                                  "<int> (optional)",
+  "region":                                         "<string> (optional - default: 'us-east-1')",
+  "host":                                           "<string> (optional)",
+  "port":                                           "<int> (optional)",
 
-  "ssl_verify_peer":                       "<bool> (optional - default: true)",
-  "use_ssl":                               "<bool> (optional - default: true)",
-  "signature_version":                     "<string> (optional)",
-  "server_side_encryption":                "<string> (optional)",
-  "sse_kms_key_id":                        "<string> (optional)",
-  "multipart_upload":                      "<bool> (optional - default: true)",
-  "download_concurrency":                  <int> (optional - default: 5),
-  "download_part_size":                    <int64> (optional - default: 5242880), # 5 MB
-  "upload_concurrency":                    <int> (optional - default: 5),
-  "upload_part_size":                      <int64> (optional - default: 5242880) # 5 MB
+  "ssl_verify_peer":                                "<bool> (optional - default: true)",
+  "use_ssl":                                        "<bool> (optional - default: true)",
+  "signature_version":                              "<string> (optional)",
+  "server_side_encryption":                         "<string> (optional)",
+  "sse_kms_key_id":                                 "<string> (optional)",
+  "multipart_upload":                               "<bool> (optional - default: true)",
+  "request_checksum_calculation_enabled":           "<bool> (optional - default: true)",
+  "response_checksum_calculation_enabled":          "<bool> (optional - default: true)",
+  "uploader_request_checksum_calculation_enabled":  "<bool> (optional - default: true)"
+  
+  "download_concurrency":                           "<int> (optional - default: 5)",
+  "download_part_size":                             "<int64> (optional - default: 5242880) # 5 MB",
+  "upload_concurrency":                             "<int> (optional - default: 5)",
+  "upload_part_size":                               "<int64> (optional - default: 5242880) # 5 MB"
 }
 ```
 
@@ -97,8 +102,11 @@ Follow these steps to make a contribution to the project:
 - Create a GitHub pull request, selecting `main` as the target branch
 
 ## Running integration tests
+
 ### Steps to run the integration tests on AWS
+
 1. Export the following variables into your environment
+
 ```
 export access_key_id=<YOUR_AWS_ACCESS_KEY>
 export focus_regex="GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
@@ -108,19 +116,25 @@ export secret_access_key=<YOUR_SECRET_ACCESS_KEY>
 export stack_name=s3cli-iam
 export bucket_name=s3cli-pipeline
 ```
+
 2. Setup infrastructure with `ci/tasks/setup-aws-infrastructure.sh`
-3. Run the desired tests by executing one or more of the scripts `run-integration-*` in `ci/tasks` (to run `run-integration-s3-compat` see [Setup for GCP](#setup-for-GCP) or [Setup for AliCloud](#setup-for-alicloud))
+3. Run the desired tests by executing one or more of the scripts `run-integration-*` in `ci/tasks` (to run
+   `run-integration-s3-compat` see [Setup for GCP](#setup-for-GCP) or [Setup for AliCloud](#setup-for-alicloud))
 4. Teardown infrastructure with `ci/tasks/teardown-infrastructure.sh`
 
 ### Setup for GCP
+
 1. Create a bucket in GCP
 2. Create access keys
 3. Navigate to **IAM & Admin > Service Accounts**.
 4. Select your service account or create a new one if needed.
-5. Ensure your service account has necessary permissions (like `Storage Object Creator`, `Storage Object Viewer`, `Storage Admin`) depending on what access you want.
+5. Ensure your service account has necessary permissions (like `Storage Object Creator`, `Storage Object Viewer`,
+   `Storage Admin`) depending on what access you want.
 6. Go to **Cloud Storage** and select **Settings**.
-7. In the **Interoperability** section, create an HMAC key for your service account. This generates an "access key ID" and a "secret access key".
+7. In the **Interoperability** section, create an HMAC key for your service account. This generates an "access key ID"
+   and a "secret access key".
 8. Export the following variables into your environment:
+
 ```
 export access_key_id=<YOUR_ACCESS_KEY>
 export secret_access_key=<YOUR_SECRET_ACCESS_KEY>
@@ -128,12 +142,15 @@ export bucket_name=<YOUR_BUCKET_NAME>
 export s3_endpoint_host=storage.googleapis.com
 export s3_endpoint_port=443
 ```
+
 4. Run `run-integration-s3-compat.sh` in `ci/tasks`
 
 ### Setup for AliCloud
+
 1. Create bucket in AliCloud
 2. Create access keys from `RAM -> User -> Create Accesskey`
 3. Export the following variables into your environment:
+
 ```
 export access_key_id=<YOUR_ACCESS_KEY>
 export secret_access_key=<YOUR_SECRET_ACCESS_KEY>
@@ -141,4 +158,5 @@ export bucket_name=<YOUR_BUCKET_NAME>
 export s3_endpoint_host="oss-<YOUR_REGION>.aliyuncs.com"
 export s3_endpoint_port=443
 ```
+
 4. Run `run-integration-s3-compat.sh` in `ci/tasks`
