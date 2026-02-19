@@ -39,7 +39,8 @@ type S3Cli struct {
 	UploadPartSize      int64 `json:"upload_part_size"`
 }
 
-const defaultAWSRegion = "us-east-1" //nolint:unused
+const defaultAWSRegion = "us-east-1"
+const defaultGoogleRegion = "us-east-1"
 
 // StaticCredentialsSource specifies that credentials will be supplied using access_key_id and secret_access_key
 const StaticCredentialsSource = "static"
@@ -179,6 +180,9 @@ func (c *S3Cli) configureAlicloud() {
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
 	c.RequestChecksumCalculationEnabled = false
+	if c.Region == "" {
+		c.Region = defaultGoogleRegion
+	}
 }
 
 func (c *S3Cli) configureGDCH() {
