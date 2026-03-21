@@ -10,13 +10,13 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.9
 	github.com/aws/smithy-go v1.24.2
-	github.com/cloudfoundry/bosh-utils v0.0.596
+	github.com/cloudfoundry/bosh-utils v0.0.599
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 )
 
 require (
-	code.cloudfoundry.org/tlsconfig v0.47.0 // indirect
+	code.cloudfoundry.org/tlsconfig v0.48.0 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.7 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.20 // indirect

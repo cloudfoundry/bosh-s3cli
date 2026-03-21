@@ -1,7 +1,7 @@
 code.cloudfoundry.org/clock v1.0.0 h1:kFXWQM4bxYvdBw2X8BbBeXwQNgfoWv1vqAk2ZZyBN2o=
 code.cloudfoundry.org/clock v1.0.0/go.mod h1:QD9Lzhd/ux6eNQVUDVRJX/RKTigpewimNYBi7ivZKY8=
-code.cloudfoundry.org/tlsconfig v0.47.0 h1:Qv4SiPMLKQTtCxUyLG0u0pvhZyxjtbvvuaWVL6Q5SXI=
-code.cloudfoundry.org/tlsconfig v0.47.0/go.mod h1:6pX+slnyBS6pNu1ETofrEIw5ozxWsOKnjWPQQzlZwFA=
+code.cloudfoundry.org/tlsconfig v0.48.0 h1:pXgD+Ctes+K4lLpXmobDzn47OthNSM/T6q6M2x/FImI=
+code.cloudfoundry.org/tlsconfig v0.48.0/go.mod h1:Y6e79JPXDXlky4pwaSTJd4qa84GyCW+U09XxSPQiuj4=
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
 github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1Xbatp0=
@@ -46,8 +46,8 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.41.9 h1:Cng+OOwCHmFljXIxpEVXAGMnBia8
 github.com/aws/aws-sdk-go-v2/service/sts v1.41.9/go.mod h1:LrlIndBDdjA/EeXeyNBle+gyCwTlizzW5ycgWnvIxkk=
 github.com/aws/smithy-go v1.24.2 h1:FzA3bu/nt/vDvmnkg+R8Xl46gmzEDam6mZ1hzmwXFng=
 github.com/aws/smithy-go v1.24.2/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
-github.com/cloudfoundry/bosh-utils v0.0.596 h1:YvaLBD6CPPEaW8nV9LxgPly+o3qPY3/ouiMryHk0qmY=
-github.com/cloudfoundry/bosh-utils v0.0.596/go.mod h1:brIAPuZN3S4tEbatJtgsAC4SFOaPSsq61cCKG3VFrNg=
+github.com/cloudfoundry/bosh-utils v0.0.599 h1:wDhaPvaTCiqd7rDKj7e0jnqY5NvqNriThuh0PWngRh8=
+github.com/cloudfoundry/bosh-utils v0.0.599/go.mod h1:IS5JzH099m/HDz+sKyUR5P+3gjgcIUYceIbNi60PuJg=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 h1:oy59UYcspoP44ggE8DM3kjxl1+sTFd802bbZlBBhBMk=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851/go.mod h1:72EEm1oq5oXqGfu9XGtaRPWEcAFYd/P10cMNln0QhA8=
 github.com/cloudfoundry/socks5-proxy v0.2.171 h1:2UM5JFFTgCzplvVo1CSPMWxMWKwUkxxhfxpfktoD4Fw=
