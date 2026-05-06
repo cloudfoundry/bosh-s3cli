@@ -29,6 +29,36 @@ type fakeS3Server struct {
 	requests []capturedS3Request
 }
 
+const (
+	headerAuthorization             = "Authorization"
+	headerContentEncoding           = "Content-Encoding"
+	headerContentLength             = "Content-Length"
+	headerChecksumAlgorithm         = "X-Amz-Checksum-Algorithm"
+	headerContentSHA256             = "X-Amz-Content-Sha256"
+	headerDecodedContentLength      = "X-Amz-Decoded-Content-Length"
+	headerSDKChecksumAlgorithm      = "X-Amz-Sdk-Checksum-Algorithm"
+	headerTrailer                   = "X-Amz-Trailer"
+	headerChecksumCRC32             = "X-Amz-Checksum-Crc32"
+	sigV4AuthorizationPrefix        = "AWS4-HMAC-SHA256 "
+	unsignedPayload                 = "UNSIGNED-PAYLOAD"
+	streamingUnsignedPayloadTrailer = "STREAMING-UNSIGNED-PAYLOAD-TRAILER"
+	checksumAlgorithmCRC32          = "CRC32"
+	checksumTrailerCRC32            = "x-amz-checksum-crc32"
+	contentEncodingAWSChunked       = "aws-chunked"
+)
+
+var capturedHeaderNames = []string{
+	headerAuthorization,
+	headerContentEncoding,
+	headerContentLength,
+	headerChecksumAlgorithm,
+	headerContentSHA256,
+	headerDecodedContentLength,
+	headerSDKChecksumAlgorithm,
+	headerTrailer,
+	headerChecksumCRC32,
+}
+
 func (s *fakeS3Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -37,17 +67,7 @@ func (s *fakeS3Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	headers := map[string][]string{}
-	for _, key := range []string{
-		"Authorization",
-		"Content-Encoding",
-		"Content-Length",
-		"X-Amz-Checksum-Algorithm",
-		"X-Amz-Content-Sha256",
-		"X-Amz-Decoded-Content-Length",
-		"X-Amz-Sdk-Checksum-Algorithm",
-		"X-Amz-Trailer",
-		"X-Amz-Checksum-Crc32",
-	} {
+	for _, key := range capturedHeaderNames {
 		if values, ok := r.Header[key]; ok {
 			headers[key] = append([]string(nil), values...)
 		}
@@ -92,193 +112,215 @@ func (s *fakeS3Server) snapshot() []capturedS3Request {
 	return append([]capturedS3Request(nil), s.requests...)
 }
 
-func TestChecksumProbe(t *testing.T) {
+func TestPutObjectDefaultChecksumsUseAWSChunkedCRC32Trailer(t *testing.T) {
 	t.Parallel()
 
-	type scenario struct {
-		Name      string
-		Overrides map[string]any
-		Size      int
-	}
+	requests := putToFakeS3(t, 128*1024, nil)
+	assertRequestCount(t, requests, 1)
 
-	const mib = 1024 * 1024
-	scenarios := []scenario{
-		{
-			Name: "single default checksum options",
-			Size: 128 * 1024,
-		},
-		{
-			Name: "single all checksum options disabled",
-			Overrides: map[string]any{
-				"request_checksum_calculation_enabled":          false,
-				"response_checksum_calculation_enabled":         false,
-				"uploader_request_checksum_calculation_enabled": false,
-			},
-			Size: 128 * 1024,
-		},
-		{
-			Name: "multipart default checksum options",
-			Size: 6 * mib,
-		},
-		{
-			Name: "multipart client checksums disabled but uploader still enabled",
-			Overrides: map[string]any{
-				"request_checksum_calculation_enabled":  false,
-				"response_checksum_calculation_enabled": false,
-			},
-			Size: 6 * mib,
-		},
-		{
-			Name: "multipart all checksum options disabled",
-			Overrides: map[string]any{
-				"request_checksum_calculation_enabled":          false,
-				"response_checksum_calculation_enabled":         false,
-				"uploader_request_checksum_calculation_enabled": false,
-			},
-			Size: 6 * mib,
-		},
-	}
-
-	for _, sc := range scenarios {
-		sc := sc
-		t.Run(sc.Name, func(t *testing.T) {
-			fake := &fakeS3Server{}
-			server := httptest.NewTLSServer(fake)
-			defer server.Close()
-
-			rawConfig := map[string]any{
-				"access_key_id":     "id",
-				"secret_access_key": "key",
-				"bucket_name":       "bucket",
-				"host":              server.URL,
-				"region":            "us-east-1",
-				"ssl_verify_peer":   false,
-			}
-			for key, value := range sc.Overrides {
-				rawConfig[key] = value
-			}
-
-			configBytes, err := json.Marshal(rawConfig)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			cfg, err := s3cliconfig.NewFromReader(bytes.NewReader(configBytes))
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			s3Client, err := client.NewAwsS3Client(&cfg)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			blobstoreClient := client.New(s3Client, &cfg)
-			payload := bytes.NewReader(bytes.Repeat([]byte("a"), sc.Size))
-			if err := blobstoreClient.Put(payload, "blob"); err != nil {
-				t.Fatal(err)
-			}
-
-			assertChecksumProbe(t, sc.Name, fake.snapshot())
-
-			out, err := json.MarshalIndent(fake.snapshot(), "", "  ")
-			if err != nil {
-				t.Fatal(err)
-			}
-			t.Logf("\n%s", out)
-		})
-	}
+	put := findPutObject(t, requests)
+	assertSigV4Authorization(t, put)
+	assertHeader(t, put, headerContentEncoding, contentEncodingAWSChunked)
+	assertHeader(t, put, headerContentLength, "131117")
+	assertHeader(t, put, headerContentSHA256, streamingUnsignedPayloadTrailer)
+	assertHeader(t, put, headerDecodedContentLength, "131072")
+	assertHeader(t, put, headerTrailer, checksumTrailerCRC32)
+	assertBodyBytes(t, put, 131117)
 }
 
-func assertChecksumProbe(t *testing.T, scenario string, requests []capturedS3Request) {
-	t.Helper()
+func TestPutObjectWithChecksumsDisabledSendsPlainUnsignedPayload(t *testing.T) {
+	t.Parallel()
 
-	switch scenario {
-	case "single default checksum options":
-		if len(requests) != 1 {
-			t.Fatalf("expected one request, got %d", len(requests))
-		}
-		assertHeader(t, requests[0], "Content-Encoding", "aws-chunked")
-		assertHeader(t, requests[0], "X-Amz-Content-Sha256", "STREAMING-UNSIGNED-PAYLOAD-TRAILER")
-		assertHeader(t, requests[0], "X-Amz-Decoded-Content-Length", "131072")
-		assertHeader(t, requests[0], "X-Amz-Trailer", "x-amz-checksum-crc32")
+	requests := putToFakeS3(t, 128*1024, allChecksumOptionsDisabled())
+	assertRequestCount(t, requests, 1)
 
-	case "single all checksum options disabled":
-		if len(requests) != 1 {
-			t.Fatalf("expected one request, got %d", len(requests))
-		}
-		assertNoHeader(t, requests[0], "Content-Encoding")
-		assertNoHeader(t, requests[0], "X-Amz-Trailer")
-		assertNoHeader(t, requests[0], "X-Amz-Sdk-Checksum-Algorithm")
-		assertNoHeader(t, requests[0], "X-Amz-Checksum-Crc32")
-		assertHeader(t, requests[0], "Content-Length", "131072")
-		assertHeader(t, requests[0], "X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD")
-
-	case "multipart default checksum options":
-		assertMultipartChecksumEnabled(t, requests)
-
-	case "multipart client checksums disabled but uploader still enabled":
-		assertMultipartChecksumEnabled(t, requests)
-
-	case "multipart all checksum options disabled":
-		assertMultipartChecksumDisabled(t, requests)
-
-	default:
-		t.Fatalf("unknown scenario %q", scenario)
-	}
+	put := findPutObject(t, requests)
+	assertSigV4Authorization(t, put)
+	assertNoFlexibleChecksumHeaders(t, put)
+	assertHeader(t, put, headerContentLength, "131072")
+	assertHeader(t, put, headerContentSHA256, unsignedPayload)
+	assertBodyBytes(t, put, 131072)
 }
 
-func assertMultipartChecksumEnabled(t *testing.T, requests []capturedS3Request) {
-	t.Helper()
+func TestMultipartDefaultChecksumsUseCRC32ForCreateAndParts(t *testing.T) {
+	t.Parallel()
 
-	init := findRequest(t, requests, http.MethodPost, "uploads=")
-	assertHeader(t, init, "X-Amz-Checksum-Algorithm", "CRC32")
+	requests := putToFakeS3(t, 6*mib, nil)
+	assertRequestCount(t, requests, 4)
+
+	create := findCreateMultipartUpload(t, requests)
+	assertSigV4Authorization(t, create)
+	assertHeader(t, create, headerChecksumAlgorithm, checksumAlgorithmCRC32)
+	assertHeader(t, create, headerContentLength, "0")
+	assertBodyBytes(t, create, 0)
 
 	parts := findUploadParts(t, requests)
-	if len(parts) != 2 {
-		t.Fatalf("expected two UploadPart requests, got %d", len(parts))
-	}
+	assertUploadPartCount(t, parts, 2)
 	for _, part := range parts {
-		assertHeader(t, part, "Content-Encoding", "aws-chunked")
-		assertHeader(t, part, "X-Amz-Content-Sha256", "STREAMING-UNSIGNED-PAYLOAD-TRAILER")
-		assertHeader(t, part, "X-Amz-Sdk-Checksum-Algorithm", "CRC32")
-		assertHeader(t, part, "X-Amz-Trailer", "x-amz-checksum-crc32")
+		assertSigV4Authorization(t, part)
+		assertHeader(t, part, headerContentEncoding, contentEncodingAWSChunked)
+		assertHeader(t, part, headerContentSHA256, streamingUnsignedPayloadTrailer)
+		assertHeader(t, part, headerSDKChecksumAlgorithm, checksumAlgorithmCRC32)
+		assertHeader(t, part, headerTrailer, checksumTrailerCRC32)
 	}
+	assertUploadPartBodyBytes(t, parts, 5_242_926, 1_048_622)
+
+	complete := findCompleteMultipartUpload(t, requests)
+	assertSigV4Authorization(t, complete)
+	assertNoFlexibleChecksumHeaders(t, complete)
+	assertHeader(t, complete, headerContentLength, "235")
+	assertBodyBytes(t, complete, 235)
 }
 
-func assertMultipartChecksumDisabled(t *testing.T, requests []capturedS3Request) {
-	t.Helper()
+func TestMultipartStillUsesChecksumsWhenOnlyClientChecksumOptionsAreDisabled(t *testing.T) {
+	t.Parallel()
 
-	init := findRequest(t, requests, http.MethodPost, "uploads=")
-	assertNoHeader(t, init, "X-Amz-Checksum-Algorithm")
+	requests := putToFakeS3(t, 6*mib, clientChecksumOptionsDisabled())
+	assertRequestCount(t, requests, 4)
+
+	create := findCreateMultipartUpload(t, requests)
+	assertSigV4Authorization(t, create)
+	assertHeader(t, create, headerChecksumAlgorithm, checksumAlgorithmCRC32)
+	assertHeader(t, create, headerContentLength, "0")
+	assertBodyBytes(t, create, 0)
 
 	parts := findUploadParts(t, requests)
-	if len(parts) != 2 {
-		t.Fatalf("expected two UploadPart requests, got %d", len(parts))
-	}
+	assertUploadPartCount(t, parts, 2)
 	for _, part := range parts {
-		assertNoHeader(t, part, "Content-Encoding")
-		assertNoHeader(t, part, "X-Amz-Decoded-Content-Length")
-		assertNoHeader(t, part, "X-Amz-Sdk-Checksum-Algorithm")
-		assertNoHeader(t, part, "X-Amz-Trailer")
-		assertNoHeader(t, part, "X-Amz-Checksum-Crc32")
-		assertHeader(t, part, "X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD")
+		assertSigV4Authorization(t, part)
+		assertHeader(t, part, headerContentEncoding, contentEncodingAWSChunked)
+		assertHeader(t, part, headerContentSHA256, streamingUnsignedPayloadTrailer)
+		assertHeader(t, part, headerSDKChecksumAlgorithm, checksumAlgorithmCRC32)
+		assertHeader(t, part, headerTrailer, checksumTrailerCRC32)
+	}
+	assertUploadPartBodyBytes(t, parts, 5_242_926, 1_048_622)
+
+	complete := findCompleteMultipartUpload(t, requests)
+	assertSigV4Authorization(t, complete)
+	assertNoFlexibleChecksumHeaders(t, complete)
+	assertHeader(t, complete, headerContentLength, "235")
+	assertBodyBytes(t, complete, 235)
+}
+
+func TestMultipartWithAllChecksumOptionsDisabledSendsPlainUploadParts(t *testing.T) {
+	t.Parallel()
+
+	requests := putToFakeS3(t, 6*mib, allChecksumOptionsDisabled())
+	assertRequestCount(t, requests, 4)
+
+	create := findCreateMultipartUpload(t, requests)
+	assertSigV4Authorization(t, create)
+	assertNoFlexibleChecksumHeaders(t, create)
+	assertHeader(t, create, headerContentLength, "0")
+	assertBodyBytes(t, create, 0)
+
+	parts := findUploadParts(t, requests)
+	assertUploadPartCount(t, parts, 2)
+	for _, part := range parts {
+		assertSigV4Authorization(t, part)
+		assertNoFlexibleChecksumHeaders(t, part)
+		assertHeader(t, part, headerContentSHA256, unsignedPayload)
+	}
+	assertUploadPartBodyBytes(t, parts, 5_242_880, 1_048_576)
+
+	complete := findCompleteMultipartUpload(t, requests)
+	assertSigV4Authorization(t, complete)
+	assertNoFlexibleChecksumHeaders(t, complete)
+	assertHeader(t, complete, headerContentLength, "235")
+	assertBodyBytes(t, complete, 235)
+}
+
+const mib = 1024 * 1024
+
+func putToFakeS3(t *testing.T, size int, overrides map[string]any) []capturedS3Request {
+	t.Helper()
+
+	fake := &fakeS3Server{}
+	server := httptest.NewTLSServer(fake)
+	defer server.Close()
+
+	rawConfig := map[string]any{
+		"access_key_id":     "id",
+		"secret_access_key": "key",
+		"bucket_name":       "bucket",
+		"host":              server.URL,
+		"region":            "us-east-1",
+		"ssl_verify_peer":   false,
+	}
+	for key, value := range overrides {
+		rawConfig[key] = value
+	}
+
+	configBytes, err := json.Marshal(rawConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := s3cliconfig.NewFromReader(bytes.NewReader(configBytes))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s3Client, err := client.NewAwsS3Client(&cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	blobstoreClient := client.New(s3Client, &cfg)
+	payload := bytes.NewReader(bytes.Repeat([]byte("a"), size))
+	if err := blobstoreClient.Put(payload, "blob"); err != nil {
+		t.Fatal(err)
+	}
+
+	requests := fake.snapshot()
+	out, err := json.MarshalIndent(requests, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("\n%s", out)
+
+	return requests
+}
+
+func allChecksumOptionsDisabled() map[string]any {
+	return map[string]any{
+		"request_checksum_calculation_enabled":          false,
+		"response_checksum_calculation_enabled":         false,
+		"uploader_request_checksum_calculation_enabled": false,
 	}
 }
 
-func findRequest(t *testing.T, requests []capturedS3Request, method string, queryContains string) capturedS3Request {
-	t.Helper()
-	for _, request := range requests {
-		if request.Method == method && strings.Contains(request.Query, queryContains) {
-			return request
-		}
+func clientChecksumOptionsDisabled() map[string]any {
+	return map[string]any{
+		"request_checksum_calculation_enabled":  false,
+		"response_checksum_calculation_enabled": false,
 	}
-	t.Fatalf("missing request method=%s query containing %q", method, queryContains)
-	return capturedS3Request{}
+}
+
+func findPutObject(t *testing.T, requests []capturedS3Request) capturedS3Request {
+	t.Helper()
+	return findOneRequest(t, requests, "PutObject", func(request capturedS3Request) bool {
+		return request.Method == http.MethodPut && strings.Contains(request.Query, "x-id=PutObject")
+	})
+}
+
+func findCreateMultipartUpload(t *testing.T, requests []capturedS3Request) capturedS3Request {
+	t.Helper()
+	return findOneRequest(t, requests, "CreateMultipartUpload", func(request capturedS3Request) bool {
+		return request.Method == http.MethodPost && strings.Contains(request.Query, "uploads=")
+	})
+}
+
+func findCompleteMultipartUpload(t *testing.T, requests []capturedS3Request) capturedS3Request {
+	t.Helper()
+	return findOneRequest(t, requests, "CompleteMultipartUpload", func(request capturedS3Request) bool {
+		return request.Method == http.MethodPost && strings.Contains(request.Query, "uploadId=upload-1")
+	})
 }
 
 func findUploadParts(t *testing.T, requests []capturedS3Request) []capturedS3Request {
 	t.Helper()
+
 	var parts []capturedS3Request
 	for _, request := range requests {
 		if request.Method == http.MethodPut && strings.Contains(request.Query, "partNumber=") {
@@ -286,6 +328,88 @@ func findUploadParts(t *testing.T, requests []capturedS3Request) []capturedS3Req
 		}
 	}
 	return parts
+}
+
+func findOneRequest(t *testing.T, requests []capturedS3Request, label string, matches func(capturedS3Request) bool) capturedS3Request {
+	t.Helper()
+
+	var found []capturedS3Request
+	for _, request := range requests {
+		if matches(request) {
+			found = append(found, request)
+		}
+	}
+	if len(found) != 1 {
+		t.Fatalf("%s: expected exactly one matching request, got %d", label, len(found))
+	}
+	return found[0]
+}
+
+func assertRequestCount(t *testing.T, requests []capturedS3Request, want int) {
+	t.Helper()
+	if len(requests) != want {
+		t.Fatalf("expected %d request(s), got %d", want, len(requests))
+	}
+}
+
+func assertUploadPartCount(t *testing.T, parts []capturedS3Request, want int) {
+	t.Helper()
+	if len(parts) != want {
+		t.Fatalf("expected %d UploadPart request(s), got %d", want, len(parts))
+	}
+}
+
+func assertUploadPartBodyBytes(t *testing.T, parts []capturedS3Request, expected ...int) {
+	t.Helper()
+
+	remaining := append([]int(nil), expected...)
+	for _, part := range parts {
+		var matched bool
+		for i, size := range remaining {
+			if part.BodyBytes == size {
+				remaining = append(remaining[:i], remaining[i+1:]...)
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			t.Fatalf("UploadPart %s?%s: unexpected body byte count %d, remaining expected values %v",
+				part.Method, part.Query, part.BodyBytes, remaining)
+		}
+	}
+
+	if len(remaining) != 0 {
+		t.Fatalf("expected UploadPart body byte count(s) not observed: %v", remaining)
+	}
+}
+
+func assertNoFlexibleChecksumHeaders(t *testing.T, request capturedS3Request) {
+	t.Helper()
+
+	assertNoHeader(t, request, headerContentEncoding)
+	assertNoHeader(t, request, headerChecksumAlgorithm)
+	assertNoHeader(t, request, headerDecodedContentLength)
+	assertNoHeader(t, request, headerSDKChecksumAlgorithm)
+	assertNoHeader(t, request, headerTrailer)
+	assertNoHeader(t, request, headerChecksumCRC32)
+}
+
+func assertBodyBytes(t *testing.T, request capturedS3Request, want int) {
+	t.Helper()
+	if request.BodyBytes != want {
+		t.Fatalf("%s %s?%s: expected %d body bytes, got %d", request.Method, request.Path, request.Query, want, request.BodyBytes)
+	}
+}
+
+func assertSigV4Authorization(t *testing.T, request capturedS3Request) {
+	t.Helper()
+	values := request.Headers[headerAuthorization]
+	for _, value := range values {
+		if strings.HasPrefix(value, sigV4AuthorizationPrefix) {
+			return
+		}
+	}
+	t.Fatalf("%s %s?%s: expected SigV4 authorization, got %v", request.Method, request.Path, request.Query, values)
 }
 
 func assertHeader(t *testing.T, request capturedS3Request, key string, want string) {
