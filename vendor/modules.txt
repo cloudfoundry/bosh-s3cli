@@ -137,7 +137,7 @@ github.com/aws/smithy-go/tracing
 github.com/aws/smithy-go/transport/http
 github.com/aws/smithy-go/transport/http/internal/io
 github.com/aws/smithy-go/waiter
-# github.com/cloudfoundry/bosh-utils v0.0.609
+# github.com/cloudfoundry/bosh-utils v0.0.611
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -173,8 +173,6 @@ github.com/jpillora/backoff
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
-# github.com/nxadm/tail v1.4.8
-## explicit; go 1.13
 # github.com/onsi/ginkgo/v2 v2.28.3
 ## explicit; go 1.25.0
 github.com/onsi/ginkgo/v2
@@ -214,9 +212,6 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/pivotal-cf/paraphernalia v0.0.0-20180203224945-a64ae2051c20
-## explicit
-github.com/pivotal-cf/paraphernalia/secure/tlsconfig
 # go.yaml.in/yaml/v3 v3.0.4
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
