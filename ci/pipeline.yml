@@ -5,11 +5,11 @@ jobs:
   plan:
   - get: bosh-s3cli
     trigger: true
-  - get: s3cli-docker-image
+  - get: s3cli-registry-image
     trigger: true
   - task: test
     file: bosh-s3cli/ci/tasks/run-unit.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
 
 - name: aws-s3-us-integration
   serial: true
@@ -17,13 +17,13 @@ jobs:
   - get: bosh-s3cli
     passed: [ unit ]
     trigger: true
-  - get: s3cli-docker-image
+  - get: s3cli-registry-image
     trigger: true
     passed:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     params: &aws-us-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -32,14 +32,14 @@ jobs:
 
   - in_parallel:
     - task: test-static-credentials
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       file: bosh-s3cli/ci/tasks/run-integration-aws.yml
       params:
         <<: *aws-us-infrastructure-params
         focus_regex: "GENERAL AWS|AWS V2 REGION|AWS V4 REGION|AWS US-EAST-1"
         s3_endpoint_host: s3.amazonaws.com
     - task: test-assume-roles
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       file: bosh-s3cli/ci/tasks/run-integration-aws-assume.yml
       params:
         access_key_id: ((bosh_s3cli_pipeline.username))
@@ -48,7 +48,7 @@ jobs:
         focus_regex: "AWS ASSUME ROLE"
         s3_endpoint_host: s3.amazonaws.com
     - task: test-env-or-profile
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       file: bosh-s3cli/ci/tasks/run-integration-aws-iam.yml
       params:
         <<: *aws-us-infrastructure-params
@@ -56,7 +56,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       params: *aws-us-infrastructure-params
 
 - name: aws-s3-public-read-integration
@@ -65,13 +65,13 @@ jobs:
   - get: bosh-s3cli
     passed: [ unit ]
     trigger: true
-  - get: s3cli-docker-image
+  - get: s3cli-registry-image
     trigger: true
     passed:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     params: &aws-us-public-read-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -79,7 +79,7 @@ jobs:
       stack_name: s3cli-public-bucket
 
   - task: test
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     file: bosh-s3cli/ci/tasks/run-integration-aws.yml
     params:
       <<: *aws-us-public-read-infrastructure-params
@@ -87,7 +87,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       params: *aws-us-public-read-infrastructure-params
 
 - name: aws-s3-frankfurt-integration
@@ -96,13 +96,13 @@ jobs:
   - get: bosh-s3cli
     passed: [ unit ]
     trigger: true
-  - get: s3cli-docker-image
+  - get: s3cli-registry-image
     trigger: true
     passed:
     - unit
   - task: setup
     file: bosh-s3cli/ci/tasks/setup-aws-infrastructure.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     params: &aws-frankfurt-infrastructure-params
       access_key_id: ((bosh_s3cli_pipeline.username))
       secret_access_key: ((bosh_s3cli_pipeline.password))
@@ -111,7 +111,7 @@ jobs:
 
   - task: test
     file: bosh-s3cli/ci/tasks/run-integration-aws.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     params:
       <<: *aws-frankfurt-infrastructure-params
       focus_regex: "GENERAL AWS|AWS V4 REGION|AWS V4 ONLY REGION"
@@ -119,7 +119,7 @@ jobs:
     ensure:
       task: teardown
       file: bosh-s3cli/ci/tasks/teardown-infrastructure.yml
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       params: *aws-frankfurt-infrastructure-params
 
 - name: gcs-s3-compatible-integration
@@ -128,12 +128,12 @@ jobs:
   - get: bosh-s3cli
     passed: [ unit ]
     trigger: true
-  - get: s3cli-docker-image
+  - get: s3cli-registry-image
     trigger: true
     passed:
     - unit
   - task: test
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     file: bosh-s3cli/ci/tasks/run-integration-s3-compat.yml
     params:
       access_key_id: ((bosh_s3cli_pipeline_gcp.username))
@@ -152,7 +152,7 @@ jobs:
       - aws-s3-frankfurt-integration
       - aws-s3-public-read-integration
       - gcs-s3-compatible-integration
-    - get: s3cli-docker-image
+    - get: s3cli-registry-image
       trigger: true
       passed:
       - aws-s3-us-integration
@@ -164,13 +164,13 @@ jobs:
         bump: patch
   - in_parallel:
     - task: build-linux
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       file: bosh-s3cli/ci/tasks/build.yml
       output_mapping: { out: out-linux }
       params:
         GOOS: linux
     - task: build-windows
-      image: s3cli-docker-image
+      image: s3cli-registry-image
       file: bosh-s3cli/ci/tasks/build.yml
       output_mapping: { out: out-windows }
       params:
@@ -187,27 +187,40 @@ jobs:
       tag: version-semver/number
       tag_prefix: v
 
-- name: build-s3cli-docker-image
+- name: build-s3cli-registry-image
   plan:
   - get: bosh-s3cli
     resource: bosh-s3cli-for-docker-image-creation
     trigger: true
   - get: bosh-golang-release-image
     trigger: true
-  - put: s3cli-docker-image
+  - task: build-image
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: concourse/oci-build-task
+      inputs:
+        - name: bosh-s3cli
+      outputs:
+        - name: image
+      params:
+        CONTEXT: bosh-s3cli/ci/docker/boshcpi.s3cli
+      run:
+        path: build
+  - put: s3cli-registry-image
+    no_get: true
     params:
-      build: "bosh-s3cli/ci/docker/boshcpi.s3cli"
-      labels:
-        org.opencontainers.image.source: https://github.com/cloudfoundry/bosh-s3cli
-    get_params:
-      skip_download: true
+      image: image/image.tar
 
 - name: bump-deps
   plan:
   - in_parallel:
     - get: bosh-s3cli
     - get: golang-release
-    - get: s3cli-docker-image
+    - get: s3cli-registry-image
     - get: weekly
       trigger: true
   - task: bump-deps
@@ -218,7 +231,7 @@ jobs:
       output_repo: bumped-bosh-s3cli
   - task: test
     file: bosh-s3cli/ci/tasks/run-unit.yml
-    image: s3cli-docker-image
+    image: s3cli-registry-image
     input_mapping:
       bosh-s3cli: bumped-bosh-s3cli
   - put: bosh-s3cli
@@ -273,16 +286,18 @@ resources:
     secret_access_key: ((bosh_s3cli_pipeline.password))
 
 - name: bosh-golang-release-image
-  type: docker-image
+  type: registry-image
   source:
     repository: ghcr.io/cloudfoundry/bosh/golang-release
+    tag: latest
     username: ((github_read_write_packages.username))
     password: ((github_read_write_packages.password))
 
-- name: s3cli-docker-image
-  type: docker-image
+- name: s3cli-registry-image
+  type: registry-image
   source:
     repository: ghcr.io/cloudfoundry/bosh/s3cli
+    tag: latest
     username: ((github_read_write_packages.username))
     password: ((github_read_write_packages.password))
 
