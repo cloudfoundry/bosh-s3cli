@@ -88,6 +88,18 @@ var _ = Describe("BlobstoreClient configuration", func() {
 				})
 			})
 
+			Context("when a non-AWS custom host is set but no region (S3-compatible provider)", func() {
+				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "my-dell-s3.example.com"}`)
+				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
+
+				It("defaults region to us-east-1 for S3-compatible SDK initialization", func() {
+					c, err := config.NewFromReader(dummyJSONReader)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(c.Host).To(Equal("my-dell-s3.example.com"))
+					Expect(c.Region).To(Equal("us-east-1"))
+				})
+			})
+
 			Context("when AWS host and region have been set", func() {
 				dummyJSONBytes := []byte(`{"access_key_id": "id", "secret_access_key": "key", "bucket_name": "some-bucket", "host": "s3.amazonaws.com", "region": "us-west-1"}`)
 				dummyJSONReader := bytes.NewReader(dummyJSONBytes)
@@ -240,7 +252,7 @@ var _ = Describe("BlobstoreClient configuration", func() {
 					"access_key_id":      "id",
 					"secret_access_key":  "key",
 					"bucket_name":        "some-bucket",
-					"host": 	      "storage.googleapis.com"
+					"host":               "my-s3-compatible.example.com"
 				}`)
 
 				configReader := bytes.NewReader(configBytes)
