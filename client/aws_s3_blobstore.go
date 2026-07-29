@@ -91,12 +91,6 @@ func (b *awsS3Client) Put(src io.ReadSeeker, dest string) error {
 				u.PartSize = defaultTransferPartSize
 			}
 		}
-
-		if cfg.ShouldDisableUploaderRequestChecksumCalculation() {
-			// Disable checksum calculation for Alicloud OSS (Object Storage Service)
-			// Alicloud doesn't support AWS chunked encoding with checksum calculation
-			u.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
-		}
 	})
 	uploadInput := &s3.PutObjectInput{
 		Body:   src,

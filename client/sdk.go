@@ -67,14 +67,6 @@ func NewAwsS3ClientWithApiOptions(
 		awsConfig.Credentials = aws.NewCredentialsCache(provider)
 	}
 
-	if c.ShouldDisableRequestChecksumCalculation() {
-		awsConfig.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
-	}
-
-	if c.ShouldDisableResponseChecksumCalculation() {
-		awsConfig.ResponseChecksumValidation = aws.ResponseChecksumValidationWhenRequired
-	}
-
 	s3Client := s3.NewFromConfig(awsConfig, func(o *s3.Options) {
 		o.UsePathStyle = !c.HostStyle
 		if endpoint := c.S3Endpoint(); endpoint != "" {

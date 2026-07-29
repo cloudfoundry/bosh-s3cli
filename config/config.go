@@ -10,26 +10,23 @@ import (
 
 // The S3Cli represents configuration for the s3cli
 type S3Cli struct {
-	AccessKeyID                               string `json:"access_key_id"`
-	SecretAccessKey                           string `json:"secret_access_key"`
-	BucketName                                string `json:"bucket_name"`
-	FolderName                                string `json:"folder_name"`
-	CredentialsSource                         string `json:"credentials_source"`
-	Host                                      string `json:"host"`
-	Port                                      int    `json:"port"` // 0 means no custom port
-	Region                                    string `json:"region"`
-	SSLVerifyPeer                             bool   `json:"ssl_verify_peer"`
-	UseSSL                                    bool   `json:"use_ssl"`
-	ServerSideEncryption                      string `json:"server_side_encryption"`
-	SSEKMSKeyID                               string `json:"sse_kms_key_id"`
-	AssumeRoleArn                             string `json:"assume_role_arn"`
-	MultipartUpload                           bool   `json:"multipart_upload"`
-	HostStyle                                 bool   `json:"host_style"`
-	SwiftAuthAccount                          string `json:"swift_auth_account"`
-	SwiftTempURLKey                           string `json:"swift_temp_url_key"`
-	RequestChecksumCalculationEnabled         bool   `json:"request_checksum_calculation_enabled"`
-	ResponseChecksumCalculationEnabled        bool   `json:"response_checksum_calculation_enabled"`
-	UploaderRequestChecksumCalculationEnabled bool   `json:"uploader_request_checksum_calculation_enabled"`
+	AccessKeyID          string `json:"access_key_id"`
+	SecretAccessKey      string `json:"secret_access_key"`
+	BucketName           string `json:"bucket_name"`
+	FolderName           string `json:"folder_name"`
+	CredentialsSource    string `json:"credentials_source"`
+	Host                 string `json:"host"`
+	Port                 int    `json:"port"` // 0 means no custom port
+	Region               string `json:"region"`
+	SSLVerifyPeer        bool   `json:"ssl_verify_peer"`
+	UseSSL               bool   `json:"use_ssl"`
+	ServerSideEncryption string `json:"server_side_encryption"`
+	SSEKMSKeyID          string `json:"sse_kms_key_id"`
+	AssumeRoleArn        string `json:"assume_role_arn"`
+	MultipartUpload      bool   `json:"multipart_upload"`
+	HostStyle            bool   `json:"host_style"`
+	SwiftAuthAccount     string `json:"swift_auth_account"`
+	SwiftTempURLKey      string `json:"swift_temp_url_key"`
 	// Optional knobs to tune transfer performance.
 	// If zero, the client will apply sensible defaults (handled by the S3 client layer).
 	// Part size values are provided in bytes.
@@ -76,12 +73,9 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 	}
 
 	c := S3Cli{
-		SSLVerifyPeer:                             true,
-		UseSSL:                                    true,
-		MultipartUpload:                           true,
-		RequestChecksumCalculationEnabled:         true,
-		ResponseChecksumCalculationEnabled:        true,
-		UploaderRequestChecksumCalculationEnabled: true,
+		SSLVerifyPeer:   true,
+		UseSSL:          true,
+		MultipartUpload: true,
 	}
 
 	err = json.Unmarshal(bytes, &c)
@@ -132,8 +126,6 @@ func NewFromReader(reader io.Reader) (S3Cli, error) {
 		c.configureAlicloud()
 	case "google":
 		c.configureGoogle()
-	case "gdch":
-		c.configureGDCH()
 	default:
 		c.configureDefault()
 	}
@@ -173,22 +165,13 @@ func (c *S3Cli) configureAlicloud() {
 	if c.Region == "" {
 		c.Region = AlicloudHostToRegion(c.Host)
 	}
-	c.RequestChecksumCalculationEnabled = false
-	c.UploaderRequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureGoogle() {
 	c.MultipartUpload = false
-	c.RequestChecksumCalculationEnabled = false
 	if c.Region == "" {
 		c.Region = defaultGoogleRegion
 	}
-}
-
-func (c *S3Cli) configureGDCH() {
-	c.RequestChecksumCalculationEnabled = false
-	c.ResponseChecksumCalculationEnabled = false
-	c.UploaderRequestChecksumCalculationEnabled = false
 }
 
 func (c *S3Cli) configureDefault() {
@@ -216,16 +199,4 @@ func (c *S3Cli) S3Endpoint() string {
 
 func (c *S3Cli) IsGoogle() bool {
 	return Provider(c.Host) == "google"
-}
-
-func (c *S3Cli) ShouldDisableRequestChecksumCalculation() bool {
-	return !c.RequestChecksumCalculationEnabled
-}
-
-func (c *S3Cli) ShouldDisableResponseChecksumCalculation() bool {
-	return !c.ResponseChecksumCalculationEnabled
-}
-
-func (c *S3Cli) ShouldDisableUploaderRequestChecksumCalculation() bool {
-	return !c.UploaderRequestChecksumCalculationEnabled
 }

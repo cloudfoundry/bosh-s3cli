@@ -36,10 +36,7 @@ Given a JSON config file (`config.json`)...
   "server_side_encryption":                         "<string> (optional)",
   "sse_kms_key_id":                                 "<string> (optional)",
   "multipart_upload":                               "<bool> (optional - default: true)",
-  "request_checksum_calculation_enabled":           "<bool> (optional - default: true)",
-  "response_checksum_calculation_enabled":          "<bool> (optional - default: true)",
-  "uploader_request_checksum_calculation_enabled":  "<bool> (optional - default: true)"
-  
+
   "download_concurrency":                           "<int> (optional - default: 5)",
   "download_part_size":                             "<int64> (optional - default: 5242880) # 5 MB",
   "upload_concurrency":                             "<int> (optional - default: 5)",
