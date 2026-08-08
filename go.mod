@@ -6,11 +6,11 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.43.4
 	github.com/aws/aws-sdk-go-v2/config v1.32.35
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.34
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.40
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.5
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.41
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.4
-	github.com/aws/smithy-go v1.27.6
-	github.com/cloudfoundry/bosh-utils v0.0.630
+	github.com/aws/smithy-go v1.27.7
+	github.com/cloudfoundry/bosh-utils v0.0.631
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
 )
@@ -31,7 +31,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.33.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.38.4 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 // indirect
-	github.com/cloudfoundry/socks5-proxy v0.2.183 // indirect
+	github.com/cloudfoundry/socks5-proxy v0.2.184 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect

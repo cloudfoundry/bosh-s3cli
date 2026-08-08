@@ -53,7 +53,7 @@ github.com/aws/aws-sdk-go-v2/credentials/stscreds
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/config
-# github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.40
+# github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.41
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/feature/s3/manager
 # github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.35
@@ -81,7 +81,7 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared/arn
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared/config
-# github.com/aws/aws-sdk-go-v2/service/s3 v1.106.5
+# github.com/aws/aws-sdk-go-v2/service/s3 v1.107.0
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/s3
 github.com/aws/aws-sdk-go-v2/service/s3/internal/arn
@@ -108,7 +108,7 @@ github.com/aws/aws-sdk-go-v2/service/ssooidc/types
 github.com/aws/aws-sdk-go-v2/service/sts
 github.com/aws/aws-sdk-go-v2/service/sts/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/sts/types
-# github.com/aws/smithy-go v1.27.6
+# github.com/aws/smithy-go v1.27.7
 ## explicit; go 1.24
 github.com/aws/smithy-go
 github.com/aws/smithy-go/auth
@@ -140,7 +140,7 @@ github.com/aws/smithy-go/traits
 github.com/aws/smithy-go/transport/http
 github.com/aws/smithy-go/transport/http/internal/io
 github.com/aws/smithy-go/waiter
-# github.com/cloudfoundry/bosh-utils v0.0.630
+# github.com/cloudfoundry/bosh-utils v0.0.631
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/httpclient
@@ -150,7 +150,7 @@ github.com/cloudfoundry/bosh-utils/uuid
 # github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.183
+# github.com/cloudfoundry/socks5-proxy v0.2.184
 ## explicit; go 1.25.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/go-logr/logr v1.4.4
