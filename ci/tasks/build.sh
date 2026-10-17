@@ -25,6 +25,10 @@ if [ "${GOOS}" = "windows" ]; then
 fi
 
 pushd "${release_dir}" > /dev/null
+  if [ -d .git ] && command -v git >/dev/null; then
+    git tag -f "v${semver#v}" || true
+  fi
+
   echo -e "\n building artifact with $(go version)..."
   go build -ldflags "-X main.version=${semver}" \
     -o "out/${binname}"                          \
